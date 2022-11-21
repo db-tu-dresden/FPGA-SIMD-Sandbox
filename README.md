@@ -16,3 +16,6 @@
 - Connect to FPGA
 (a) `source /data/intel_fpga/devcloudLoginToolSetup.sh`
 (b) `devcloud_login`
+
+- Run
+`./main.fpga`
