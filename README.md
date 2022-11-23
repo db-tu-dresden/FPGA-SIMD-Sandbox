@@ -2,7 +2,7 @@
 
 ## Emulator
 (1) Build
-`./build_fpga_emu.sh`
+`qsub -l nodes=1:fpga_compile:ppn=2 -d . build_fpga_emu.sh -l walltime=23:00:00`
 
 (2) Execute
 `./main.fpga_emu`
