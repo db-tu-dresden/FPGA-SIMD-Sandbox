@@ -1,0 +1,97 @@
+
+########################################################################
+#      Date:           Thu 01 Dec 2022 02:33:31 PM PST
+#    Job ID:           2067580.v-qsvr-1.aidevcloud
+#      User:           u177951
+# Resources:           cput=35:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:00:00
+########################################################################
+
+ 
+:: initializing oneAPI environment ...
+   2067580.v-qsvr-1.aidevcloud.SC: BASH_VERSION = 5.0.17(1)-release
+   args: Using "$@" for setvars.sh arguments: 
+:: advisor -- latest
+:: ccl -- latest
+:: clck -- latest
+:: compiler -- latest
+:: dal -- latest
+:: debugger -- latest
+:: dev-utilities -- latest
+:: dnnl -- latest
+:: dpcpp-ct -- latest
+:: dpl -- latest
+:: embree -- latest
+:: inspector -- latest
+:: intelpython -- latest
+:: ipp -- latest
+:: ippcp -- latest
+:: ipp -- latest
+:: ispc -- latest
+:: itac -- latest
+:: mkl -- latest
+:: modelzoo -- latest
+:: modin -- latest
+:: mpi -- latest
+:: neural-compressor -- latest
+:: oidn -- latest
+:: openvkl -- latest
+:: ospray -- latest
+:: ospray_studio -- latest
+:: pytorch -- latest
+:: rkcommon -- latest
+:: rkutil -- latest
+:: tbb -- latest
+:: tensorflow -- latest
+:: vpl -- latest
+:: vtune -- latest
+:: oneAPI environment initialized ::
+ 
+ 
+:: initializing oneAPI environment ...
+   2067580.v-qsvr-1.aidevcloud.SC: BASH_VERSION = 5.0.17(1)-release
+   args: Using "$@" for setvars.sh arguments: --force
+:: advisor -- latest
+:: ccl -- latest
+:: clck -- latest
+:: compiler -- latest
+:: dal -- latest
+:: debugger -- latest
+:: dev-utilities -- latest
+:: dnnl -- latest
+:: dpcpp-ct -- latest
+:: dpl -- latest
+:: embree -- latest
+:: inspector -- latest
+:: intelpython -- latest
+:: ipp -- latest
+:: ippcp -- latest
+:: ipp -- latest
+:: ispc -- latest
+:: itac -- latest
+:: mkl -- latest
+:: modelzoo -- latest
+:: modin -- latest
+:: mpi -- latest
+:: neural-compressor -- latest
+:: oidn -- latest
+:: openvkl -- latest
+:: ospray -- latest
+:: ospray_studio -- latest
+:: pytorch -- latest
+:: rkcommon -- latest
+:: rkutil -- latest
+:: tbb -- latest
+:: tensorflow -- latest
+:: vpl -- latest
+:: vtune -- latest
+:: oneAPI environment initialized ::
+ 
+dpcpp -Wall  -v -fintelfpga -Xshardware -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga kernels.cpp main.cpp  
+warning: -reuse-exe file 'main.fpga' not found; ignored
+aoc: Compiling for FPGA. This process may take several hours to complete.  Prior to performing this compile, be sure to check the reports to ensure the design will meet your performance targets.  If the reports indicate performance targets are not being met, code edits may be required.  Please refer to the oneAPI FPGA Optimization Guide for information on performance tuning applications for FPGAs.
+
+########################################################################
+# End of output for job 2067580.v-qsvr-1.aidevcloud
+# Date: Thu 01 Dec 2022 04:36:05 PM PST
+########################################################################
+
