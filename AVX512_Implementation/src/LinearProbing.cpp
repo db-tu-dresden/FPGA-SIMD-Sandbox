@@ -53,25 +53,39 @@ int vectorizedLinearProbing(unsigned int arr[], int dataSize) {
     
     /* 
      * create two vector to realize Hashmap
-     * hasVect store value of k at position hash(k)
-     * countVect store the count of occurence of k at position hash(k)
+     * hasVec store value of k at position hash(k)
+     * countVec store the count of occurence of k at position hash(k)
      * calloc : allocate memory and initialize all elements with '0'
      */
-    unsigned int *hashVect = (unsigned int *)calloc((((unsigned long)((unsigned int)1300000077*dataSize)* HSIZE)>>32),sizeof(unsigned int));
-    unsigned int *countVect = (unsigned int *)calloc((((unsigned long)((unsigned int)1300000077*dataSize)* HSIZE)>>32),sizeof(unsigned int));
+    unsigned int *hashVec = (unsigned int *)calloc((((unsigned long)((unsigned int)1300000077*dataSize)* HSIZE)>>32),sizeof(unsigned int));
+    unsigned int *countVec = (unsigned int *)calloc((((unsigned long)((unsigned int)1300000077*dataSize)* HSIZE)>>32),sizeof(unsigned int));
 
     /* Insert the first element in the empty hashmap.
      * Since the data structures have only just been initialized,
      * the first element can be inserted directly
      */ 
     int i = 0;
-    hashVect[hash(arr[i])] = arr[i];
-    countVect[hash(arr[i])] = countVect[hash(arr[i])] + 1;
+    hashVec[hash(arr[i])] = arr[i];
+    countVec[hash(arr[i])] = countVec[hash(arr[i])] + 1;
 
     // do the following commands for every element of arr[]
     for(i=1;i<dataSize; i+=1){
+        // broadcast element i of arr[] to vector of type __m512i
+        // broadcastCurrentValue contains sixteen times value of arr[i]
         __m512i broadcastCurrentValue = _mm512_set1_epi32(arr[i]);
-        print512_num(broadcastCurrentValue);
+
+        // Load a vector of the type__m512i with the following addresses, 
+        // starting from the start position hashVec[hash(arr[i])]
+        // __m512i followingHashVecAdresses = _mm512_loadu_epi32(&hashVec[hash(arr[i])]);
+        // print512_num(followingHashVecAdresses);
+
+        // load the following elements of HashVec using the memory addresses from followingHashVecAdresses
+        // __m512i followingHashVecElements
+
+        // compare vector with broadcast value against vector with following elements for equality
+        // __mmask16 compareRes = _mm512_cmpneq_epi32_mask(broadcastCurrentValue, followingHashVecElements);
+
+        // case distinction regarding the content of the mask compareRes
 
 
         // DELETE THIS BREAK - ONLY FOR TESTING!!
@@ -79,7 +93,7 @@ int vectorizedLinearProbing(unsigned int arr[], int dataSize) {
     }
 
 
-/*
+/* DELETE !!
     printf("element 1: %i \n", arr[1]); 
     printf("hash of element 1: %i \n", hash(arr[1])); 
     printf("hash of element 1: %i \n", 1300000077*arr[1]* HSIZE); 
