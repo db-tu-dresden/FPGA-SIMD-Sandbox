@@ -33,8 +33,27 @@ unsigned int hash(int key) {
 void print512_num(__m512i var) {
     uint32_t val[16];
     memcpy(val, &var, sizeof(val));
-    printf("Numerical: %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i \n", 
+    printf("Content of __m512i Array: %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i \n", 
            val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8], val[9], val[10], val[11], val[12], val[13], val[14], val[15]);
+}
+
+/* 
+ * function to print an integer in bit-wise notation 
+ * Assumes little endian
+ * print-result:    p16, p15, p14, p13, p12, p11, p10, p09, p08, p07, p06, p05, p04, p03, p02, p01
+ */
+void printBits(size_t const size, void const * const ptr) {
+    unsigned char *b = (unsigned char*) ptr;
+    unsigned char byte;
+    int i, j;
+    
+    for (i = size-1; i >= 0; i--) {
+        for (j = 7; j >= 0; j--) {
+            byte = (b[i] >> j) & 1;
+            printf("%u ", byte);
+        }
+    }
+    puts("");
 }
 
 /*
@@ -50,7 +69,9 @@ int vectorizedLinearProbing(unsigned int arr[], int dataSize) {
     printf("element [1] of vector: %i \n", arr[1]); 
 
     // start of algorithm logic
-    
+    __mmask16 oneMask = (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+    __m512i zeroM512iArray = _mm512_setzero_epi32();
+
     /* 
      * create two vector to realize Hashmap
      * hasVec store value of k at position hash(k)
@@ -73,38 +94,35 @@ int vectorizedLinearProbing(unsigned int arr[], int dataSize) {
         // broadcast element i of arr[] to vector of type __m512i
         // broadcastCurrentValue contains sixteen times value of arr[i]
         __m512i broadcastCurrentValue = _mm512_set1_epi32(arr[i]);
+print512_num(broadcastCurrentValue);
 
         // Load a vector of the type__m512i with the following addresses, 
         // starting from the start position hashVec[hash(arr[i])]
-        // __m512i followingHashVecAdresses = _mm512_loadu_epi32(&hashVec[hash(arr[i])]);
-        // print512_num(followingHashVecAdresses);
-
         // load the following elements of HashVec using the memory addresses from followingHashVecAdresses
-        // __m512i followingHashVecElements
+        __m512i followingHashVecAdresses = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &hashVec[hash(arr[i])]);
+print512_num(followingHashVecAdresses);
 
         // compare vector with broadcast value against vector with following elements for equality
-        // __mmask16 compareRes = _mm512_cmpneq_epi32_mask(broadcastCurrentValue, followingHashVecElements);
+        __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, followingHashVecAdresses);
+printBits(sizeof(compareRes), &compareRes);
 
         // case distinction regarding the content of the mask compareRes
 
 
         // DELETE THIS BREAK - ONLY FOR TESTING!!
-        break;
+        //break;
     }
 
 
-/* DELETE !!
-    printf("element 1: %i \n", arr[1]); 
-    printf("hash of element 1: %i \n", hash(arr[1])); 
-    printf("hash of element 1: %i \n", 1300000077*arr[1]* HSIZE); 
-    printf("element 2: %i \n", arr[2]); 
-    printf("hash of element 2: %i \n", hash(arr[2])); 
-    printf("hash of element 2: %i \n", 1300000077*arr[2]* HSIZE); 
-    printf("element 3: %i \n", arr[3]); 
-    printf("hash of element 3: %i \n", hash(arr[3])); 
-    printf("hash of element 3: %i \n", 1300000077*arr[3]* HSIZE); 
-*/
-    // __m512i zero = _mm512_setzero_epi32();
-    // print512_num(zero);
+
+
+
+    
+
+    /* 
+     * TODO :   implement error-handling: 
+     *          return 1 if the program ends without errors 
+     *          return 0 if an error has occurred       
+     */
     return 1;
 }
