@@ -49,6 +49,10 @@ void generateData() {
         int currentValue = arr[i];
         countArrayForComparison[currentValue-1] = countArrayForComparison[currentValue-1] + 1;
     }
+// DELETE - only for testing
+arr[0] = 2;
+arr[1] = 2;
+arr[2] = 2;
 }
 
 /*
