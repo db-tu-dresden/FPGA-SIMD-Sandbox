@@ -96,28 +96,68 @@ int vectorizedLinearProbing(unsigned int arr[], int dataSize) {
         __m512i broadcastCurrentValue = _mm512_set1_epi32(arr[i]);
 print512_num(broadcastCurrentValue);
 
-        // Load a vector of the type__m512i with the following addresses, 
-        // starting from the start position hashVec[hash(arr[i])]
-        // load the following elements of HashVec using the memory addresses from followingHashVecAdresses
-        __m512i followingHashVecAdresses = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &hashVec[hash(arr[i])]);
-print512_num(followingHashVecAdresses);
+        /*
+         * Load a vector of the type__m512i with the following addresses, 
+         * starting from the start position hashVec[hash(arr[i])]
+         * load the following elements of HashVec using the memory addresses from nextHashVecElements ()
+         * realized here in one step, variable "nextHashVecElements" does not exist
+         */
+        __m512i nextHashVecElements = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &hashVec[hash(arr[i])]);
+print512_num(nextHashVecElements);
 
         // compare vector with broadcast value against vector with following elements for equality
-        __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, followingHashVecAdresses);
+        __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, nextHashVecElements);
 printBits(sizeof(compareRes), &compareRes);
 
-        // case distinction regarding the content of the mask compareRes
+        /*
+         * case distinction regarding the content of the mask "compareRes"
+         *
+         * case "a":
+         * if compareRes != 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 --> identical value found (compared to broadcastCurrentValue).
+         * --> Determine the position in hashVec[] (where the value is stored) and 
+         * add +1 to the current count at this position in countVec 
+         * (value has already been recorded, number must be increased)
+         *
+         * case "b":
+         * if compareRes = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  --> value from "broadcastCurrentValue" not found in current set
+         * case "b1": compare to zero: if result contains at least one "1" --> free space available
+         *      @todo next step?
+         * case "b2": no free space in curent set --> go +16 memory locations forward
+        */ 
+        int mask = (int)compareRes;
+        // case "a"
+        if (mask != 0) {
+            printf("Result in mask: %i \n", mask); 
+// @todo add_mask(...)
+
+        } else {        
+            // case "b1"
+            __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(zeroM512iArray, nextHashVecElements);
+            if((int)checkForFreeSpace == 0) {
+                // no free space available in the current set
+// @todo next step?
+
+            } else {
+                // free slots available in the current set
+// @todo next step?
+
+            }
+
+
+        }
+
+
 
 
         // DELETE THIS BREAK - ONLY FOR TESTING!!
-        //break;
+        break;
     }
 
 
 
 
 
-    
+
 
     /* 
      * TODO :   implement error-handling: 
