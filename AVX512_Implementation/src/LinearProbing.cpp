@@ -70,6 +70,7 @@ int vectorizedLinearProbing(unsigned int arr[], int dataSize) {
 
     // start of algorithm logic
     __mmask16 oneMask = (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+    __mmask16 zeroMask = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
     __m512i zeroM512iArray = _mm512_setzero_epi32();
 
     /* 
@@ -130,16 +131,17 @@ printBits(sizeof(compareRes), &compareRes);
             printf("Result in mask: %i \n", mask); 
 // @todo add_mask(...)
 
+
         } else {        
             // case "b1"
             __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(zeroM512iArray, nextHashVecElements);
             if((int)checkForFreeSpace == 0) {
                 // no free space available in the current set
-// @todo next step?
+// @todo next step
 
             } else {
                 // free slots available in the current set
-// @todo next step?
+// @todo next step
 
             }
 
