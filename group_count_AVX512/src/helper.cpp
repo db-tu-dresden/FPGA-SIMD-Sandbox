@@ -21,6 +21,7 @@ void print512_num(__m512i var) {
  * helper function to print an integer in bit-wise notation 
  * Assumes little endian
  * print-result:    p16, p15, p14, p13, p12, p11, p10, p09, p08, p07, p06, p05, p04, p03, p02, p01
+ * usage: printBits(sizeof(nameOfMask), &nameOfMask);
  */
 void printBits(size_t const size, void const * const ptr) {
     unsigned char *b = (unsigned char*) ptr;

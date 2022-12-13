@@ -56,7 +56,6 @@ int  main(int argc, char** argv){
         cout << "HashTable not allocated" << endl;
     }
     
-
     LinearProbingAVX512(arr, dataSize, hashVec, countVec, HSIZE);
 
     // Ausgabe des HashTable
