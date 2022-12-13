@@ -76,10 +76,6 @@ void LinearProbingAVX512(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, 
         if (mask == 1) {
             // cout << "CASE A:" <<endl;
 
-            // cout << "input[p]: " << input[p] <<endl;
-            // cout << "hashVec[hash_key]: " << hashVec[hash_key] <<endl;
-            // cout << "countVec[hash_key]: " << countVec[hash_key] <<endl;
-
             __m512i nextCounts = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &countVec[hash_key%HSIZE]);
             nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes , nextCounts, oneM512iArray);
             // print512_num(nextCounts);
@@ -95,51 +91,62 @@ void LinearProbingAVX512(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, 
                     break;
                 };
             }
+            p++;
         }   else {
             // cout << "CASE B: " <<endl;
              /**
               * CASE (B): 
-              * inputValue does NOT match any of the keys in nextElements (no key match)
-              * CASE (B1): compare "nextElements" with zero and insert inputValue into next possible slot
+              * --> inputValue does NOT match any of the keys in nextElements (no key match)
+              * --> compare "nextElements" with zero
+              * CASE (B1):   resulting mask of this comparison is not 0
+              *             --> insert inputValue into next possible slot       
+              *             
+              * CASE (B2):  resulting mask of this comparison is 0
+              *             --> no free slot in current 16-slot array
+              *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+              *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
               **/ 
 
             // __m512i freeSlots is used as a helper; contains the informations of __mmask16 checkForFreeSpace
             // @todo    find a method to be able to access the individual bits of the mask "checkForFreeSpace" directly
             //          and thus to process their information directly
             __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(zeroM512iArray, nextElements);
-            __m512i freeSlots = _mm512_setzero_epi32();
-            freeSlots = _mm512_mask_add_epi32(freeSlots, checkForFreeSpace , freeSlots, oneM512iArray);
+            int innerMask = _mm512_mask2int(checkForFreeSpace);
+            if(innerMask != 0) {                // CASE B1          
+                __m512i freeSlots = _mm512_setzero_epi32();
+                freeSlots = _mm512_mask_add_epi32(freeSlots, checkForFreeSpace , freeSlots, oneM512iArray);
+                print512_num(freeSlots);
 
-            uint32_t val[16];
-            memcpy(val, &freeSlots, sizeof(val));
-            for(int i=0; i<16; i++) {              
-                if(val[i] == 1) {
-                    cout << "Free slot found! Insert inputValue: " << inputValue << " at Position hashVec[(hash_key+i)%HSIZE]:" << ((hash_key+i)%HSIZE) << endl;
 
-                    // insert key at new position and increment corresponding count
-                    hashVec[(hash_key+i)%HSIZE] = inputValue;
-                    countVec[(hash_key+i)%HSIZE] = countVec[(hash_key+i)%HSIZE] + 1;
-                    break;
-                };
+                uint32_t val[16];
+                memcpy(val, &freeSlots, sizeof(val));
+                for(int i=0; i<16; i++) {              
+                    if(val[i] == 1) {
+                        cout << "Free slot found! Insert inputValue: " << inputValue << " at Position hashVec[(hash_key+i)%HSIZE]:" << ((hash_key+i)%HSIZE) << endl;
+
+                        // insert key at new position and increment corresponding count
+                        hashVec[(hash_key+i)%HSIZE] = inputValue;
+                        countVec[(hash_key+i)%HSIZE] = countVec[(hash_key+i)%HSIZE] + 1;
+                        break;
+                    };
+                }
+            p++;
+            }   else    {                   // CASE B2   
+                /**
+                 * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                 * @todo : avoid infinite loop!
+                */
+                hash_key = (hash_key+16) % HSIZE;
             }
-
-            /**
-              * CASE (B): 
-              * inputValue does NOT match any of the keys in nextElements (no key match)
-              * CASE (B2): compare "nextElements" with zero is "0 at every position -> no free slot in current 16-slot array"
-              * load next +16 slots (note overflow of array - modulo HSIZE!)
-              **/ 
         }
-
-
-        p++;
+        
         /*
-        if(p==100) {
+        if(p==30) {
             break;
         };     */
     }
     for(int i=0; i<16; i++) {
-        cout << "after " << hashVec[i] << "  " << countVec[i] <<endl;
+        cout << "Endresult value / count: " << hashVec[i] << "  " << countVec[i] <<endl;
     };
     printf("END of LinearProbingAVX512() function - AVX512 section: \n");
     printf("###########################\n");
