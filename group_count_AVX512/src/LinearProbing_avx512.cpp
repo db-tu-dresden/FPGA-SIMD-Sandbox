@@ -134,6 +134,7 @@ void LinearProbingAVX512(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, 
             }   else    {                   // CASE B2   
                 /**
                  * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                 *       : this case is not implemented yet 
                  * @todo : avoid infinite loop!
                 */
                 hash_key = (hash_key+16) % HSIZE;
