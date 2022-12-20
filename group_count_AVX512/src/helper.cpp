@@ -37,6 +37,15 @@ void printBits(size_t const size, void const * const ptr) {
     puts("");
 }
 
+
+void initializeHashMap(uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+    //initalize hash array with zeros
+    for (int i=0; i<HSIZE;i++) {
+        hashVec[i]=0;
+        countVec[i]=0;
+    }
+}
+
 /**
   *  Generate a data array with random values between 1 and #distinctValues
   *  The array is dynamically sized. The number of elements corresponds to the value in dataSize.

@@ -21,11 +21,13 @@
  */ 
 __mmask16 oneMask = (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
 __mmask16 zeroMask = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+__mmask16 testMask = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0);
 __m512i zeroM512iArray = _mm512_setzero_epi32();
 __m512i oneM512iArray = _mm512_setr_epi32 (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
 
+
 /**
- * Main function of the AVX512-based group_count implementation.
+ * Variant 1 of a AVX512-based group_count implementation.
  * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
  * @param arr the input data array
  * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
@@ -33,15 +35,109 @@ __m512i oneM512iArray = _mm512_setr_epi32 (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
  * @param countVec store the count of occurence of k at position hashx(k)
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-void LinearProbingAVX512(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
-    printf("###########################\n");
-    printf("BEGIN of LinearProbingAVX512() function - AVX512 section: \n");
+void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+    /**
+     * iterate over input data
+     * @param p current element of input data array
+     **/ 
+    int p = 0;
+    while (p < dataSize) {
 
-    //initalize hash array with zeros
-    for (int i=0; i<HSIZE;i++) {
-        hashVec[i]=0;
-        countVec[i]=0;
+        // get single value from input at position p
+        uint32_t inputValue = input[p];
+
+        // compute hash_key of the input value
+        uint32_t hash_key = hashx(inputValue,HSIZE);
+
+        //broadcast inputValue into a SIMD register
+        __m512i broadcastCurrentValue = _mm512_set1_epi32(inputValue);
+    
+        // Load 16 consecutive elements from hashVec, starting from position hash_key
+        __m512i nextElements = _mm512_maskz_loadu_epi32(oneMask, &hashVec[hash_key]);
+        
+        // compare vector with broadcast value against vector with following elements for equality
+        __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
+  
+        /**
+            * case distinction regarding the content of the mask "compareRes"
+            * 
+            * CASE (A):
+            * inputValue does match one of the keys in nextElements (key match)
+            * just increment the associated count entry in countVec
+        **/ 
+        if (compareRes == 1) {
+
+            // load cout values from the corresponding location                
+            __m512i nextCounts = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &countVec[hash_key]);
+                
+            // increment by one at the corresponding location
+            nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes , nextCounts, oneM512iArray);
+               
+            // selective store of changed value
+            _mm512_mask_storeu_epi32(&countVec[hash_key],compareRes,nextCounts);
+            p++;
+            }   else {
+                // cout << "CASE B: " <<endl;
+                /**
+                    * CASE (B): 
+                    * --> inputValue does NOT match any of the keys in nextElements (no key match)
+                    * --> compare "nextElements" with zero
+                    * CASE (B1):   resulting mask of this comparison is not 0
+                    *             --> insert inputValue into next possible slot       
+                    *                 
+                    * CASE (B2):  resulting mask of this comparison is 0
+                    *             --> no free slot in current 16-slot array
+                    *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+                    *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+                    **/ 
+
+                // __m512i freeSlots is used as a helper; contains the informations of __mmask16 checkForFreeSpace
+                // @todo    find a method to be able to access the individual bits of the mask "checkForFreeSpace" directly
+                //          and thus to process their information directly
+
+    
+                __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(_mm512_setzero_epi32(),nextElements);
+                uint32_t innerMask = _mm512_mask2int(checkForFreeSpace);
+                if(innerMask != 0) {                // CASE B1    
+                    //cout <<"Case B1"<<endl;   
+                    __mmask16 mask1 = _mm512_knot(innerMask);
+
+                    // compute position of the emtpy slot   
+                    uint32_t pos = (32-__builtin_clz(mask1))%16;
+
+                    // use 
+                    hashVec[hash_key+pos] = (uint32_t)inputValue;
+                    countVec[hash_key+pos]++;
+                    p++;
+                }   else    {                   // CASE B2   
+                    /**
+                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                    *       : this case is not implemented yet 
+                    * @todo : avoid infinite loop!
+                    */
+                    cout <<"B2"<<endl;
+                    if (hash_key + 16 > HSIZE) {
+                        hash_key = 0;
+                    }
+                    else {
+                        hash_key = (hash_key+16) % HSIZE;
+                    }
+                }
+            }
     }
+}
+
+
+/**
+ * Variant 2 of thae AVX512-based group_count implementation.
+ * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
+ * @param arr the input data array
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
+ * @param hashVec store value of k at position hashx(k)
+ * @param countVec store the count of occurence of k at position hashx(k)
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ */
+void LinearProbingAVX512Variant2(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
 
     /**
      * iterate over input data
@@ -49,106 +145,185 @@ void LinearProbingAVX512(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, 
      **/ 
     int p = 0;
     while (p < dataSize) {
+
+        // get input value
         uint32_t inputValue = input[p];
-        uint32_t hash_key = hashx(input[p],HSIZE);
-        // cout << "current pair input/hash: " << input[p]<<" "<<hash_key<<endl;
+
+        // compute hash_key for the input value
+        uint32_t hash_key = hashx(inputValue,HSIZE);
+
+        // compute the aligned start position within the hashMap based the hash_key
+        uint32_t aligned_start = (hash_key/16)*16;
 
         /**
-         * broadcast element p of input[] to vector of type __m512i
-         * broadcastCurrentValue contains sixteen times value of input[i]
-         **/
-        __m512i broadcastCurrentValue = _mm512_set1_epi32(input[p]);
-
+        * broadcast element p of input[] to vector of type __m512i
+        * broadcastCurrentValue contains sixteen times value of input[i]
+        **/
+        __m512i broadcastCurrentValue = _mm512_set1_epi32(inputValue);
+        
+        while (1) {
         // Load 16 consecutive elements from hashVec, starting from position hash_key
-        __m512i nextElements = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &hashVec[hash_key%HSIZE]);
-
+        __m512i nextElements = _mm512_load_epi32(&hashVec[aligned_start]);
+        
         // compare vector with broadcast value against vector with following elements for equality
         __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
-       
+  
+        // compute the matching position indicated by a one within the compareRes mask
+        // if no match was found, the matchPos is zero
+        uint32_t matchPos = (32-__builtin_clz(compareRes)); 
+
         /**
-         * case distinction regarding the content of the mask "compareRes"
-         * 
-         * CASE (A):
-         * inputValue does match one of the keys in nextElements (key match)
-         * just increment the associated count entry in countVec
-         **/ 
-        int mask = _mm512_mask2int(compareRes);
-        if (mask == 1) {
-            // cout << "CASE A:" <<endl;
-
-            __m512i nextCounts = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &countVec[hash_key%HSIZE]);
-            nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes , nextCounts, oneM512iArray);
-            // print512_num(nextCounts);
-
-            uint32_t val[16];
-            memcpy(val, &nextCounts, sizeof(val));
-            for(int i=0; i<16; i++) {
-                if(val[i] != 0) {
-                    // cout << val[i] <<endl;
-                    countVec[(hash_key+i)%HSIZE] = val[i];
-                    // alternativ addition:
-                    // countVec[(hash_key+i)%HSIZE] = countVec[(hash_key+i)%HSIZE] + 1;
-                    break;
-                };
-            }
+          * case distinction regarding the content of the mask "compareRes"
+          * 
+          * CASE (A):
+          * inputValue does match one of the keys in nextElements (key match)
+          * just increment the associated count entry in countVec
+        **/ 
+        if (matchPos > 0) {
+            // increase the counter in countVec
+            countVec[aligned_start+matchPos-1]++;
             p++;
+            break;
         }   else {
             // cout << "CASE B: " <<endl;
-             /**
-              * CASE (B): 
-              * --> inputValue does NOT match any of the keys in nextElements (no key match)
-              * --> compare "nextElements" with zero
-              * CASE (B1):   resulting mask of this comparison is not 0
-              *             --> insert inputValue into next possible slot       
-              *             
-              * CASE (B2):  resulting mask of this comparison is 0
-              *             --> no free slot in current 16-slot array
-              *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
-              *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
-              **/ 
+            /**
+            * CASE (B): 
+            * --> inputValue does NOT match any of the keys in nextElements (no key match)
+            * --> compare "nextElements" with zero
+            * CASE (B1):   resulting mask of this comparison is not 0
+            *             --> insert inputValue into next possible slot       
+            *                 
+            * CASE (B2):  resulting mask of this comparison is 0
+            *             --> no free slot in current 16-slot array
+            *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+            *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+            **/ 
 
-            // __m512i freeSlots is used as a helper; contains the informations of __mmask16 checkForFreeSpace
-            // @todo    find a method to be able to access the individual bits of the mask "checkForFreeSpace" directly
-            //          and thus to process their information directly
-            __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(zeroM512iArray, nextElements);
-            int innerMask = _mm512_mask2int(checkForFreeSpace);
-            if(innerMask != 0) {                // CASE B1          
-                __m512i freeSlots = _mm512_setzero_epi32();
-                freeSlots = _mm512_mask_add_epi32(freeSlots, checkForFreeSpace , freeSlots, oneM512iArray);
-                print512_num(freeSlots);
-
-
-                uint32_t val[16];
-                memcpy(val, &freeSlots, sizeof(val));
-                for(int i=0; i<16; i++) {              
-                    if(val[i] == 1) {
-                        cout << "Free slot found! Insert inputValue: " << inputValue << " at Position hashVec[(hash_key+i)%HSIZE]:" << ((hash_key+i)%HSIZE) << endl;
-
-                        // insert key at new position and increment corresponding count
-                        hashVec[(hash_key+i)%HSIZE] = inputValue;
-                        countVec[(hash_key+i)%HSIZE] = countVec[(hash_key+i)%HSIZE] + 1;
-                        break;
-                    };
-                }
-            p++;
+            // freeSlot is indicated by a zero in the nextElements
+            __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(_mm512_setzero_epi32(),nextElements);
+            uint32_t innerMask = _mm512_mask2int(checkForFreeSpace);
+            if(innerMask != 0) {                // CASE B1    
+             
+                __mmask16 mask1 = _mm512_knot(innerMask);   
+                uint32_t pos = (32-__builtin_clz(mask1))%16;
+        
+                hashVec[aligned_start+pos] = (uint32_t)inputValue;
+                countVec[aligned_start+pos]++;
+                p++;
+                break;
             }   else    {                   // CASE B2   
                 /**
-                 * @todo : error-handling: what, if there is no free slot (bad global settings!)
-                 *       : this case is not implemented yet 
-                 * @todo : avoid infinite loop!
+                * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                *       : this case is not implemented yet 
+                * @todo : avoid infinite loop!
                 */
-                hash_key = (hash_key+16) % HSIZE;
+                aligned_start = (aligned_start+16) % HSIZE;
             }
         }
-        
-        /*
-        if(p==30) {
-            break;
-        };     */
+        }
     }
-    for(int i=0; i<16; i++) {
-        cout << "Endresult value / count: " << hashVec[i] << "  " << countVec[i] <<endl;
-    };
-    printf("END of LinearProbingAVX512() function - AVX512 section: \n");
-    printf("###########################\n");
+}
+
+/**
+ * Variant 3 of a AVX512-based group_count implementation.
+ * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
+ * @param arr the input data array
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
+ * @param hashVec store value of k at position hashx(k)
+ * @param countVec store the count of occurence of k at position hashx(k)
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ */
+void LinearProbingAVX512Variant3(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+    /**
+     * iterate over input data
+     * @param p current element of input data array
+     **/ 
+    int p = 0;
+    while (p < dataSize) {
+
+        // load 16 input values
+        __m512i iValues = _mm512_load_epi32(&input[p]);
+
+        //iterate over the input values
+        int i=0;
+        while (i<16) {
+
+            // broadcast single value from input at postion i into a new SIMD register
+            __m512i broadcastCurrentValue = _mm512_permutexvar_epi32(_mm512_set1_epi32((uint32_t)i),iValues);
+
+            uint32_t inputValue = (uint32_t)broadcastCurrentValue[0];
+            uint32_t hash_key = hashx(inputValue,HSIZE);
+
+            // compute the aligned start position within the hashMap based the hash_key
+            uint32_t aligned_start = (hash_key/16)*16;
+         
+            while (1) {
+            // Load 16 consecutive elements from hashVec, starting from position hash_key
+            __m512i nextElements = _mm512_load_epi32(&hashVec[aligned_start]);
+        
+            // compare vector with broadcast value against vector with following elements for equality
+            __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
+  
+            // compute the matching position indicated by a one within the compareRes mask
+            // if no match was found, the matchPos is zero
+            uint32_t matchPos = (32-__builtin_clz(compareRes)); 
+
+            /**
+            * case distinction regarding the content of the mask "compareRes"
+            * 
+            * CASE (A):
+            * inputValue does match one of the keys in nextElements (key match)
+            * just increment the associated count entry in countVec
+            **/ 
+            if (matchPos > 0) {
+                // increase the counter in countVec
+                countVec[aligned_start+matchPos-1]++;
+                i++;
+                break;
+            }   else {
+                // cout << "CASE B: " <<endl;
+                /**
+                * CASE (B): 
+                * --> inputValue does NOT match any of the keys in nextElements (no key match)
+                * --> compare "nextElements" with zero
+                * CASE (B1):   resulting mask of this comparison is not 0
+                *             --> insert inputValue into next possible slot       
+                *                 
+                * CASE (B2):  resulting mask of this comparison is 0
+                *             --> no free slot in current 16-slot array
+                *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+                *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+                **/ 
+
+                // freeSlot is indicated by a zero in the nextElements
+                __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(_mm512_setzero_epi32(),nextElements);
+                uint32_t innerMask = _mm512_mask2int(checkForFreeSpace);
+                if(innerMask != 0) {                // CASE B1    
+             
+                    __mmask16 mask1 = _mm512_knot(innerMask);   
+                    uint32_t pos = (32-__builtin_clz(mask1))%16;
+                    
+                    hashVec[aligned_start+pos] = (uint32_t)inputValue;
+                    countVec[aligned_start+pos]++;
+                    i++;
+                    break;
+                }   else    {                   // CASE B2   
+                    /**
+                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                    *       : this case is not implemented yet 
+                    * @todo : avoid infinite loop!
+                    */
+                   
+                    if (aligned_start + 16 > HSIZE) {
+                        aligned_start = 0;
+                    }
+                    else {
+                        aligned_start = (aligned_start+16) % HSIZE;
+                    }
+                }
+            }
+            }
+        }
+        p+=16;
+    }
 }
