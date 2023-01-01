@@ -1,0 +1,101 @@
+####################################################
+Terminal-Log der verschiedenen Versionen mit falschen Ergebnissen
+####################################################
+####################################################
+
+
+####################################################
+####################################################
+SETTING
+####################################################
+uint64_t distinctValues = 8000;
+uint64_t dataSize = 16*10000000;
+float scale = 1.1;
+uint64_t HSIZE = distinctValues * scale;
+
+
+
+####################################################
+####################################################
+VERSION1
+####################################################
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$ ./main 
+Configured HSIZE : 8800
+Memory allocated - 160000000 values, between 1 and 8000
+Generation of initial data done.
+HashTable allocated - 8800 values
+Linear Probing with AVX512
+53.5904
+Final result check: AVX512 approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 160000001
+Linear Probing scalar
+95.4389
+Final result check: scalar approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 160000001
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$ 
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$  g++ -std=c++14 src/main.cpp -mavx512f  -o main
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$ ./main 
+Configured HSIZE : 8800
+Memory allocated - 160000000 values, between 1 and 8000
+Generation of initial data done.
+HashTable allocated - 8800 values
+Linear Probing with AVX512
+53.8325
+Final result check: AVX512 approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 160000640
+Linear Probing scalar
+96.8912
+Final result check: scalar approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 160000041
+
+
+
+####################################################
+####################################################
+VERSION2
+####################################################
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$ ./main 
+Configured HSIZE : 8800
+Memory allocated - 160000000 values, between 1 and 8000
+Generation of initial data done.
+HashTable allocated - 8800 values
+Linear Probing with AVX512
+90.5439
+Final result check: AVX512 approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 1
+Linear Probing scalar
+96.7419
+Final result check: scalar approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 160000001
+
+
+
+
+####################################################
+####################################################
+VERSION3
+####################################################
+u177951@s001-n061:~/FPGA-SIMD-Sandbox/group_count_AVX512$ ./main 
+Configured HSIZE : 8800
+Memory allocated - 160000000 values, between 1 and 8000
+Generation of initial data done.
+HashTable allocated - 8800 values
+Linear Probing with AVX512
+72.7025
+Final result check: AVX512 approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 640
+Linear Probing scalar
+96.5654
+Final result check: scalar approach
+Compare parameter dataSize against sum of all count values in countVec:
+160000000 160000041
