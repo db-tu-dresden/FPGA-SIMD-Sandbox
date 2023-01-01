@@ -7,7 +7,6 @@
 #include <chrono>
 
 #include "LinearProbing_avx512.cpp"
-//#include "LinearProbing_avx512-v1.cpp"
 #include "LinearProbing_scalar.cpp"
 /*
 *   This is a proprietary AVX512 implementation of Bala Gurumurthy's LinearProbing approach. 
@@ -58,18 +57,34 @@ int  main(int argc, char** argv){
     } else {
         cout << "HashTable not allocated" << endl;
     }
-    
+
+    /** ##############################################
+     * Linear Probing AVX512
+    */
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"Linear Probing with AVX512"<<endl;
     auto begin = chrono::high_resolution_clock::now();
-    LinearProbingAVX512Variant2(arr, dataSize, hashVec, countVec, HSIZE);
+    LinearProbingAVX512Variant3(arr, dataSize, hashVec, countVec, HSIZE);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
 
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
+
+    // Ausgabe des HashTable - AVX512 Variante
+    uint32_t sumAVX;
+    for (int i=0; i<distinctValues * scale; i++) {
+        if (hashVec[i]>0) {
+            sumAVX+=countVec[i];
+        }
+    }
+    cout << "Final result check: AVX512 approach"<<endl;
+    cout << "Compare parameter dataSize against sum of all count values in countVec:"<<endl;
+    cout << dataSize <<" "<<sumAVX<<endl;
      
-    
+    /** ##############################################
+     * Linear Probing scalar
+    */
     initializeHashMap(hashVec,countVec,HSIZE);
     begin = chrono::high_resolution_clock::now();
     cout <<"Linear Probing scalar"<<endl;
@@ -79,6 +94,17 @@ int  main(int argc, char** argv){
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
 
     cout <<mis<<endl;
+
+    // Ausgabe des HashTable - AVX512 Variante
+    uint32_t sumLinear;
+    for (int i=0; i<distinctValues * scale; i++) {
+        if (hashVec[i]>0) {
+            sumLinear+=countVec[i];
+        }
+    }
+    cout << "Final result check: scalar approach"<<endl;
+    cout << "Compare parameter dataSize against sum of all count values in countVec:"<<endl;
+    cout << dataSize <<" "<<sumLinear<<endl;
     
     /*
     //__m512i a = _mm512_setzero_epi32();
@@ -92,17 +118,7 @@ int  main(int argc, char** argv){
     //__mmask16 mask1 = _mm512_knot(mask);
 
     cout <<32-__builtin_clz(mask)<<endl;
-    */
-    // Ausgabe des HashTable
-    uint32_t sum;
-    for (int i=0; i<distinctValues * scale; i++) {
-        if (hashVec[i]>0) {
-            sum+=countVec[i];
-        }
-    }
-    cout << "Final result check: compare parameter dataSize against sum of all count values in countVec:"<<endl;
-    cout << dataSize <<" "<<sum<<endl;
-    
+    */    
     return 0;
 
 }

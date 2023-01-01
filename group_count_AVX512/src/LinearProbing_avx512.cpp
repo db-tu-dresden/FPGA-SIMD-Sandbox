@@ -109,11 +109,10 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                     hashVec[hash_key+pos] = (uint32_t)inputValue;
                     countVec[hash_key+pos]++;
                     p++;
-                }   else    {                   // CASE B2   
+                }   else    { 
                     /**
-                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
-                    *       : this case is not implemented yet 
-                    * @todo : avoid infinite loop!
+                    *   CASE B2   
+                    * 
                     */
                     cout <<"B2"<<endl;
                     if (hash_key + 16 > HSIZE) {
@@ -211,12 +210,11 @@ void LinearProbingAVX512Variant2(uint32_t* input, uint64_t dataSize, uint32_t* h
                 countVec[aligned_start+pos]++;
                 p++;
                 break;
-            }   else    {                   // CASE B2   
-                /**
-                * @todo : error-handling: what, if there is no free slot (bad global settings!)
-                *       : this case is not implemented yet 
-                * @todo : avoid infinite loop!
-                */
+            }   else    { 
+                    /**
+                    *   CASE B2   
+                    * 
+                    */
                 aligned_start = (aligned_start+16) % HSIZE;
             }
         }
@@ -307,13 +305,11 @@ void LinearProbingAVX512Variant3(uint32_t* input, uint64_t dataSize, uint32_t* h
                     countVec[aligned_start+pos]++;
                     i++;
                     break;
-                }   else    {                   // CASE B2   
+                }   else    { 
                     /**
-                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
-                    *       : this case is not implemented yet 
-                    * @todo : avoid infinite loop!
-                    */
-                   
+                    *   CASE B2   
+                    * 
+                    */                   
                     if (aligned_start + 16 > HSIZE) {
                         aligned_start = 0;
                     }
