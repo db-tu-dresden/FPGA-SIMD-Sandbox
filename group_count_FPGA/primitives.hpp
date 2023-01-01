@@ -126,18 +126,21 @@ fpvec<T> cmpeq_uint32_mask(fpvec<T> a, fpvec<T> b) {
 * set). mem_addr does not need to be aligned on any particular boundary."
 *
 * customized load-function:
-* param1 src : array from which the data is loaded, of related bit of writeMask is set to "0"
+* param1 src : array from which the data is loaded, if related bit of writeMask is set to "0"
 * param2 writeMask : if bit is set to "1" load related item from data
 * param3 data : array which contains the data which should be loaded
 * param4 startIndex : first index-position of data from where the data should be loaded
+* param5 HSZIZE : HSIZE that describes the size of the arrays of the Hashvector
+* 
+* @TODO : change type of data to a normal array of ?? size ?
 */
 template<typename T>
-fpvec<T> mask_loadu_uint32(fpvec<T> src, fpvec<T> writeMask, fpvec<T> data, T startIndex) {
+fpvec<T> mask_loadu_uint32(fpvec<T> src, fpvec<T> writeMask, fpvec<T> data, T startIndex, T HSIZE) {
 	auto result = fpvec<T>{};
 #pragma unroll
 	for (int i = 0; i < 16; i++) {
 		if (writeMask[i] == 1) {
-			result[i] = data[startIndex + i];
+			result[i] = data[(startIndex + i)%HSIZE];
 		}
 		else {
 			result[i] = src[i];
@@ -172,17 +175,57 @@ fpvec<T> mask_add_uint32(fpvec<T> src, fpvec<T> writeMask, fpvec<T> a, fpvec<T> 
 /**	#8
 * scalar primitive for Intel Intrinsic:
 * _mm512_mask_storeu_epi32
+* original description: "Store packed 32-bit integers from a into memory using writemask k. 
+* mem_addr does not need to be aligned on any particular boundary."
+*
+* customized store  - function:
+* param1 result : array, in which the data is stored, if related bit of writeMask is set to "1"
+* param2 startIndex : first index - position of data from where the data should be loaded
+* param3 writeMask : if bit is set to "1" store related item from data into result array
+* param4 data : array which contains the data that should be stored
+* param5 HSZIZE : HSIZE that describes the size of the arrays of the Hashvector
+*
+* @TODO : change type of data to a normal array of ?? size ?
 */
+
+template<typename T>
+void mask_storeu_uint32(fpvec<T>* result, T startIndex, fpvec<T> writeMask, fpvec<T> data, T HSIZE) {
+#pragma unroll
+	for (int i = 0; i < 16; i++) {
+		if (writeMask[i] == 1) {
+			result[(startIndex + i)%HSIZE] = data[i];
+		}
+		else {
+			result[(startIndex + i)%HSIZE] = result[(startIndex + i)%HSIZE];
+		}
+	}
+}
 
 /**	#9
 * scalar primitive for Intel Intrinsic:
 * _mm512_mask2int
 */
 
+
 /**	#10
 * scalar primitive for Intel Intrinsic:
 * _mm512_knot
+* original description: "Compute the bitwise NOT of 16-bit mask a, and store the result in k."
 */
+template<typename T>
+fpvec<T> knot_uint32(fpvec<T> src) {
+	auto result = fpvec<T>{};
+#pragma unroll
+	for (int i = 0; i < 16; i++) {
+		if (src[i] == 0) {
+			result[i] = 1;
+		}
+		else {
+			result[i] = 0;
+		}
+	}
+	return result;
+}
 
 /**	#11
 * scalar primitive for Built-in Function Provided by GCC:
