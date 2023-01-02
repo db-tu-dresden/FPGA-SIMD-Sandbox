@@ -31,7 +31,7 @@
 
 ## List of all used AVX512 intrinsics:
 
-| # | Line of code (tbc) | Return value | Intel Intrinsics | List of Arguments | used in implementation version |
+| # | Line of code (tbc) | Return value | Intel Intrinsics | List of Arguments | used in version of function LinearProbingAVX512Variantx() |
 | ------------- | ------------- | ------------- | ------------- |------------- | ------------- |
 | 1 | 25, 99, 202, 297 | __m512i | _mm512_setzero_epi32() | no arguments | global | 
 | 2 | 26 | __m512i | _mm512_setr_epi32() | (int e15, int e14, ... int e1, int e0) | global | 
