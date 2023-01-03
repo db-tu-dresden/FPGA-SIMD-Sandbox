@@ -49,36 +49,44 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
         // compute hash_key of the input value
         uint32_t hash_key = hashx(inputValue,HSIZE);
 
-        //broadcast inputValue into a SIMD register
+        // broadcast inputValue into a SIMD register
         __m512i broadcastCurrentValue = _mm512_set1_epi32(inputValue);
 
         while (1) {
-    
-        // Load 16 consecutive elements from hashVec, starting from position hash_key
-        __m512i nextElements = _mm512_maskz_loadu_epi32(oneMask, &hashVec[hash_key]);
-        
-        // compare vector with broadcast value against vector with following elements for equality
-        __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
-  
-        /**
-            * case distinction regarding the content of the mask "compareRes"
-            * 
-            * CASE (A):
-            * inputValue does match one of the keys in nextElements (key match)
-            * just increment the associated count entry in countVec
-        **/ 
-        if (compareRes == 1) {
 
-            // load cout values from the corresponding location                
-            __m512i nextCounts = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &countVec[hash_key]);
+            // Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
+            int32_t overflow = (hash_key + 16) - HSIZE;
+            overflow = overflow < 0? 0: overflow;
+            uint32_t overflow_correction_mask_i = (1 << (16-overflow)) - 1; 
+            __mmask16 overflow_correction_mask = _cvtu32_mask16(overflow_correction_mask_i);
+            
+            // Load 16 consecutive elements from hashVec, starting from position hash_key
+            __m512i nextElements = _mm512_maskz_loadu_epi32(oneMask, &hashVec[hash_key]);
+                       
+            // compare vector with broadcast value against vector with following elements for equality
+            __mmask16 compareRes = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
+    
+            /**
+                * case distinction regarding the content of the mask "compareRes"
+                * 
+                * CASE (A):
+                * inputValue does match one of the keys in nextElements (key match)
+                * just increment the associated count entry in countVec
+            **/ 
+            if (compareRes == 1) {
+
+                // std::cout << "CASE A" << std::endl;
+
+                // load cout values from the corresponding location                
+                __m512i nextCounts = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &countVec[hash_key]);
+                    
+                // increment by one at the corresponding location
+                nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes, nextCounts, oneM512iArray);
                 
-            // increment by one at the corresponding location
-            nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes , nextCounts, oneM512iArray);
-               
-            // selective store of changed value
-            _mm512_mask_storeu_epi32(&countVec[hash_key],compareRes,nextCounts);
-            p++;
-            break;
+                // selective store of changed value
+                _mm512_mask_storeu_epi32(&countVec[hash_key],compareRes,nextCounts);
+                p++;
+                break;
             }   else {
                 // cout << "CASE B: " <<endl;
                 /**
@@ -99,10 +107,10 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                 //          and thus to process their information directly
 
     
-                __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(_mm512_setzero_epi32(),nextElements);
+                __mmask16 checkForFreeSpace = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, _mm512_setzero_epi32(), nextElements);
                 uint32_t innerMask = _mm512_mask2int(checkForFreeSpace);
                 if(innerMask != 0) {                // CASE B1    
-                    //cout <<"Case B1"<<endl;   
+                    // cout <<"Case B1"<<endl;   
                     __mmask16 mask1 = _mm512_knot(innerMask);
 
                     // compute position of the emtpy slot   
@@ -119,12 +127,11 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                     *       : this case is not implemented yet 
                     * @todo : avoid infinite loop!
                     */
-                    cout <<"B2"<<endl;
-                    if (hash_key + 16 > HSIZE) {
+                    // cout <<"B2"<<endl;
+                    
+                    hash_key += 16;
+                    if(hash_key >= HSIZE){
                         hash_key = 0;
-                    }
-                    else {
-                        hash_key = (hash_key+16) % HSIZE;
                     }
                 }
             }
