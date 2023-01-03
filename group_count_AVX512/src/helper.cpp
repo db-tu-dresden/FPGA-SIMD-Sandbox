@@ -46,6 +46,17 @@ void initializeHashMap(uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
     }
 }
 
+void validate(uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+    uint64_t sum=0;
+    for (int i=0; i<HSIZE; i++) {
+        if (hashVec[i]>0) {
+            sum+=countVec[i];
+        }
+    }
+    cout << "Final result check: compare parameter dataSize against sum of all count values in countVec:"<<endl;
+    cout << dataSize <<" "<<sum<<endl;
+}
+
 /**
   *  Generate a data array with random values between 1 and #distinctValues
   *  The array is dynamically sized. The number of elements corresponds to the value in dataSize.
@@ -69,10 +80,8 @@ void generateData(T* arr, uint64_t distinctValues, uint64_t dataSize) {
          *   inside the "countArrayForComparison" array.
          *   This only serves for testing the code and the result of the LinearProbing algorithm.
          */
-/*
         int currentValue = arr[i];
         countArrayForComparison[currentValue-1] = countArrayForComparison[currentValue-1] + 1;
-*/  
     }
 
     /**
@@ -81,13 +90,12 @@ void generateData(T* arr, uint64_t distinctValues, uint64_t dataSize) {
      *  This function and print only serves to compare the result of the AVX512 implementation 
      *  against the initially generated data. It is not necessary for the logical flow of the algorithm.
      */
-/*  printf("###########################\n");
+    /*printf("###########################\n");
     printf("Helper function during development process :\n");
     printf("Generated values and their count of occurence inside the input data array:\n");
     int j;
     for(j=0;j<distinctValues;j+=1) {
         printf("Count of value '%i' inside data input array: %i\n", j+1, countArrayForComparison[j]); 
     }
-    printf("###########################\n");   
-*/
+    printf("###########################\n");*/
 }
