@@ -51,6 +51,8 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
 
         //broadcast inputValue into a SIMD register
         __m512i broadcastCurrentValue = _mm512_set1_epi32(inputValue);
+
+        while (1) {
     
         // Load 16 consecutive elements from hashVec, starting from position hash_key
         __m512i nextElements = _mm512_maskz_loadu_epi32(oneMask, &hashVec[hash_key]);
@@ -76,6 +78,7 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
             // selective store of changed value
             _mm512_mask_storeu_epi32(&countVec[hash_key],compareRes,nextCounts);
             p++;
+            break;
             }   else {
                 // cout << "CASE B: " <<endl;
                 /**
@@ -109,10 +112,12 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                     hashVec[hash_key+pos] = (uint32_t)inputValue;
                     countVec[hash_key+pos]++;
                     p++;
-                }   else    { 
+                    break;
+                }   else    {                   // CASE B2   
                     /**
-                    *   CASE B2   
-                    * 
+                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                    *       : this case is not implemented yet 
+                    * @todo : avoid infinite loop!
                     */
                     cout <<"B2"<<endl;
                     if (hash_key + 16 > HSIZE) {
@@ -123,6 +128,7 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                     }
                 }
             }
+        }
     }
 }
 
@@ -210,12 +216,19 @@ void LinearProbingAVX512Variant2(uint32_t* input, uint64_t dataSize, uint32_t* h
                 countVec[aligned_start+pos]++;
                 p++;
                 break;
-            }   else    { 
-                    /**
-                    *   CASE B2   
-                    * 
-                    */
-                aligned_start = (aligned_start+16) % HSIZE;
+            }   else    {                   // CASE B2   
+                /**
+                * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                *       : this case is not implemented yet 
+                * @todo : avoid infinite loop!
+                */
+                //aligned_start = (aligned_start+16) % HSIZE;
+                       if (aligned_start + 16 > HSIZE) {
+                        aligned_start = 0;
+                    }
+                    else {
+                        aligned_start = (aligned_start+16) % HSIZE;
+                    }
             }
         }
         }
@@ -305,11 +318,13 @@ void LinearProbingAVX512Variant3(uint32_t* input, uint64_t dataSize, uint32_t* h
                     countVec[aligned_start+pos]++;
                     i++;
                     break;
-                }   else    { 
+                }   else    {                   // CASE B2   
                     /**
-                    *   CASE B2   
-                    * 
-                    */                   
+                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
+                    *       : this case is not implemented yet 
+                    * @todo : avoid infinite loop!
+                    */
+                   
                     if (aligned_start + 16 > HSIZE) {
                         aligned_start = 0;
                     }
