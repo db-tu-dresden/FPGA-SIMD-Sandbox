@@ -212,13 +212,20 @@ void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fp
 * serial primitive for Intel Intrinsic:
 * _mm512_mask2int
 * original description: "Converts bit mask k1 into an integer value, storing the results in dst."
+* own (simplified implementation):
+* return 1 if at least 1 bit of mask is set;
+* return 0 if no bit of mask is set
 */
 template<typename T>
 uint32_t mask2int(fpvec<T>& mask) {
 #pragma unroll	
+	uint32_t res = 0;
 	for (int i=0; i<(64/sizeof(T)); i++) {
-		//tbd
+		if (mask.elements[i] == 1) {
+			res = 1;
+		}
 	}
+	return res;
 }
 
 /**	#10
