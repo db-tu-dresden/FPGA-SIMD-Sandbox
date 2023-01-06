@@ -29,6 +29,10 @@
 using namespace std::chrono;
 
 /**
+ * Compile code with:    g++ -std=c++14 -O3 src/main.cpp -o main
+*/
+
+/**
  * This is a hashbased group count implementation using the linear probing approach.
  * The Intel Intrinsics from the previous AVX512-based implementation were re-implemented without AVX512.
  * This (actually serial) code is intended to be able to run it again later in parallel with the Intel OneAPI on FPGAs.
@@ -41,7 +45,7 @@ using namespace std::chrono;
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-uint64_t distinctValues = 60;
+uint64_t distinctValues = 8000;
 uint64_t dataSize = 16*10000000;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
@@ -78,18 +82,18 @@ int  main(int argc, char** argv){
     }
 
     initializeHashMap(hashVec,countVec,HSIZE);
-    cout <<"=============================="<<endl;
-    cout <<"Linear Probing for FPGA - SIMD Variant1"<<endl;
+    std::cout <<"=============================="<<std::endl;
+    std::cout <<"Linear Probing for FPGA - SIMD Variant1"<<std::endl;
     auto begin = chrono::high_resolution_clock::now();
     LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
 
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    cout<<mis<<endl;
+    std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
 
 
-    return 0;
 
+    return 0;
 }

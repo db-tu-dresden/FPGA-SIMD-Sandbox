@@ -82,7 +82,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
         * inputValue does match one of the keys in nextElements (key match)
         * just increment the associated count entry in countVec
         **/ 
-        if (compareRes == 1) {
+        if (mask2int(compareRes) == 1) {
           // load cout values from the corresponding location                
           fpvec<uint32_t> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
                     
@@ -90,7 +90,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
           nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneM512iArray);
                 
           // selective store of changed value
-          mask_storeu_epi32(&countVec, hash_key, HSIZE, compareRes,nextCounts);
+          mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
           p++;
           break;
           }   else {
@@ -109,10 +109,10 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
             fpvec<uint32_t> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask, nextElements);
             uint32_t innerMask = mask2int(checkForFreeSpace);
             if(innerMask != 0) {                // CASE B1    
-              fpvec<uint32_t> mask1 = knot(innerMask);
+              fpvec<uint32_t> mask1 = knot(checkForFreeSpace);
 
               // compute position of the emtpy slot   
-              uint32_t pos = (32-__builtin_clz(mask1))%16;
+              uint32_t pos = (32-clz_onceBultin(mask1))%16;
 
               // use 
               hashVec[hash_key+pos] = (uint32_t)inputValue;
