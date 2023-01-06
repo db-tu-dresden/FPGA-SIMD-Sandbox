@@ -23,7 +23,7 @@
 
 #include "kernels.hpp"
 #include "kernels.cpp"
-#include "helper.cpp"
+#include "helper_main.cpp"
 
 
 using namespace std::chrono;
