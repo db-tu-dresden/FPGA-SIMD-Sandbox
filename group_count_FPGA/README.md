@@ -45,7 +45,7 @@
 | 9 | 87 | __m512i | _mm512_mask_storeu_epi32() | (void* mem_addr, __mmask16 k, __m512i a) | v1 | #8 mask_storeu_epi32() |
 | 10 | 111, 216, 318 | uint32_t | _mm512_mask2int() | (__mmask16 k1) | v1, v2, v3 | #9 mask2int() |
 | 11 | 114, 219, 321 | __mask16 | _mm512_knot() | (__mmask16 a) | v1, v2, v3 | #10 knot() |
-| 12 | 117, 185, 220, 287, 322 | int | __builtin_clz() | (unsigned int x) | v1, v2, v3 | #11 tbd |
+| 12 | 117, 185, 220, 287, 322 | int | __builtin_clz() | (unsigned int x) | v1, v2, v3 | #11 clz_onceBultin() |
 | | | | | | | |
 | | | | | | | |
 | 13 | 178, 263, 280 | __m512i | _mm512_load_epi32() | (void const* mem_addr) | v2, v3 | #12 load_epi32()) |
