@@ -218,8 +218,8 @@ void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fp
 */
 template<typename T>
 uint32_t mask2int(fpvec<T>& mask) {
-#pragma unroll	
 	uint32_t res = 0;
+	#pragma unroll	
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		if (mask.elements[i] == 1) {
 			res = 1;
@@ -251,7 +251,23 @@ fpvec<T> knot(fpvec<T>& src) {
 /**	#11
 * serial primitive for Built-in Function Provided by GCC:
 * __builtin_clz
+* original description: "Built-in Function: int __builtin_clz (unsigned int x)
+* Returns the number of leading 0-bits in x, starting at the most significant bit position. 
+* If x is 0, the result is undefined."
 */
+template<typename T>
+uint32_t clz_onceBultin(fpvec<T>& src) {
+	uint32_t res = 0;
+	#pragma unroll
+	for (int i=0; i<(64/sizeof(T)); i++) {
+		if (src.elements[i]==0) {
+			res = res+1;
+		} else {
+			break;
+		}
+	}
+	return res;
+}
 
 /**	#12
 * serial primitive for Intel Intrinsic:
