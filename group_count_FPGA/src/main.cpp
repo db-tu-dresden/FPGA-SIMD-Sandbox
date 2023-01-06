@@ -81,6 +81,7 @@ int  main(int argc, char** argv){
         std::cout << "HashTable not allocated" << std::endl;
     }
 
+//v1
     initializeHashMap(hashVec,countVec,HSIZE);
     std::cout <<"=============================="<<std::endl;
     std::cout <<"Linear Probing for FPGA - SIMD Variant1"<<std::endl;
@@ -88,12 +89,33 @@ int  main(int argc, char** argv){
     LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
 
+//v2
+    initializeHashMap(hashVec,countVec,HSIZE);
+    std::cout <<"=============================="<<std::endl;
+    std::cout <<"Linear Probing for FPGA - SIMD Variant2"<<std::endl;
+    begin = chrono::high_resolution_clock::now();
+    LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
+    std::cout<<mis<<std::endl;
+    validate(dataSize, hashVec,countVec, HSIZE);
 
+//v3
+    initializeHashMap(hashVec,countVec,HSIZE);
+    std::cout <<"=============================="<<std::endl;
+    std::cout <<"Linear Probing for FPGA - SIMD Variant3"<<std::endl;
+    begin = chrono::high_resolution_clock::now();
+    LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
+    std::cout<<mis<<std::endl;
+    validate(dataSize, hashVec,countVec, HSIZE);
 
     return 0;
 }

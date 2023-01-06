@@ -129,3 +129,29 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
       } 
     }
 }   
+
+/**
+ * Variant 2 of a hasbased group_count implementation for FPGA.
+ * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
+ * @param input the input data array
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
+ * @param hashVec store value of k at position hashx(k)
+ * @param countVec store the count of occurence of k at position hashx(k)
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ */
+void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE) {
+
+}  
+
+/**
+ * Variant 3 of a hasbased group_count implementation for FPGA.
+ * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
+ * @param input the input data array
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
+ * @param hashVec store value of k at position hashx(k)
+ * @param countVec store the count of occurence of k at position hashx(k)
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ */
+void LinearProbingFPGA_variant3(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE) {
+
+}  

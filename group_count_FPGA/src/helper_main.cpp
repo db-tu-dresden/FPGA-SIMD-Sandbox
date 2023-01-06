@@ -20,6 +20,7 @@ void validate(uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t
     }
     cout << "Final result check: compare parameter dataSize against sum of all count values in countVec:"<<endl;
     cout << dataSize <<" "<<sum<<endl;
+    cout <<" "<<endl;
 }
 
 /**
