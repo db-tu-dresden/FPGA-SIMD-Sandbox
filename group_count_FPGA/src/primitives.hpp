@@ -20,7 +20,7 @@ struct fpvec {
  * _mm512_setzero_epi32
  */
 template<typename T>
-fpvec<T> setzero_uint32() {
+fpvec<T> setzero() {
 	auto reg = fpvec<T>{};
 	uint32_t zero = 0;
 #pragma unroll
@@ -37,7 +37,7 @@ fpvec<T> setzero_uint32() {
  * function will (currently) only be working for arrys with 16 elements a 32bit integers!
  */
 template<typename T>
-fpvec<T> setr_16slot_uint32(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uint32_t e11, uint32_t e10, uint32_t e9,
+fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uint32_t e11, uint32_t e10, uint32_t e9,
 	uint32_t e8, uint32_t e7, uint32_t e6, uint32_t e5, uint32_t e4, uint32_t e3, uint32_t e2, uint32_t e1, uint32_t e0) {
 	auto result = fpvec<T>{};
 #pragma unroll
@@ -65,9 +65,9 @@ fpvec<T> setr_16slot_uint32(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e
 * _mm512_set1_epi32
 */
 template<typename T>
-fpvec<T> set1_uint32(uint32_t value) {
+fpvec<T> set1(T value) {
 	auto reg = fpvec<T>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		reg.elements[i] = value;
 	}
@@ -80,12 +80,26 @@ fpvec<T> set1_uint32(uint32_t value) {
 * original description: "Convert integer value a into an 16-bit mask, and store the result in k."*
 */
 template<typename T>
-fpvec<T> cvtu32_mask16_uint32(uint32_t value) {
+fpvec<T> cvtu32_mask16(T n) {
 	auto reg = fpvec<T>{};
-#pragma unroll
+	int lastElement = ((64/sizeof(T))-1);
+	#pragma unroll
+	while (lastElement >= 0) {
+         // storing remainder in array
+        reg.elements[lastElement] = n % 2;
+		//std::cout << reg.elements[lastElement] << std::endl;
+		if (n>0) {
+			n = n / 2;
+		} else {
+			n = n;
+		}
+                lastElement = lastElement-1;
+    } 
+	/* // print fpvec result register
 	for (int i=0; i<(64/sizeof(T)); i++) {
-		// tbd
-	}
+		std::cout << reg.elements[i] << " ";
+	} */
+
 	return reg;
 }
 
@@ -107,7 +121,7 @@ fpvec<T> cvtu32_mask16_uint32(uint32_t value) {
 * param4 HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
 template<typename T>
-fpvec<T> mask_loadu_uint32(fpvec<T> writeMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
+fpvec<T> mask_loadu(fpvec<T> writeMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
 	auto result = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
@@ -128,7 +142,7 @@ fpvec<T> mask_loadu_uint32(fpvec<T> writeMask, uint32_t* data, uint32_t startInd
 * using zeromask k1 (elements are zeroed out when the corresponding mask bit is not set)."
 */
 template<typename T>
-fpvec<T> mask_cmpeq_epi32_mask_uint32(fpvec<T> zeroMask, fpvec<T> a, fpvec<T> b) {
+fpvec<T> mask_cmpeq_epi32_mask(fpvec<T> zeroMask, fpvec<T> a, fpvec<T> b) {
 	auto resultMask = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
@@ -154,7 +168,7 @@ fpvec<T> mask_cmpeq_epi32_mask_uint32(fpvec<T> zeroMask, fpvec<T> a, fpvec<T> b)
 * (elements are copied from src when the corresponding mask bit is not set)."
 */
 template<typename T>
-fpvec<T> mask_add_epi32_uint32(fpvec<T> src, fpvec<T> writeMask, fpvec<T> a, fpvec<T> b) {
+fpvec<T> mask_add_epi32(fpvec<T> src, fpvec<T> writeMask, fpvec<T> a, fpvec<T> b) {
 	auto result = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
@@ -182,7 +196,7 @@ fpvec<T> mask_add_epi32_uint32(fpvec<T> src, fpvec<T> writeMask, fpvec<T> a, fpv
 * param4 data : register-array which contains the data that should be stored
 */
 template<typename T>
-void _mm512_mask_storeu_epi32_uint32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fpvec<T> writeMask, fpvec<T> data) {
+void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fpvec<T> writeMask, fpvec<T> data) {
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		if (writeMask[i] == 1) {
@@ -200,7 +214,7 @@ void _mm512_mask_storeu_epi32_uint32(uint32_t* result, uint32_t startIndex, uint
 * original description: "Converts bit mask k1 into an integer value, storing the results in dst."
 */
 template<typename T>
-uint32_t mask2int_uint32(fpvec<T> mask) {
+uint32_t mask2int(fpvec<T> mask) {
 #pragma unroll	
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		//tbd
@@ -213,7 +227,7 @@ uint32_t mask2int_uint32(fpvec<T> mask) {
 * original description: "Compute the bitwise NOT of 16-bit mask a, and store the result in k."
 */
 template<typename T>
-fpvec<T> knot_uint32(fpvec<T> src) {
+fpvec<T> knot(fpvec<T> src) {
 	auto result = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
@@ -244,7 +258,7 @@ fpvec<T> knot_uint32(fpvec<T> src) {
 * param4 HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
 template<typename T>
-fpvec<T> load_epi32_uint32(uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
+fpvec<T> load_epi32(uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
 	auto result = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
@@ -259,7 +273,7 @@ fpvec<T> load_epi32_uint32(uint32_t* data, uint32_t startIndex, uint64_t HSIZE) 
 * original description: "Compare packed 32-bit integers in a and b for equality, and store the results in mask vector k."
 */
 template<typename T>
-fpvec<T> cmpeq_epi32_mask_uint32(fpvec<T> a, fpvec<T> b) {
+fpvec<T> cmpeq_epi32_mask(fpvec<T> a, fpvec<T> b) {
 	auto resultMask = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
@@ -279,7 +293,7 @@ fpvec<T> cmpeq_epi32_mask_uint32(fpvec<T> a, fpvec<T> b) {
 * original description: "Shuffle 32-bit integers in a across lanes using the corresponding index in idx, and store the results in dst."
 */
 template<typename T>
-fpvec<T> permutexvar_epi32_uint32(fpvec<T> idx, fpvec<T> a) {
+fpvec<T> permutexvar_epi32(fpvec<T> idx, fpvec<T> a) {
 	auto resultMask = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
