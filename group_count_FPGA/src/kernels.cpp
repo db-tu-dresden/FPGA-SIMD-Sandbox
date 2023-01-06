@@ -15,25 +15,17 @@
 
 #include "primitives.hpp"
 #include "kernels.hpp"
+#include "helper_kernel.cpp"
 
 class kernels;
 
-/*
-// delete after testing
-void printBits(size_t const size, void const * const ptr) {
-    unsigned char *b = (unsigned char*) ptr;
-    unsigned char byte;
-    int i, j;
-    
-    for (i = size-1; i >= 0; i--) {
-        for (j = 7; j >= 0; j--) {
-            byte = (b[i] >> j) & 1;
-            printf("%u ", byte);
-        }
-    }
-    puts("");
-}
-*/
+/**
+ * declare some (global) basic masks and arrays
+ */ 
+fpvec<uint32_t> oneMask = set1(1);
+fpvec<uint32_t> zeroMask = set1(0);
+fpvec<uint32_t> zeroM512iArray = set1(0);
+fpvec<uint32_t> oneM512iArray = set1(1);
 
 /**
  * Variant 1 of a hasbased group_count implementation for FPGA.
@@ -53,6 +45,85 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
      * testReg = cvtu32_mask16(n);
      */
 
+    /**
+     * iterate over input data
+     * @param p current element of input data array
+     **/ 
+    int p = 0;
+    while (p < dataSize) {
+      // get single value from input at position p
+      uint32_t inputValue = input[p];
 
+      // compute hash_key of the input value
+      uint32_t hash_key = hashx(inputValue,HSIZE);
 
-}
+      // broadcast inputValue into a SIMD register
+      fpvec<uint32_t> broadcastCurrentValue = set1(inputValue);
+
+      while (1) {
+        // Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
+        int32_t overflow = (hash_key + 16) - HSIZE;
+        overflow = overflow < 0? 0: overflow;
+        uint32_t overflow_correction_mask_i = (1 << (16-overflow)) - 1; 
+        fpvec<uint32_t> overflow_correction_mask = cvtu32_mask16(overflow_correction_mask_i);
+      
+        // Load 16 consecutive elements from hashVec, starting from position hash_key
+        fpvec<uint32_t> nextElements = mask_loadu(oneMask, hashVec, hash_key, HSIZE);
+                       
+        // compare vector with broadcast value against vector with following elements for equality
+        fpvec<uint32_t> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
+    
+        /**
+        * case distinction regarding the content of the mask "compareRes"
+        * 
+        * CASE (A):
+        * inputValue does match one of the keys in nextElements (key match)
+        * just increment the associated count entry in countVec
+        **/ 
+        if (compareRes == 1) {
+          // load cout values from the corresponding location                
+          fpvec<uint32_t> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
+                    
+          // increment by one at the corresponding location
+          nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneM512iArray);
+                
+          // selective store of changed value
+          mask_storeu_epi32(&countVec, hash_key, HSIZE, compareRes,nextCounts);
+          p++;
+          break;
+          }   else {
+            /**
+            * CASE (B): 
+            * --> inputValue does NOT match any of the keys in nextElements (no key match)
+            * --> compare "nextElements" with zero
+            * CASE (B1):   resulting mask of this comparison is not 0
+            *             --> insert inputValue into next possible slot       
+            *                 
+            * CASE (B2):  resulting mask of this comparison is 0
+            *             --> no free slot in current 16-slot array
+            *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+            *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+            **/ 
+            fpvec<uint32_t> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask, nextElements);
+            uint32_t innerMask = mask2int(checkForFreeSpace);
+            if(innerMask != 0) {                // CASE B1    
+              fpvec<uint32_t> mask1 = knot(innerMask);
+
+              // compute position of the emtpy slot   
+              uint32_t pos = (32-__builtin_clz(mask1))%16;
+
+              // use 
+              hashVec[hash_key+pos] = (uint32_t)inputValue;
+              countVec[hash_key+pos]++;
+              p++;
+              break;
+            } else    {                   // CASE B2   
+              hash_key += 16;
+              if(hash_key >= HSIZE){
+                hash_key = 0;
+              }
+            }
+          }
+      } 
+    }
+}   
