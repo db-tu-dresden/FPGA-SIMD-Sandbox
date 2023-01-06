@@ -20,7 +20,9 @@
 // Sleep
 #include <unistd.h>
 
+
 #include "kernels.hpp"
+#include "kernels.cpp"
 #include "helper.cpp"
 
 

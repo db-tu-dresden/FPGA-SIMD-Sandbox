@@ -18,6 +18,23 @@
 
 class kernels;
 
+/*
+// delete after testing
+void printBits(size_t const size, void const * const ptr) {
+    unsigned char *b = (unsigned char*) ptr;
+    unsigned char byte;
+    int i, j;
+    
+    for (i = size-1; i >= 0; i--) {
+        for (j = 7; j >= 0; j--) {
+            byte = (b[i] >> j) & 1;
+            printf("%u ", byte);
+        }
+    }
+    puts("");
+}
+*/
+
 /**
  * Variant 1 of a hasbased group_count implementation for FPGA.
  * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
@@ -28,15 +45,14 @@ class kernels;
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
 void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE) {
-    
+    /** 
+     * define example register
+     * fpvec<uint32_t> testReg;
+     * 
+     * example function call from primitives.hpp
+     * testReg = cvtu32_mask16(n);
+     */
 
-    uint32_t n = 19; 
-    //__mmask16 overflow_correction_mask = _cvtu32_mask16(n);
-    //printBits(sizeof(overflow_correction_mask), &overflow_correction_mask);
 
-    // define example register
-      fpvec<uint32_t> testReg;
-
-    testReg = cvtu32_mask16_uint32(n);
 
 }
