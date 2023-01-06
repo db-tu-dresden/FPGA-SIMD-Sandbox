@@ -22,10 +22,12 @@ class kernels;
 /**
  * declare some (global) basic masks and arrays
  */ 
-fpvec<uint32_t> oneMask = set1(1);
-fpvec<uint32_t> zeroMask = set1(0);
-fpvec<uint32_t> zeroM512iArray = set1(0);
-fpvec<uint32_t> oneM512iArray = set1(1);
+uint32_t one = 1;
+uint32_t zero = 0;
+fpvec<uint32_t> oneMask = set1(one);
+fpvec<uint32_t> zeroMask = set1(zero);
+fpvec<uint32_t> zeroM512iArray = set1(zero);
+fpvec<uint32_t> oneM512iArray = set1(one);
 
 /**
  * Variant 1 of a hasbased group_count implementation for FPGA.
