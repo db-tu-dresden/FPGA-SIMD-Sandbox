@@ -199,7 +199,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
          *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
         **/ 
         // freeSlot is indicated by a zero in the nextElements
-        fpvec<uint32_t> checkForFreeSpace = cmpeq_epi32_mask(zeroM512iArray,nextElements);
+        fpvec<uint32_t> checkForFreeSpace = cmpeq_epi32_mask(zeroMask,nextElements);
         uint32_t innerMask = mask2int(checkForFreeSpace);
         if(innerMask != 0) {                // CASE B1    
           fpvec<uint32_t> mask1 = knot(checkForFreeSpace);   
@@ -233,5 +233,89 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
 void LinearProbingFPGA_variant3(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE) {
+  /**
+   * iterate over input data
+   * @param p current element of input data array
+  **/ 
+  int p = 0;
+  while (p < dataSize) {
+    // load 16 input values
+    fpvec<uint32_t> iValues = load_epi32(oneMask, input, p, HSIZE);
+    
+    //iterate over the input values
+    int i=0;
+    while (i<16) {
+      // broadcast single value from input at postion i into a new SIMD register
+      fpvec<uint32_t> idx = set1((uint32_t)i);
+      fpvec<uint32_t> broadcastCurrentValue = permutexvar_epi32(idx,iValues);
 
+      uint32_t inputValue = (uint32_t)(broadcastCurrentValue.elements[0]);
+      uint32_t hash_key = hashx(inputValue,HSIZE);
+
+      // compute the aligned start position within the hashMap based the hash_key
+      uint32_t aligned_start = (hash_key/16)*16;
+         
+      while (1) {
+        // Load 16 consecutive elements from hashVec, starting from position hash_key
+        fpvec<uint32_t> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
+        
+        // compare vector with broadcast value against vector with following elements for equality
+            fpvec<uint32_t> compareRes = cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
+
+        // compute the matching position indicated by a one within the compareRes mask
+        // if no match was found, the matchPos is zero
+        uint32_t matchPos = (32-clz_onceBultin(compareRes)); 
+
+        /**
+         * case distinction regarding the content of the mask "compareRes"
+         * 
+         * CASE (A):
+         * inputValue does match one of the keys in nextElements (key match)
+         * just increment the associated count entry in countVec
+        **/ 
+        if (matchPos > 0) {
+          // increase the counter in countVec
+          countVec[aligned_start+matchPos-1]++;
+          i++;
+          break;
+        }
+        else {
+          /**
+           * CASE (B): 
+           * --> inputValue does NOT match any of the keys in nextElements (no key match)
+           * --> compare "nextElements" with zero
+           * CASE (B1):   resulting mask of this comparison is not 0
+           *             --> insert inputValue into next possible slot       
+           *                 
+           * CASE (B2):  resulting mask of this comparison is 0
+           *             --> no free slot in current 16-slot array
+           *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+           *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+          **/ 
+
+          // freeSlot is indicated by a zero in the nextElements
+          fpvec<uint32_t> checkForFreeSpace = cmpeq_epi32_mask(zeroMask,nextElements);
+          uint32_t innerMask = mask2int(checkForFreeSpace);
+          if(innerMask != 0) {                // CASE B1    
+            fpvec<uint32_t> mask1 = knot(checkForFreeSpace);   
+            uint32_t pos = (32-clz_onceBultin(mask1))%16;
+                 
+            hashVec[aligned_start+pos] = (uint32_t)inputValue;
+            countVec[aligned_start+pos]++;
+            i++;
+            break;
+          }
+          else {                   // CASE B2   
+            if (aligned_start + 16 > HSIZE) {
+              aligned_start = 0;
+            }
+            else {
+              aligned_start = (aligned_start+16) % HSIZE;
+            }
+          }
+        }
+      }
+    }
+    p+=16;
+  }
 }  

@@ -45,7 +45,8 @@ using namespace std::chrono;
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-uint64_t distinctValues = 8000;
+//uint64_t distinctValues = 8000;
+uint64_t distinctValues = 10;
 uint64_t dataSize = 16*10000000;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
@@ -93,11 +94,12 @@ int  main(int argc, char** argv){
     std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
 
-//v2
+//v2 
     initializeHashMap(hashVec,countVec,HSIZE);
     std::cout <<"=============================="<<std::endl;
     std::cout <<"Linear Probing for FPGA - SIMD Variant2"<<std::endl;
     begin = chrono::high_resolution_clock::now();
+//v2 not working yet   
     LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
@@ -105,11 +107,13 @@ int  main(int argc, char** argv){
     std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
 
+
 //v3
     initializeHashMap(hashVec,countVec,HSIZE);
     std::cout <<"=============================="<<std::endl;
     std::cout <<"Linear Probing for FPGA - SIMD Variant3"<<std::endl;
     begin = chrono::high_resolution_clock::now();
+//v3 not working yet   
     LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
