@@ -321,7 +321,9 @@ fpvec<T> permutexvar_epi32(fpvec<T>& idx, fpvec<T>& a) {
 	auto reg = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
-		// tbd
+		uint32_t id = idx.elements[i];
+		uint32_t value = a.elements[id];
+		reg.elements[i] = value;
 	}
 	return reg;
 }
