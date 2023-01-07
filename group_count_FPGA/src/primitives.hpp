@@ -115,10 +115,10 @@ fpvec<T> cvtu32_mask16(T n) {
 *								mem_addr does not need to be aligned on any particular boundary."
 *
 * customized loadu-function:
-* param1 writeMask : if bit is set to "1" load related item from data
-* param2 data : array which contains the data which should be loaded
-* param3 startIndex : first index-position of data from where the data should be loaded
-* param4 HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
+* @param writeMask : if bit is set to "1" load related item from data
+* @param data : array which contains the data which should be loaded
+* @param startIndex : first index-position of data from where the data should be loaded
+* @param HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
 template<typename T>
 fpvec<T> mask_loadu(fpvec<T>& writeMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
@@ -189,11 +189,11 @@ fpvec<T> mask_add_epi32(fpvec<T>& src, fpvec<T>& writeMask, fpvec<T>& a, fpvec<T
 * mem_addr does not need to be aligned on any particular boundary."
 *
 * customized store  - function:
-* param1 result : array, in which the data is stored, if related bit of writeMask is set to "1"
-* param2 startIndex : first index - position of data from where the data should be stored
-* param3 HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (result array)
-* param4 writeMask : if bit is set to "1" -> store related item from data into result array
-* param4 data : register-array which contains the data that should be stored
+* @param result : array, in which the data is stored, if related bit of writeMask is set to "1"
+* @param startIndex : first index - position of data from where the data should be stored
+* @param HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (result array)
+* @param writeMask : if bit is set to "1" -> store related item from data into result array
+* @param data : register-array which contains the data that should be stored
 */
 template<typename T>
 void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fpvec<T>& writeMask, fpvec<T>& data) {
@@ -276,12 +276,13 @@ uint32_t clz_onceBultin(fpvec<T>& src) {
 * mem_addr must be aligned on a 64-byte boundary or a general-protection exception may be generated."
 *
 * customized load-function:
-* param2 data : array which contains the data which should be loaded
-* param3 startIndex : first index-position of data from where the data should be loaded
-* param4 HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
+* @param templateMask : Register of type fpvec<uint32_t>
+* @param data : array which contains the data which should be loaded
+* @param startIndex : first index-position of data from where the data should be loaded
+* @param HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
 template<typename T>
-fpvec<T> load_epi32(uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {		// testen - fehlt Parameter <T> ?
+fpvec<T> load_epi32(fpvec<T>& templateMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {		// testen - fehlt Parameter <T> ?
 	auto reg = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
