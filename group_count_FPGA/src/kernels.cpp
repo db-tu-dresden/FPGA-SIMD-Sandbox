@@ -154,7 +154,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
     // compute the aligned start position within the hashMap based the hash_key
     uint32_t aligned_start = (hash_key/16)*16;
-
+    
     /**
      * broadcast element p of input[] to vector of type fpvec<uint32_t>
      * broadcastCurrentValue contains sixteen times value of input[i]
@@ -164,13 +164,21 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
     while(1) {
       // Load 16 consecutive elements from hashVec, starting from position hash_key
       fpvec<uint32_t> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
-        
+
       // compare vector with broadcast value against vector with following elements for equality
       fpvec<uint32_t> compareRes = cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
   
-      // compute the matching position indicated by a one within the compareRes mask
-      // if no match was found, the matchPos is zero
-      uint32_t matchPos = (32-clz_onceBultin(compareRes)); 
+      /**
+       * old:
+       * uint32_t matchPos = (32-clz_onceBultin(compareRes));
+       * clz_onceBultin(compareRes) returns 16, if compareRes is 0 at every position 
+       * used fix: calculate elements of used fpvev<> registers dynamically with (64/sizeof(uint32_t))
+       * 
+       * new
+       * compute the matching position indicated by a one within the compareRes mask
+       * if no match was found, the matchPos is zero
+      */      
+      uint32_t matchPos = ((64/sizeof(uint32_t))-clz_onceBultin(compareRes)); 
 
       /**
        * case distinction regarding the content of the mask "compareRes"
@@ -262,9 +270,17 @@ void LinearProbingFPGA_variant3(uint32_t *input, uint64_t dataSize, uint32_t *ha
         // compare vector with broadcast value against vector with following elements for equality
             fpvec<uint32_t> compareRes = cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
 
-        // compute the matching position indicated by a one within the compareRes mask
-        // if no match was found, the matchPos is zero
-        uint32_t matchPos = (32-clz_onceBultin(compareRes)); 
+        /**
+         * old:
+         * uint32_t matchPos = (32-clz_onceBultin(compareRes));
+         * clz_onceBultin(compareRes) returns 16, if compareRes is 0 at every position 
+         * used fix: calculate elements of used fpvev<> registers dynamically with (64/sizeof(uint32_t))
+         * 
+         * new
+         * compute the matching position indicated by a one within the compareRes mask
+         * if no match was found, the matchPos is zero
+        */      
+        uint32_t matchPos = ((64/sizeof(uint32_t))-clz_onceBultin(compareRes)); 
 
         /**
          * case distinction regarding the content of the mask "compareRes"
