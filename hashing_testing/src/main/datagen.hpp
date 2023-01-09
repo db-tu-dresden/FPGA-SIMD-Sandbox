@@ -1,0 +1,241 @@
+#ifndef TUD_HASHING_TESTING_DATAGEN
+#define TUD_HASHING_TESTING_DATAGEN
+
+#include <stdint.h>
+#include <stdlib.h>
+#include <vector>
+
+/*
+    Density sets the information about the data layout between the values.
+    In the DENSE Case this should mean that the numbers are in an interval from [x:y]
+        with a step size of 1.
+    In the SPARSE case the numbers are taken at random from the full range of values.    
+*/
+enum Density{DENSE, SPARSE};
+
+/*
+    The Distribution gives us another tuning factor.
+    For this we disregard the order of the keys.
+    With NORMAL we try to generate the data such that the different keys follow a
+        normal distributuion.
+    With UNIFORM we try to achieve a uniform distribution. This includes some variations
+        in the relative frequencies.
+*/
+enum Distribution{NORMAL, UNIFORM};
+
+/*
+    With Generation we try to achieve the same affect the paper: "A Seven-Dimensional 
+        Analysis of Hashing Methods and its Implications on Query Processing"
+    With the FLAT generation we have no prerequirements of how the data should look like.
+    GRID on the other hand has the prerequrement that every 
+*/
+enum Generation{FLAT, GRID};
+
+
+template<typename T>
+T make_grid(size_t x){
+    size_t halfword[] ={0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE};
+    size_t nr_half = 14;
+    T result = 0;
+
+    for(size_t i = 0; x < sizeof(T); x++){
+        size_t k = x % nr_half;
+        x /= nr_half;
+     
+        result ^= halfword[k] << (8 * i);
+    }
+    
+    return result;
+}
+
+//TODO CHECK IF it is okay to use.
+uint64_t noise(size_t position, size_t seed){
+    size_t BIT_NOISE1 = 0x68E31DA4;
+    size_t BIT_NOISE2 = 0xB5297A4D;
+    size_t BIT_NOISE3 = 0x1B56C4E9;
+
+    // size_t BIT_NOISE1 = 0x7FFFFFFFFFFFFF5B;
+    // size_t BIT_NOISE2 = 0x68E31DA4B5297A4D;
+    // size_t BIT_NOISE3 = 0xA8F8628ADC17D6CB;
+
+    uint64_t mangled = position;
+    mangled *= BIT_NOISE1;
+    mangled += seed;
+    mangled ^= (mangled << 13);
+    // mangled ^= (mangled >> 8);
+    mangled += BIT_NOISE2;
+    mangled ^= (mangled >> 7);
+    // mangled ^= (mangled << 8);
+    mangled *= BIT_NOISE3;
+    mangled ^= (mangled << 17);
+    // mangled ^= (mangled >> 8);
+
+    mangled *= BIT_NOISE1;
+    mangled += seed;
+    mangled ^= (mangled << 13);
+    // mangled ^= (mangled >> 8);
+    mangled += BIT_NOISE2;
+    mangled ^= (mangled >> 7);
+    // mangled ^= (mangled << 8);
+    mangled *= BIT_NOISE3;
+    mangled ^= (mangled << 17);
+
+    return mangled;
+}
+
+
+/*
+    helping function that turns the index into random numbers
+*/
+template<typename T>
+void flat_number_gen(
+    std::vector<T>& numbers,
+    std::vector<size_t> index,
+    size_t distinct_values
+){
+    for(size_t i = 0; numbers.size() < distinct_values && i < index.size(); i++){
+        T num = index[i];
+        bool in = (num == 0);
+
+        for(T x: numbers){
+            if(x == num){
+                in = true;
+                break;
+            }
+        }
+
+        if(!in){
+            numbers.push_back((T)num);
+        }
+    }
+    std::cout << "numbers\n";
+    for(T x: numbers){
+        std::cout << x << "\t";
+    }std::cout << std::endl;
+}
+
+
+/*
+    helping function that turns the index into random numbers
+*/
+template<typename T>
+void grid_number_gen(
+    std::vector<T>& numbers,
+    std::vector<size_t> index,
+    size_t distinct_values
+){
+    for(size_t i = 0; numbers.size() < distinct_values && i < index.size(); i++){
+        size_t id = index[i];
+        T num = make_grid<T>(i);
+        bool in = (num == 0);
+
+        for(T x: numbers){
+            if(x == num){
+                in = true;
+                break;
+            }
+        }
+
+        if(!in){
+            numbers.push_back((T)num);
+        }
+    }
+}
+
+
+/*
+    helping function that turns one number into a grid number
+*/
+
+
+/*
+    random number generator for different layouts dense and sparse
+*/
+void index_dense(std::vector<size_t>& index, size_t distinct_values, size_t start){
+    for(size_t i = start; i < distinct_values+start; i++){
+        index.push_back(i);
+    }
+}
+
+void index_sparse(std::vector<size_t>&index, size_t distinct_values, size_t seed){
+    if(seed != 0){
+        seed = std::rand();
+    }    
+    for(size_t i = 1; i <= distinct_values; i++){
+        index.push_back(noise(i, seed));
+    }
+}
+
+
+
+/*
+    Data generator with different options for data layout. 
+    DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!
+*/
+template<typename T>
+void generate_data(
+    T*& result, 
+    size_t data_size,   // number of values to be generated
+    size_t distinct_values, // number of distinct values
+    Density den = Density::DENSE,
+    Generation gen = Generation::FLAT,
+    Distribution dis = Distribution::UNIFORM,
+    size_t start = 0,   // starting offset for consecutive numbers (dense)
+    size_t seed = 0     // for sparse number generation 0 true random 1.. reproducible
+){
+    size_t mul = 1;
+    size_t retries = 0;
+retry:
+    mul++;
+    retries++;
+    if(retries < 10)
+    {
+        std::vector<size_t> index;
+        std::vector<T> numbers;
+
+        switch(den){
+        case Density::DENSE:
+            index_dense(index, distinct_values*mul, start);
+            break;
+        case Density::SPARSE:
+            index_sparse(index, distinct_values*mul, seed);
+            break;    
+        default:
+            throw std::runtime_error("Unknown Density input");
+        }
+
+        switch (gen){
+        case Generation::FLAT:
+            flat_number_gen<T>(numbers, index, distinct_values);
+            break;
+        case Generation::GRID:
+            grid_number_gen<T>(numbers, index, distinct_values);
+            break;
+        default:
+            throw std::runtime_error("Unknown Generation methoed input");    
+        }
+        
+        if(numbers.size() < distinct_values){
+            goto retry;
+        }
+
+        switch(dis){
+        case Distribution::NORMAL:
+            throw std::runtime_error("Normal Distribution not yet implemented");    
+            break;
+        case Distribution::UNIFORM:
+            for(size_t i = 0; i < data_size; i++){
+                size_t ran = noise(i, seed + start + 1) % distinct_values;
+                result[i] = numbers[ran];
+            }
+            break;
+        default:
+            throw std::runtime_error("Unknown Distribution input");    
+        }
+    }else{
+        throw std::runtime_error("To many retries in data gen.");
+    }
+}
+
+
+#endif //TUD_HASHING_TESTING_DATAGEN
