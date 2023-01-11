@@ -108,10 +108,10 @@ void flat_number_gen(
             numbers.push_back((T)num);
         }
     }
-    std::cout << "numbers\n";
-    for(T x: numbers){
-        std::cout << x << "\t";
-    }std::cout << std::endl;
+    // std::cout << "numbers\n";
+    // for(T x: numbers){
+    //     std::cout << x << "\t";
+    // }std::cout << std::endl;
 }
 
 

@@ -16,7 +16,11 @@ class Group_count{
     public:
         virtual void create_hash_table(T* input, size_t dataSize) = 0;
         
+        virtual T get(T input) = 0;
+
         virtual void print() = 0;
+
+        virtual std::string identify() = 0;
 
 };
 

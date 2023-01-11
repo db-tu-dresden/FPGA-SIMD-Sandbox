@@ -7,7 +7,7 @@
 
 template <typename T>
 class Scalar_group_count : public Group_count<T>{
-    private:
+    protected:
         T* m_hash_vec;
         T* m_count_vec;
 
@@ -17,8 +17,12 @@ class Scalar_group_count : public Group_count<T>{
         
         void create_hash_table(T* input, size_t dataSize);
         
+        T get(T value);
+
         void print();
         void print2();
+
+        std::string identify();
 
 };
 

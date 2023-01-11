@@ -66,8 +66,30 @@ void Scalar_group_count<T>::create_hash_table(T* input, size_t dataSize){
 }
 
 template <typename T>
+T Scalar_group_count<T>::get(T input){
+    size_t rounds = 0;
+    size_t HSIZE = this->m_HSIZE;
+    
+    T hash_key = this->m_hash_function(input, HSIZE);
+
+    while(rounds <= 1){
+        T value = this->m_hash_vec[hash_key];
+        
+        if(value == input){
+            return this->m_count_vec[hash_key];
+        }else if(value == EMPTY_SPOT){
+            return 0;
+        }else{
+            hash_key = (hash_key + 1) % HSIZE;
+            rounds += (hash_key == 0);
+        }
+    }
+    return 0;
+}
+
+template <typename T>
 void Scalar_group_count<T>::print(){
-    size_t count =0;
+    size_t count = 0;
     size_t HSIZE = this->m_HSIZE;
 
     for(size_t i = 0; i < HSIZE; i++){
@@ -93,6 +115,12 @@ void Scalar_group_count<T>::print2(){
     }
     std::cout << "Total Count:\t" << count << std::endl;
 }
+
+template <typename T>
+std::string Scalar_group_count<T>::identify(){
+    return "Scalar Group Count";
+}
+
 
 template class Scalar_group_count<uint32_t>;
 template class Scalar_group_count<uint64_t>;
