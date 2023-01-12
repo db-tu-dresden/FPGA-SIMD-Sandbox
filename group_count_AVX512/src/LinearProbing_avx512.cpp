@@ -19,9 +19,9 @@
 /**
  * declare some (global) basic masks and arrays
  */ 
-__mmask16 oneMask = (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
-__mmask16 zeroMask = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-__mmask16 testMask = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0);
+__mmask16 oneMask = 0xFFFF;
+__mmask16 zeroMask = 0x0000;
+__mmask16 testMask = 0x0002;
 __m512i zeroM512iArray = _mm512_setzero_epi32();
 __m512i oneM512iArray = _mm512_setr_epi32 (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
 
