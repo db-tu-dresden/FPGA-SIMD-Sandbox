@@ -328,4 +328,25 @@ fpvec<T> permutexvar_epi32(fpvec<T>& idx, fpvec<T>& a) {
 	return reg;
 }
 
+/**	#15
+* serial primitive for Built-in Function Provided by GCC:
+* __builtin_ctz
+* original description: "Built-in Function: int __builtin_ctz (unsigned int x)
+* Returns the number of trailing 0-bits in x, starting at the least significant bit position. 
+* If x is 0, the result is undefined."
+*/
+template<typename T>
+uint32_t ctz_onceBultin(fpvec<T>& src) {
+	uint32_t res = 0;
+	#pragma unroll
+	for (int i=((64/sizeof(T))-1); i>=0; i--) {
+		if (src.elements[i]==0) {
+			res = res+1;
+		} else {
+			break;
+		}
+	}
+	return res;
+}
+
 #endif // PRIMITIVES_HPP
