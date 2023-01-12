@@ -24,7 +24,7 @@
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-uint64_t distinctValues = 60;
+uint64_t distinctValues = 32;
 uint64_t dataSize = 16*10000000;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
@@ -73,6 +73,7 @@ int  main(int argc, char** argv){
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
 
     initializeHashMap(hashVec,countVec,HSIZE);
@@ -86,6 +87,7 @@ int  main(int argc, char** argv){
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
@@ -98,6 +100,7 @@ int  main(int argc, char** argv){
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
@@ -110,6 +113,7 @@ int  main(int argc, char** argv){
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
      
     
     /*initializeHashMap(hashVec,countVec,HSIZE);
