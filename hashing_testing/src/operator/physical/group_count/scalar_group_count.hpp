@@ -19,8 +19,7 @@ class Scalar_group_count : public Group_count<T>{
         
         T get(T value);
 
-        void print();
-        void print2();
+        void print(bool horizontal);
 
         std::string identify();
 

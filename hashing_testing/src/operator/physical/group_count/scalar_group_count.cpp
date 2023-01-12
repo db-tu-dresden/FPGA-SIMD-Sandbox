@@ -10,8 +10,6 @@ template <typename T>
 Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, T (*hash_function)(T, size_t))
     : Group_count<T>(HSIZE, hash_function)
 {
-    // m_HSIZE = HSIZE;
-    // m_hash_function = hash_function;
     m_hash_vec = (T*) aligned_alloc(64, HSIZE * sizeof(T));
     m_count_vec = (T*) aligned_alloc(64, HSIZE * sizeof(T));
 
@@ -19,8 +17,6 @@ Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, T (*hash_function)(T, si
         m_hash_vec[i] = 0;
         m_count_vec[i] = 0;
     }
-    // initialize(m_hash_vec, HSIZE, EMPTY_SPOT);
-    // initialize(m_count_vec, HSIZE, 0);
 }
 
 template <typename T>
@@ -88,32 +84,35 @@ T Scalar_group_count<T>::get(T input){
 }
 
 template <typename T>
-void Scalar_group_count<T>::print(){
+void Scalar_group_count<T>::print(bool horizontal){
     size_t count = 0;
     size_t HSIZE = this->m_HSIZE;
 
-    for(size_t i = 0; i < HSIZE; i++){
-        std::cout << "\t" << m_hash_vec[i];
-    }
-    std::cout << std::endl;
+    if(horizontal){
+        
+        for(size_t i = 0; i < HSIZE; i++){
+                std::cout << "\t" << i;
+        }
+        std::cout << std::endl;
 
-    for(size_t i = 0; i < HSIZE; i++){
-        std::cout << "\t" << m_count_vec[i];
-        count += m_count_vec[i];
-    }
-    std::cout << std::endl << "Total Count:\t" << count << std::endl;
-}
+        for(size_t i = 0; i < HSIZE; i++){
+                std::cout << "\t" << m_hash_vec[i];
+        }
+        std::cout << std::endl;
 
-template <typename T>
-void Scalar_group_count<T>::print2(){
-    size_t count =0;
-    size_t HSIZE = this->m_HSIZE;
-
-    for(size_t i = 0; i < HSIZE; i++){
-        std::cout << i << "\t" << m_hash_vec[i] << "\t" << m_count_vec[i] << std::endl;
-        count += m_count_vec[i];
+        for(size_t i = 0; i < HSIZE; i++){
+            std::cout << "\t" << m_count_vec[i];
+            count += m_count_vec[i];
+        }
+        std::cout << std::endl << "Total Count:\t" << count << std::endl;
     }
-    std::cout << "Total Count:\t" << count << std::endl;
+    else{
+        for(size_t i = 0; i < HSIZE; i++){
+            std::cout << i << "\t" << m_hash_vec[i] << "\t" << m_count_vec[i] << std::endl;
+            count += m_count_vec[i];
+        }
+        std::cout << "Total Count:\t" << count << std::endl;
+    }
 }
 
 template <typename T>

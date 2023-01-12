@@ -6,7 +6,7 @@
 
 
 #include "../operator/physical/group_count/scalar_group_count.hpp"
-#include "../operator/physical/group_count/avx512_group_count.hpp"
+#include "../operator/physical/group_count/avx512_group_count_soa_v1.hpp"
 
 #include "datagen.hpp"
 
@@ -24,7 +24,7 @@ template <typename T>
 size_t createCountValidationTable(T** res_table, T** res_count, T* data, size_t dataSize, size_t HSIZE);
 
 template <typename T> 
-void validate(Group_count<T>* grouping, T* table_value, T* table_count, size_t dataSize);
+bool validate(Group_count<T>* grouping, T* table_value, T* table_count, size_t dataSize);
 
 template <typename T>
 void run_test(Group_count<T>* group_count, T* data, size_t dataSize, T* validation_value, T* validation_count, size_t validation_size);
@@ -36,23 +36,31 @@ uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, st
 
 
 
-using ps_type = uint64_t;
-// using ps_type = uint32_t;
+// using ps_type = uint64_t;
+using ps_type = uint32_t;
 
 int main(int argc, char** argv){
-    size_t distinctValuesCount = 6;
+    size_t distinctValuesCount = 12;
     float scale = 1.8f;
     size_t HSIZE = (size_t)(scale * distinctValuesCount + 0.5f);
-    size_t dataSize = 16 * 100000000;
+    size_t dataSize = 16 * 4;//000000;
     ps_type* data = new ps_type[dataSize];
 
 
     std::cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     std::cout << "Generate Data\n";    
-    generate_data<ps_type>(data, dataSize, distinctValuesCount, Density::SPARSE);
-
-
-
+    // generate_data<ps_type>(data, dataSize, distinctValuesCount, Density::SPARSE);
+    // for(size_t i = 0; i < dataSize; i++){
+    //     data[i] = data[i] % (HSIZE * 30);
+    // }
+    dataSize = 5;
+    data = new ps_type[dataSize];
+    data[0] = 247;
+    data[1] = 518;
+    data[2] = 313;
+    data[3] = 518;
+    data[4] = 247;
+    
     //generating data for validation so that we only need to calculate it once per data
     ps_type *table_value;
     ps_type *table_count;
@@ -60,11 +68,18 @@ int main(int argc, char** argv){
     std::cout << "Prepare Validation data\n";
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
 
-
-    run_test<ps_type>(new AVX512_group_count<ps_type>(HSIZE, &id_mod), data, dataSize, table_value, table_count, slots);
-    run_test<ps_type>(new Scalar_group_count<ps_type>(HSIZE, &id_mod), data, dataSize, table_value, table_count, slots);
+    run_test<ps_type>(new Scalar_group_count<ps_type>(HSIZE, &hashx), data, dataSize, table_value, table_count, slots);
+    run_test<ps_type>(new AVX512_group_count_SoA_v1<ps_type>(HSIZE, &hashx), data, dataSize, table_value, table_count, slots);
 
 }
+
+
+
+
+
+
+
+
 
 /// @brief 
 /// @tparam T 
@@ -103,7 +118,11 @@ void run_test(Group_count<T>* group_count, T* data, size_t dataSize, T* validati
     std::cout << "\tperf:\t" << (data_count)/(duration_s) << " Gval/s\n";
     std::cout << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 
-    validate<ps_type>(group_count, validation_value, validation_count, validation_size);
+    bool errors = validate<ps_type>(group_count, validation_value, validation_count, validation_size);
+    // if(errors)
+    // {
+    //     group_count->print(false);
+    // }
     free(group_count);
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
 }
@@ -178,7 +197,7 @@ size_t createCountValidationTable(T** res_table, T** res_count, T* data, size_t 
 
 
 template <typename T> 
-void validate(Group_count<T>* grouping, T* table_value, T* table_count, size_t dataSize){
+bool validate(Group_count<T>* grouping, T* table_value, T* table_count, size_t dataSize){
     std::cout << "Start Validation\n";
     size_t nr_of_errors = 0;
     for(size_t i = 0; i < dataSize; i++){
@@ -187,7 +206,7 @@ void validate(Group_count<T>* grouping, T* table_value, T* table_count, size_t d
 
         if(count != table_count[i]){
             std::cout << "\tERROR Count\t" << value << " has a count of\t" 
-                << count << " but expected to have\t" << table_count << std::endl;
+                << count << " but expected to have\t" << table_count[i] << std::endl;
             nr_of_errors++;
         }
     }
@@ -195,9 +214,10 @@ void validate(Group_count<T>* grouping, T* table_value, T* table_count, size_t d
     if(nr_of_errors == 1){
         std::cout << "\tFound one Error\n";
     }else if(nr_of_errors > 1){
-        std::cout << "\tFound " << nr_of_errors << "Errors\n";
+        std::cout << "\tFound " << nr_of_errors << " Errors\n";
     }else{
         std::cout << std::endl;
     }
+    return nr_of_errors != 0;
 }
 

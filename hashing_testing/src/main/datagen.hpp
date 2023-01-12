@@ -158,7 +158,7 @@ void index_dense(std::vector<size_t>& index, size_t distinct_values, size_t star
 }
 
 void index_sparse(std::vector<size_t>&index, size_t distinct_values, size_t seed){
-    if(seed != 0){
+    if(seed == 0){
         seed = std::rand();
     }    
     for(size_t i = 1; i <= distinct_values; i++){
@@ -181,9 +181,9 @@ void generate_data(
     Generation gen = Generation::FLAT,
     Distribution dis = Distribution::UNIFORM,
     size_t start = 0,   // starting offset for consecutive numbers (dense)
-    size_t seed = 0     // for sparse number generation 0 true random 1.. reproducible
+    size_t seed = 0     // for sparse number generation 0 true random, 1.. reproducible
 ){
-    size_t mul = 1;
+    double mul = 1.5;
     size_t retries = 0;
 retry:
     mul++;
@@ -225,6 +225,9 @@ retry:
             break;
         case Distribution::UNIFORM:
             for(size_t i = 0; i < data_size; i++){
+                if(seed == 0){
+                    seed = std::rand();
+                }
                 size_t ran = noise(i, seed + start + 1) % distinct_values;
                 result[i] = numbers[ran];
             }

@@ -13,12 +13,27 @@ class Group_count{
         size_t m_HSIZE;
         Group_count(size_t HSIZE, T (*hash_function)(T, size_t)):m_HSIZE{HSIZE},m_hash_function{hash_function}{}
 
+
+void printBits(size_t const size, void const * const ptr) {
+    unsigned char *b = (unsigned char*) ptr;
+    unsigned char byte;
+    int i, j;
+    
+    for (i = size-1; i >= 0; i--) {
+        for (j = 7; j >= 0; j--) {
+            byte = (b[i] >> j) & 1;
+            printf("%u ", byte);
+        }
+    }
+    puts("");
+}
+
     public:
         virtual void create_hash_table(T* input, size_t dataSize) = 0;
         
         virtual T get(T input) = 0;
 
-        virtual void print() = 0;
+        virtual void print(bool horizontal=true) = 0;
 
         virtual std::string identify() = 0;
 
