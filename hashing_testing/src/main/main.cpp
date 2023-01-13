@@ -8,6 +8,7 @@
 #include "../operator/physical/group_count/scalar_group_count.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_v1.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_v2.hpp"
+#include "../operator/physical/group_count/avx512_group_count_soa_v3.hpp"
 
 #include "datagen.hpp"
 
@@ -42,10 +43,10 @@ using ps_type = uint32_t;
 
 int main(int argc, char** argv){
     size_t distinct_value_count = 2048; // setting the number of Distinct Values
-    float scale = 1.1f; // setting the hash map scaling factor
-    size_t data_size = 16 * 100000000;; // setting the number of entries
+    float scale = 1.8f; // setting the hash map scaling factor
+    size_t data_size = 16 * 10000000;; // setting the number of entries
 
-    ps_type (*function) (ps_type, size_t) = &id_mod; // setting the function
+    ps_type (*function) (ps_type, size_t) = &hashx; // setting the function
 
     size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
     ps_type* data = new ps_type[data_size];  
@@ -69,6 +70,7 @@ int main(int argc, char** argv){
     run_test<ps_type>(new Scalar_group_count<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
+    run_test<ps_type>(new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
 
 }
 
@@ -108,7 +110,7 @@ void run_test(Group_count<T>* group_count, T* data, size_t data_size, T* validat
     std::cout << "\tTime:\t" << duration << " ns\n";
     std::cout << "\tTime:\t" << duration_s << " s\n";
     std::cout << "\tData:\t" << data_amount << " Gbit\n"; 
-    std::cout << "\tData:\t" << data_count << " Million Values(Gval)\n"; 
+    std::cout << "\tData:\t" << data_size << " Values\n"; 
     std::cout << "\ttput:\t" << (data_amount)/(duration_s) << " Gbit/s\n";
     std::cout << "\tperf:\t" << (data_count)/(duration_s) << " Gval/s\n";
     std::cout << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";

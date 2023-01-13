@@ -24,7 +24,7 @@ AVX512_group_count_SoA_v2<T>::~AVX512_group_count_SoA_v2(){
 
 template <typename T>
 std::string AVX512_group_count_SoA_v2<T>::identify(){
-    return "Scalar Group Count SoA Version 2";
+    return "AVX512 Group Count SoA Version 2";
 }
 
 

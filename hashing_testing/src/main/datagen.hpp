@@ -70,15 +70,15 @@ uint64_t noise(size_t position, size_t seed){
     mangled ^= (mangled << 17);
     // mangled ^= (mangled >> 8);
 
-    mangled *= BIT_NOISE1;
-    mangled += seed;
-    mangled ^= (mangled << 13);
-    // mangled ^= (mangled >> 8);
-    mangled += BIT_NOISE2;
-    mangled ^= (mangled >> 7);
-    // mangled ^= (mangled << 8);
-    mangled *= BIT_NOISE3;
-    mangled ^= (mangled << 17);
+    // mangled *= BIT_NOISE1;
+    // mangled += seed;
+    // mangled ^= (mangled << 13);
+    // // mangled ^= (mangled >> 8);
+    // mangled += BIT_NOISE2;
+    // mangled ^= (mangled >> 7);
+    // // mangled ^= (mangled << 8);
+    // mangled *= BIT_NOISE3;
+    // mangled ^= (mangled << 17);
 
     return mangled;
 }
@@ -108,10 +108,6 @@ void flat_number_gen(
             numbers.push_back((T)num);
         }
     }
-    // std::cout << "numbers\n";
-    // for(T x: numbers){
-    //     std::cout << x << "\t";
-    // }std::cout << std::endl;
 }
 
 
@@ -142,12 +138,6 @@ void grid_number_gen(
     }
 }
 
-
-/*
-    helping function that turns one number into a grid number
-*/
-
-
 /*
     random number generator for different layouts dense and sparse
 */
@@ -168,12 +158,91 @@ void index_sparse(std::vector<size_t>&index, size_t distinct_values, size_t seed
 
 
 
+
 /*
     Data generator with different options for data layout. 
     DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!
 */
 template<typename T>
 void generate_data(
+    T*& result, 
+    size_t data_size,   // number of values to be generated
+    size_t distinct_values, // number of distinct values
+    Density den = Density::DENSE,
+    Generation gen = Generation::FLAT,
+    Distribution dis = Distribution::UNIFORM,
+    size_t start = 0,   // starting offset for consecutive numbers (dense)
+    size_t seed = 0     // for sparse number generation 0 true random, 1.. reproducible
+){
+    
+    if(seed == 0){
+        srand(std::time(nullptr));
+    }
+    
+    double mul = 1.5;
+    size_t retries = 0;
+retry:
+    mul++;
+    retries++;
+    if(retries < 10)
+    {
+        std::vector<size_t> index;
+        std::vector<T> numbers;
+
+        switch(den){
+        case Density::DENSE:
+            index_dense(index, distinct_values*mul, start);
+            break;
+        case Density::SPARSE:
+            index_sparse(index, distinct_values*mul, seed);
+            break;    
+        default:
+            throw std::runtime_error("Unknown Density input");
+        }
+
+        switch (gen){
+        case Generation::FLAT:
+            flat_number_gen<T>(numbers, index, distinct_values);
+            break;
+        case Generation::GRID:
+            grid_number_gen<T>(numbers, index, distinct_values);
+            break;
+        default:
+            throw std::runtime_error("Unknown Generation methoed input");    
+        }
+        
+        if(numbers.size() < distinct_values){
+            goto retry;
+        }
+
+        switch(dis){
+        case Distribution::NORMAL:
+            throw std::runtime_error("Normal Distribution not yet implemented");    
+            break;
+        case Distribution::UNIFORM:
+            for(size_t i = 0; i < data_size; i++){
+                if(seed == 0){
+                    seed = std::rand();
+                }
+                size_t ran = noise(i, seed + start + 1) % distinct_values;
+                result[i] = numbers[ran];
+            }
+            break;
+        default:
+            throw std::runtime_error("Unknown Distribution input");    
+        }
+    }else{
+        throw std::runtime_error("To many retries in data gen.");
+    }
+}
+
+
+/*
+    Data generator with different options for data layout. 
+    DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!
+*/
+template<typename T>
+void generate_data2(
     T*& result, 
     size_t data_size,   // number of values to be generated
     size_t distinct_values, // number of distinct values
