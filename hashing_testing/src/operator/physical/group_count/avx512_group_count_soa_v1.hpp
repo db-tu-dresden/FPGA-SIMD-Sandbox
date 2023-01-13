@@ -14,7 +14,7 @@ class AVX512_group_count_SoA_v1 : public Scalar_group_count<T>{
         AVX512_group_count_SoA_v1(size_t HSIZE, T (*hash_function)(T, size_t));
         ~AVX512_group_count_SoA_v1();
         
-        void create_hash_table(T* input, size_t dataSize);
+        void create_hash_table(T* input, size_t data_size);
         
         std::string identify();
 };

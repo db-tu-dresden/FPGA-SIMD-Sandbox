@@ -26,11 +26,16 @@ Scalar_group_count<T>::~Scalar_group_count(){
 }
 
 template <typename T>
-void Scalar_group_count<T>::create_hash_table(T* input, size_t dataSize){
+std::string Scalar_group_count<T>::identify(){
+    return "Scalar Group Count";
+}
+
+template <typename T>
+void Scalar_group_count<T>::create_hash_table(T* input, size_t data_size){
     size_t p = 0;
     size_t HSIZE = this->m_HSIZE;
     // Iterate over input 
-    while(p < dataSize){
+    while(p < data_size){
         int error = 0;
         // get the possible possition of the element.
         T hash_key = this->m_hash_function(input[p], HSIZE);
@@ -113,11 +118,6 @@ void Scalar_group_count<T>::print(bool horizontal){
         }
         std::cout << "Total Count:\t" << count << std::endl;
     }
-}
-
-template <typename T>
-std::string Scalar_group_count<T>::identify(){
-    return "Scalar Group Count";
 }
 
 

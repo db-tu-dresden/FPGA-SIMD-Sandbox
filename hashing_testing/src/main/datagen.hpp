@@ -183,6 +183,10 @@ void generate_data(
     size_t start = 0,   // starting offset for consecutive numbers (dense)
     size_t seed = 0     // for sparse number generation 0 true random, 1.. reproducible
 ){
+    if(seed == 0){
+        srand(std::time(nullptr));
+    }
+    
     double mul = 1.5;
     size_t retries = 0;
 retry:
