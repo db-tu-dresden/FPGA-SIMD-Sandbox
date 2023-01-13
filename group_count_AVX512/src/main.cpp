@@ -24,13 +24,16 @@
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-uint64_t distinctValues = 32;
+//uint64_t distinctValues = 32;
+uint64_t distinctValues = 8000;
 uint64_t dataSize = 16*10000000;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
 
-
 int  main(int argc, char** argv){
+    // print global settings
+    cout << "Global configuration:"<< endl;
+    cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< endl;
     // print hashsize of current settings
     cout << "Configured HSIZE : " << HSIZE << endl;
 
@@ -61,55 +64,53 @@ int  main(int argc, char** argv){
         cout << "HashTable not allocated" << endl;
     }
 
-
+//scalar version
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
-    cout <<"Linear Probing - scalar"<<endl;
+    cout <<"Linear Probing - scalar:"<<endl;
     auto begin = chrono::high_resolution_clock::now();
     LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
-
+//SIMD AVX512 - v1
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
-    cout <<"Linear Probing - SIMD Variant1"<<endl;
+    cout <<"Linear Probing - SIMD Variant 1:"<<endl;
     begin = chrono::high_resolution_clock::now();
     LinearProbingAVX512Variant1(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
+//SIMD AVX512 - v2
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
-    cout <<"Linear Probing - SIMD Variant2"<<endl;
+    cout <<"Linear Probing - SIMD Variant 2:"<<endl;
     begin = chrono::high_resolution_clock::now();
     LinearProbingAVX512Variant2(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
+//SIMD AVX512 - v3
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
-    cout <<"Linear Probing - SIMD Variant3"<<endl;
+    cout <<"Linear Probing - SIMD Variant 3:"<<endl;
     begin = chrono::high_resolution_clock::now();
     LinearProbingAVX512Variant3(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);

@@ -52,7 +52,6 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
         __m512i broadcastCurrentValue = _mm512_set1_epi32(inputValue);
 
         while (1) {
-
             // Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
             int32_t overflow = (hash_key + 16) - HSIZE;
             overflow = overflow < 0? 0: overflow;
@@ -83,8 +82,8 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                 _mm512_mask_storeu_epi32(&countVec[hash_key],compareRes,nextCounts);
                 p++;
                 break;
-            }   else {
-                // cout << "CASE B: " <<endl;
+            }   
+            else {
                 /**
                     * CASE (B): 
                     * --> inputValue does NOT match any of the keys in nextElements (no key match)
@@ -99,15 +98,11 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                     **/ 
 
                 // __m512i freeSlots is used as a helper; contains the informations of __mmask16 checkForFreeSpace
-                // @todo    find a method to be able to access the individual bits of the mask "checkForFreeSpace" directly
-                //          and thus to process their information directly
 
-    
                 __mmask16 checkForFreeSpace = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, _mm512_setzero_epi32(), nextElements);
                 uint32_t innerMask = _mm512_mask2int(checkForFreeSpace);
                 if(innerMask != 0) {                // CASE B1       
-                    
-                    __mmask16 mask1 = _mm512_knot(innerMask);
+                    // __mmask16 mask1 = _mm512_knot(innerMask);    // not used anymore
 
                     // compute position of the emtpy slot   
                     // uint32_t pos = (32-__builtin_clz(mask1))%16;
@@ -119,13 +114,6 @@ void LinearProbingAVX512Variant1(uint32_t* input, uint64_t dataSize, uint32_t* h
                     p++;
                     break;
                 }   else    {                   // CASE B2   
-                    /**
-                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
-                    *       : this case is not implemented yet 
-                    * @todo : avoid infinite loop!
-                    */
-                    // cout <<"B2"<<endl;
-                    
                     hash_key += 16;
                     if(hash_key >= HSIZE){
                         hash_key = 0;
@@ -243,11 +231,6 @@ void LinearProbingAVX512Variant2(uint32_t* input, uint64_t dataSize, uint32_t* h
                     p++;
                     break;
                 }   else    {                   // CASE B2
-                    /**
-                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
-                    *       : this case is not implemented yet 
-                    * @todo : avoid infinite loop!
-                    */
                     //aligned_start = (aligned_start+16) % HSIZE;
 // since we now use the overflow mask we can do this to change our position
 // we ALSO need to set the remainder to 0.
@@ -295,72 +278,90 @@ void LinearProbingAVX512Variant3(uint32_t* input, uint64_t dataSize, uint32_t* h
 
             // compute the aligned start position within the hashMap based the hash_key
             uint32_t aligned_start = (hash_key/16)*16;
+            uint32_t remainder = hash_key - aligned_start; // should be equal to hash_key % 16
          
             while (1) {
-            // Load 16 consecutive elements from hashVec, starting from position hash_key
-            __m512i nextElements = _mm512_load_epi32(&hashVec[aligned_start]);
-        
-            // compare vector with broadcast value against vector with following elements for equality
-            __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, nextElements);
-  
-            // compute the matching position indicated by a one within the compareRes mask
-            // if no match was found, the matchPos is zero
-            uint32_t matchPos = (32-__builtin_clz(compareRes)); 
+                int32_t overflow = (aligned_start + 16) - HSIZE;
+                overflow = overflow < 0? 0: overflow;
+                uint32_t overflow_correction_mask_i = (1 << (16-overflow)) - 1; 
+                __mmask16 overflow_correction_mask = _cvtu32_mask16(overflow_correction_mask_i);
 
-            /**
-            * case distinction regarding the content of the mask "compareRes"
-            * 
-            * CASE (A):
-            * inputValue does match one of the keys in nextElements (key match)
-            * just increment the associated count entry in countVec
-            **/ 
-            if (matchPos > 0) {
-                // increase the counter in countVec
-                countVec[aligned_start+matchPos-1]++;
-                i++;
-                break;
-            }   else {
-                // cout << "CASE B: " <<endl;
+                int32_t cutlow = 16 - remainder; // should be in a range from 1-16
+                uint32_t cutlow_mask_i = (1 << cutlow) -1;
+                cutlow_mask_i <<= remainder;
+                // __mmask16 cutlow_mask = _cvtu32_mask16(cutlow_mask_i); // unused
+
+                uint32_t combined_mask_i = cutlow_mask_i & overflow_correction_mask_i;
+                __mmask16 overflow_and_cutlow_mask = _cvtu32_mask16(combined_mask_i);
+
+                // Load 16 consecutive elements from hashVec, starting from position hash_key
+                __m512i nextElements = _mm512_load_epi32(&hashVec[aligned_start]);
+            
+                // compare vector with broadcast value against vector with following elements for equality
+                __mmask16 compareRes = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
+    
                 /**
-                * CASE (B): 
-                * --> inputValue does NOT match any of the keys in nextElements (no key match)
-                * --> compare "nextElements" with zero
-                * CASE (B1):   resulting mask of this comparison is not 0
-                *             --> insert inputValue into next possible slot       
-                *                 
-                * CASE (B2):  resulting mask of this comparison is 0
-                *             --> no free slot in current 16-slot array
-                *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
-                *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+                * case distinction regarding the content of the mask "compareRes"
+                * 
+                * CASE (A):
+                * inputValue does match one of the keys in nextElements (key match)
+                * just increment the associated count entry in countVec
                 **/ 
-
-                // freeSlot is indicated by a zero in the nextElements
-                __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(_mm512_setzero_epi32(),nextElements);
-                uint32_t innerMask = _mm512_mask2int(checkForFreeSpace);
-                if(innerMask != 0) {                // CASE B1    
-             
-                    __mmask16 mask1 = _mm512_knot(innerMask);   
-                    uint32_t pos = (32-__builtin_clz(mask1))%16;
+                if (compareRes != 0) {
+                    // compute the matching position indicated by a one within the compareRes mask
+                    // the position can be calculated two ways.
+// example: 00010000 is our matching mask
+// we could count the leading zeros and get the position like 7 - leadingzeros
+// we calculate the trailing zeros and get the position implicitly 
+                    uint32_t matchPos = __builtin_ctz(compareRes); 
                     
-                    hashVec[aligned_start+pos] = (uint32_t)inputValue;
-                    countVec[aligned_start+pos]++;
+//WE COULD DO THIS LIKE VARIANT ONE.
+//  This would mean we wouldn't calculate the match pos since it is clear already.                
+                    // increase the counter in countVec
+                    countVec[aligned_start+matchPos]++;
                     i++;
                     break;
-                }   else    {                   // CASE B2   
+                }   
+                else {
                     /**
-                    * @todo : error-handling: what, if there is no free slot (bad global settings!)
-                    *       : this case is not implemented yet 
-                    * @todo : avoid infinite loop!
-                    */
-                   
-                    if (aligned_start + 16 > HSIZE) {
-                        aligned_start = 0;
-                    }
-                    else {
-                        aligned_start = (aligned_start+16) % HSIZE;
+                    * CASE (B): 
+                    * --> inputValue does NOT match any of the keys in nextElements (no key match)
+                    * --> compare "nextElements" with zero
+                    * CASE (B1):   resulting mask of this comparison is not 0
+                    *             --> insert inputValue into next possible slot       
+                    *                 
+                    * CASE (B2):  resulting mask of this comparison is 0
+                    *             --> no free slot in current 16-slot array
+                    *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+                    *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+                    **/ 
+
+                    // checkForFreeSpace. A free space is indicated by 1.
+                    __mmask16 checkForFreeSpace = _mm512_mask_cmpeq_epi32_mask(overflow_and_cutlow_mask, _mm512_setzero_epi32(),nextElements);
+                    uint32_t innerMask = _mm512_mask2int(checkForFreeSpace);
+                    if(innerMask != 0) {                // CASE B1    
+                        // __mmask16 mask1 = _mm512_knot(innerMask);   
+                        // uint32_t pos = (32-__builtin_clz(mask1))%16;
+
+                        //this does not calculate the correct position. we should rather look at trailing zeros.
+                        uint32_t pos = __builtin_ctz(checkForFreeSpace);
+                        
+                        hashVec[aligned_start+pos] = (uint32_t)inputValue;
+                        countVec[aligned_start+pos]++;
+                        i++;
+                        break;
+                    }   
+                    else    {                   // CASE B2                    
+                        //aligned_start = (aligned_start+16) % HSIZE;
+// since we now use the overflow mask we can do this to change our position
+// we ALSO need to set the remainder to 0.
+                        remainder = 0;
+                        aligned_start += 16;
+                        if(aligned_start >= HSIZE){
+                            aligned_start = 0;
+                        }
                     }
                 }
-            }
             }
         }
         p+=16;
