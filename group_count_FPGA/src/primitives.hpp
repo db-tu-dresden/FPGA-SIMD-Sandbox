@@ -126,7 +126,8 @@ fpvec<T> mask_loadu(fpvec<T>& writeMask, uint32_t* data, uint32_t startIndex, ui
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
-			reg.elements[i] = data[(startIndex+i)%HSIZE];
+			// old reg.elements[i] = data[(startIndex+i)%HSIZE];
+			reg.elements[i] = data[startIndex+i];
 		}
 		else {
 			reg.elements[i] = 0;
@@ -200,10 +201,12 @@ void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fp
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
-			result[(startIndex+i)%HSIZE] = data.elements[i];
+			// old result[(startIndex+i)%HSIZE] = data.elements[i];
+			result[startIndex+i] = data.elements[i];
 		}
 		else {
-			result[(startIndex+i)%HSIZE] = result[(startIndex+i)%HSIZE];		// not necessary? do nothing?
+			// old result[(startIndex+i)%HSIZE] = result[(startIndex+i)%HSIZE];
+			result[startIndex+i] = result[startIndex+i];		// not necessary? do nothing?
 		}
 	}
 }
@@ -286,7 +289,7 @@ fpvec<T> load_epi32(fpvec<T>& templateMask, uint32_t* data, uint32_t startIndex,
 	auto reg = fpvec<T>{};
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
-		reg.elements[i] = data[(startIndex+i)%HSIZE];
+		reg.elements[i] = data[startIndex+i];
 	}
 	return reg;
 }
