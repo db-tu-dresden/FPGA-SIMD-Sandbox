@@ -23,6 +23,7 @@
 
 #include "kernels.hpp"
 #include "kernels.cpp"
+#include "LinearProbing_scalar.cpp"
 #include "helper_main.cpp"
 
 
@@ -46,12 +47,16 @@ using namespace std::chrono;
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
 //uint64_t distinctValues = 8000;
-uint64_t distinctValues = 10;
-uint64_t dataSize = 16*10000000;
+uint64_t distinctValues = 32;
+//uint64_t dataSize = 16*10000000;
+uint64_t dataSize = 48;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
 
 int  main(int argc, char** argv){
+    // print global settings
+    cout << "Global configuration:"<< endl;
+    cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< endl;
     // print hashsize of current settings
     std::cout << "Configured HSIZE : " << HSIZE << std::endl;
 
@@ -82,44 +87,57 @@ int  main(int argc, char** argv){
         std::cout << "HashTable not allocated" << std::endl;
     }
 
-//v1
+//scalar version
     initializeHashMap(hashVec,countVec,HSIZE);
-    std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant1"<<std::endl;
+    cout <<"=============================="<<endl;
+    cout <<"Linear Probing - scalar:"<<endl;
     auto begin = chrono::high_resolution_clock::now();
-    LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
+    LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    std::cout<<mis<<std::endl;
+    cout<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
-//v2 
+//SIMD v1 - not working yet  
     initializeHashMap(hashVec,countVec,HSIZE);
     std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant2"<<std::endl;
+    std::cout <<"Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
     begin = chrono::high_resolution_clock::now();
-//v2 not working yet   
+    LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
+    std::cout<<mis<<std::endl;
+    validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    
+//SIMD v2 - not working yet  
+    initializeHashMap(hashVec,countVec,HSIZE);
+    std::cout <<"=============================="<<std::endl;
+    std::cout <<"Linear Probing for FPGA - SIMD Variant 2:"<<std::endl;
+    begin = chrono::high_resolution_clock::now();
     LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
-
-//v3
+//SIMD v3 - not working yet  
     initializeHashMap(hashVec,countVec,HSIZE);
     std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant3"<<std::endl;
+    std::cout <<"Linear Probing for FPGA - SIMD Variant 3:"<<std::endl;
     begin = chrono::high_resolution_clock::now();
-//v3 not working yet   
     LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
     return 0;
 }
