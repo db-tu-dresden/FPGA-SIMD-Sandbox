@@ -201,12 +201,13 @@ void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fp
 #pragma unroll
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
-			// old result[(startIndex+i)%HSIZE] = data.elements[i];
-			result[startIndex+i] = data.elements[i];
+			result[(startIndex+i)%HSIZE] = data.elements[i];
+			//result[startIndex+i] = data.elements[i];
 		}
 		else {
 			// old result[(startIndex+i)%HSIZE] = result[(startIndex+i)%HSIZE];
-			result[startIndex+i] = result[startIndex+i];		// not necessary? do nothing?
+			// result[startIndex+i] = result[startIndex+i];		// not necessary? do nothing?
+			int hello = 0; // do nothing		
 		}
 	}
 }

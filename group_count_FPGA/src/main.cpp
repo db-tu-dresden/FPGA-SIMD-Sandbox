@@ -48,7 +48,7 @@ using namespace std::chrono;
  */
 //uint64_t distinctValues = 8000;
 uint64_t distinctValues = 32;
-//uint64_t dataSize = 16*10000000;
+//uint64_t dataSize = cdcd16*10000000;
 uint64_t dataSize = 48;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
@@ -92,19 +92,24 @@ int  main(int argc, char** argv){
     cout <<"=============================="<<endl;
     cout <<"Linear Probing - scalar:"<<endl;
     auto begin = chrono::high_resolution_clock::now();
-    LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
+    //LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
     cout<<mis<<endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    //validate(dataSize, hashVec,countVec, HSIZE);
+    //validate_element(arr, dataSize, hashVec, countVec, HSIZE);
 
 //SIMD v1 - not working yet  
     initializeHashMap(hashVec,countVec,HSIZE);
     std::cout <<"=============================="<<std::endl;
     std::cout <<"Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
     begin = chrono::high_resolution_clock::now();
+/*for(int i=0; i<dataSize; i++) {
+    std::cout<<arr[i]<<std::endl;
+}    
+ std::cout<<"END OF ARR ==========="<<std::endl;
+*/
     LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
@@ -112,7 +117,11 @@ int  main(int argc, char** argv){
     std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
-    
+for(int i=0; i<HSIZE; i++) {
+    std::cout<<"hashVec[i]: "<<hashVec[i]<<" | countVec[i]: "<<countVec[i]<<std::endl;
+}    
+ std::cout<<"END OF ALL ==========="<<std::endl;
+/*
 //SIMD v2 - not working yet  
     initializeHashMap(hashVec,countVec,HSIZE);
     std::cout <<"=============================="<<std::endl;
@@ -138,6 +147,13 @@ int  main(int argc, char** argv){
     std::cout<<mis<<std::endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+
+*/
+
+
+
+
+
 
     return 0;
 }

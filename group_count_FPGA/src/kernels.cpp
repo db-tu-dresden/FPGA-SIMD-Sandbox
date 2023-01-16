@@ -58,7 +58,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
 		// compute hash_key of the input value
 		uint32_t hash_key = hashx(inputValue,HSIZE);
-
+std::cout<<"p: "<<p<<" |  inputValue: "<<inputValue<<" |  hash_key: "<<hash_key<<std::endl;
 		// broadcast inputValue into a SIMD register
 		fpvec<uint32_t> broadcastCurrentValue = set1(inputValue);
 
@@ -68,7 +68,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 		overflow = overflow < 0? 0: overflow;
 		uint32_t overflow_correction_mask_i = (1 << (16-overflow)) - 1; 
 		fpvec<uint32_t> overflow_correction_mask = cvtu32_mask16(overflow_correction_mask_i);
-		
+
 		// Load 16 consecutive elements from hashVec, starting from position hash_key
 		fpvec<uint32_t> nextElements = mask_loadu(oneMask, hashVec, hash_key, HSIZE);
 
@@ -85,49 +85,67 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 		if ((mask2int(compareRes)) != 0) {    // !=0, because own function returns only 0 if any bit is zero
 			// load cout values from the corresponding location                
 			fpvec<uint32_t> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
-						
+
+
+for (int i=0; i<(64/sizeof(uint32_t)); i++) {
+		std::cout << nextCounts.elements[i] << " ";
+	}
+	std::cout << " " << std::endl;						
+
+
 			// increment by one at the corresponding location
 			nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneM512iArray);
-					
+
+
+for (int i=0; i<(64/sizeof(uint32_t)); i++) {
+		std::cout << nextCounts.elements[i] << " ";
+	}
+	std::cout << " " << std::endl;			
+	std::cout << " " << std::endl;		
+	std::cout << " " << std::endl;				
+
+
 			// selective store of changed value
 			mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
 			p++;
 			break;
-			}   
-			else {
-				/**
-				 * CASE (B): 
-				 * --> inputValue does NOT match any of the keys in nextElements (no key match)
-				 * --> compare "nextElements" with zero
-				 * CASE (B1):   resulting mask of this comparison is not 0
-				 *             --> insert inputValue into next possible slot       
-				 *                 
-				 * CASE (B2):  resulting mask of this comparison is 0
-				 *             --> no free slot in current 16-slot array
-				 *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
-				 *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
-				 **/ 
-				fpvec<uint32_t> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask, nextElements);
-				uint32_t innerMask = mask2int(checkForFreeSpace);
-				if(innerMask != 0) {                // CASE B1    
-					//fpvec<uint32_t> mask1 = knot(checkForFreeSpace); // old, not used anymore
+		}   
+		else {
+			/**
+			 * CASE (B): 
+			 * --> inputValue does NOT match any of the keys in nextElements (no key match)
+			 * --> compare "nextElements" with zero
+			 * CASE (B1):   resulting mask of this comparison is not 0
+			 *             --> insert inputValue into next possible slot       
+			 *                 
+			 * CASE (B2):  resulting mask of this comparison is 0
+			 *             --> no free slot in current 16-slot array
+			 *             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+			 *             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+			 **/ 
+			fpvec<uint32_t> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask, nextElements);
+			uint32_t innerMask = mask2int(checkForFreeSpace);
+			if(innerMask != 0) {                // CASE B1    
+				//fpvec<uint32_t> mask1 = knot(checkForFreeSpace); // old, not used anymore
+				//compute position of the emtpy slot   
+				//uint32_t pos = (32-clz_onceBultin(mask1))%16;    // old, not used anymore
+				uint32_t pos = ctz_onceBultin(checkForFreeSpace);
+//std::cout<<pos<<std::endl;
+				// use 
 
-					//compute position of the emtpy slot   
-					//uint32_t pos = (32-clz_onceBultin(mask1))%16;    // old, not used anymore
-					uint32_t pos = ctz_onceBultin(checkForFreeSpace);
-
-					// use 
-					hashVec[hash_key+pos] = (uint32_t)inputValue;
-					countVec[hash_key+pos]++;
-					p++;
-					break;
-				} else    {                   // CASE B2   
-					hash_key += 16;
-					if(hash_key >= HSIZE){
+				hashVec[hash_key+pos] = (uint32_t)inputValue;
+				countVec[hash_key+pos]++;
+std::cout<<"hashVec[hash_key+pos]: "<<hashVec[hash_key+pos]<<" |  countVec[hash_key+pos]: "<<countVec[hash_key+pos]<<std::endl;
+std::cout<<"p: "<<p<<" |  hash_key: "<<hash_key<<" |  pos: "<<pos<<std::endl;
+				p++;
+				break;
+			} else    {                   // CASE B2   
+				hash_key += 16;
+				if(hash_key >= HSIZE){
 					hash_key = 0;
-					}
 				}
 			}
+		}
 		} 
 	}
 }   
