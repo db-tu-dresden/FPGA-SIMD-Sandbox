@@ -27,7 +27,7 @@ Scalar_group_count<T>::~Scalar_group_count(){
 
 template <typename T>
 std::string Scalar_group_count<T>::identify(){
-    return "Scalar Group Count";
+    return "Scalar Group Count SoA";
 }
 
 template <typename T>

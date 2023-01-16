@@ -106,8 +106,10 @@ void flat_number_gen(
 
         if(!in){
             numbers.push_back((T)num);
+            std::cout << "\t" << num; 
         }
     }
+    std::cout << std::endl;
 }
 
 
@@ -147,16 +149,11 @@ void index_dense(std::vector<size_t>& index, size_t distinct_values, size_t star
     }
 }
 
-void index_sparse(std::vector<size_t>&index, size_t distinct_values, size_t seed){
-    if(seed == 0){
-        seed = std::rand();
-    }    
+void index_sparse(std::vector<size_t>&index, size_t distinct_values, size_t seed){   
     for(size_t i = 1; i <= distinct_values; i++){
         index.push_back(noise(i, seed));
     }
 }
-
-
 
 
 /*
@@ -174,10 +171,11 @@ void generate_data(
     size_t start = 0,   // starting offset for consecutive numbers (dense)
     size_t seed = 0     // for sparse number generation 0 true random, 1.. reproducible
 ){
-    
     if(seed == 0){
         srand(std::time(nullptr));
+        seed = std::rand();
     }
+    std::cout << "\tThe seed is:\t" << seed << std::endl;
     
     double mul = 1.5;
     size_t retries = 0;
@@ -221,9 +219,6 @@ retry:
             break;
         case Distribution::UNIFORM:
             for(size_t i = 0; i < data_size; i++){
-                if(seed == 0){
-                    seed = std::rand();
-                }
                 size_t ran = noise(i, seed + start + 1) % distinct_values;
                 result[i] = numbers[ran];
             }
@@ -254,8 +249,9 @@ void generate_data2(
 ){
     if(seed == 0){
         srand(std::time(nullptr));
+        seed = std::rand();
     }
-    
+    std::cout << "\tThe seed is:\t" << seed << std::endl;
     double mul = 1.5;
     size_t retries = 0;
 retry:
@@ -298,9 +294,6 @@ retry:
             break;
         case Distribution::UNIFORM:
             for(size_t i = 0; i < data_size; i++){
-                if(seed == 0){
-                    seed = std::rand();
-                }
                 size_t ran = noise(i, seed + start + 1) % distinct_values;
                 result[i] = numbers[ran];
             }

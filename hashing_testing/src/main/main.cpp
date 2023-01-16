@@ -9,6 +9,7 @@
 #include "../operator/physical/group_count/avx512_group_count_soa_v1.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_v2.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_v3.hpp"
+// #include "../operator/physical/group_count/avx512_group_count_soaov_v1.hpp"
 
 #include "datagen.hpp"
 
@@ -29,7 +30,7 @@ template <typename T>
 bool validate(Group_count<T>* grouping, T* table_value, T* table_count, size_t data_size);
 
 template <typename T>
-void run_test(Group_count<T>* group_count, T* data, size_t data_size, T* validation_value, T* validation_count, size_t validation_size, bool cleanup = true);
+bool run_test(Group_count<T>* group_count, T* data, size_t data_size, T* validation_value, T* validation_count, size_t validation_size, bool cleanup = true);
     
 
 
@@ -42,19 +43,22 @@ uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, st
 using ps_type = uint32_t;
 
 int main(int argc, char** argv){
-    size_t distinct_value_count = 2048; // setting the number of Distinct Values
-    float scale = 1.8f; // setting the hash map scaling factor
-    size_t data_size = 16 * 10000000;; // setting the number of entries
+
+    size_t distinct_value_count = 40; // setting the number of Distinct Values
+    float scale = 1.2f; // setting the hash map scaling factor
+    size_t data_size = 16 * 10;//0000;; // setting the number of entries
+    
+    ps_type* data = new ps_type[data_size];  
 
     ps_type (*function) (ps_type, size_t) = &hashx; // setting the function
-
     size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
-    ps_type* data = new ps_type[data_size];  
+
 
 //Generate and prepare Validation data.
     std::cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     std::cout << "Generate Data\n\t" << data_size << " entries with " << distinct_value_count << " distinct values with " << sizeof(ps_type) * 8 << "bit\n";    
     generate_data<ps_type>(data, data_size, distinct_value_count, Density::SPARSE);
+    
     for(size_t i = 0; i < data_size; i++){
         data[i] = data[i] % (HSIZE * 30);
     }
@@ -66,11 +70,12 @@ int main(int argc, char** argv){
     size_t validation_size = createCountValidationTable(&table_value, &table_count, data, data_size, HSIZE);
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
 
-// Run test with the given configuaration
+    // Run test with the given configuaration
     run_test<ps_type>(new Scalar_group_count<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
+    // run_test<ps_type>(new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
 
 }
 
@@ -87,7 +92,7 @@ int main(int argc, char** argv){
 /// @param validation_size 
 /// @param cleanup true if group_count should be delete when the benchmark is finished. 
 template <typename T>
-void run_test(Group_count<T>* group_count, T* data, size_t data_size, T* validation_value, T* validation_count, size_t validation_size, bool cleanup){
+bool run_test(Group_count<T>* group_count, T* data, size_t data_size, T* validation_value, T* validation_count, size_t validation_size, bool cleanup){
 // prepare for the testing of the function    
     std::chrono::high_resolution_clock::time_point time_begin, time_end;
     uint64_t duration;
@@ -125,6 +130,7 @@ void run_test(Group_count<T>* group_count, T* data, size_t data_size, T* validat
         free(group_count);
     }
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
+    return errors;
 }
 
 
