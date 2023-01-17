@@ -86,15 +86,9 @@ fpvec<T> cvtu32_mask16(T n) {
 	#pragma unroll
 	while (lastElement >= 0) {
          // storing remainder in array
-        reg.elements[lastElement] = n % 2;
-		//std::cout << reg.elements[lastElement] << std::endl;
-		if (n>0) {
-			n = n / 2;
-		} else {
-			n = n;
-		}
-                lastElement = lastElement-1;
-    } 
+        reg.elements[lastElement] = (n >> lastElement) & 0x1;;
+		lastElement = lastElement-1;
+    }
 	/* // print fpvec result register
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		std::cout << reg.elements[i] << " ";
@@ -248,6 +242,7 @@ fpvec<T> knot(fpvec<T>& src) {
 		else {
 			reg.elements[i] = 0;
 		}
+		// reg.elements[i] = !src.elements[i];
 	}
 	return reg;
 }
@@ -263,7 +258,7 @@ template<typename T>
 uint32_t clz_onceBultin(fpvec<T>& src) {
 	uint32_t res = 0;
 	#pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=((64/sizeof(T))-1); i>=0; i--) {
 		if (src.elements[i]==0) {
 			res = res+1;
 		} else {
@@ -343,7 +338,7 @@ template<typename T>
 uint32_t ctz_onceBultin(fpvec<T>& src) {
 	uint32_t res = 0;
 	#pragma unroll
-	for (int i=((64/sizeof(T))-1); i>=0; i--) {
+	for (int i=0; i<(64/sizeof(T)); i++) {
 		if (src.elements[i]==0) {
 			res = res+1;
 		} else {
