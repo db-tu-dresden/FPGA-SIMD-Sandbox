@@ -7,7 +7,7 @@
 #define EMPTY_SPOT 0
 
 template <typename T>
-Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, T (*hash_function)(T, size_t))
+Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t))
     : Group_count<T>(HSIZE, hash_function)
 {
     m_hash_vec = (T*) aligned_alloc(64, HSIZE * sizeof(T));
@@ -27,7 +27,7 @@ Scalar_group_count<T>::~Scalar_group_count(){
 
 template <typename T>
 std::string Scalar_group_count<T>::identify(){
-    return "Scalar Group Count SoA";
+    return "Scalar Group Count SoA Version 1";
 }
 
 template <typename T>

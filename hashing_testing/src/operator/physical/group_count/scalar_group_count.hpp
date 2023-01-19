@@ -12,12 +12,16 @@ class Scalar_group_count : public Group_count<T>{
         T* m_count_vec;
 
     public:
-        Scalar_group_count(size_t HSIZE, T (*hash_function)(T, size_t));
+        Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t));
         ~Scalar_group_count();
         
         void create_hash_table(T* input, size_t dataSize);
         
         T get(T value);
+
+        T getval(size_t id){
+            return m_hash_vec[id];
+        }
 
         void print(bool horizontal);
 

@@ -9,9 +9,9 @@ class Group_count{
     private:
 
     protected:
-        T (* m_hash_function) (T, size_t);
+        size_t (* m_hash_function) (T, size_t);
         size_t m_HSIZE;
-        Group_count(size_t HSIZE, T (*hash_function)(T, size_t)):m_HSIZE{HSIZE},m_hash_function{hash_function}{}
+        Group_count(size_t HSIZE, size_t (*hash_function)(T, size_t)):m_HSIZE{HSIZE},m_hash_function{hash_function}{}
 
 
 void printBits(size_t const size, void const * const ptr) {

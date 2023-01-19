@@ -106,10 +106,10 @@ void flat_number_gen(
 
         if(!in){
             numbers.push_back((T)num);
-            std::cout << "\t" << num; 
+            // std::cout << "\t" << num; 
         }
     }
-    std::cout << std::endl;
+    // std::cout << std::endl;
 }
 
 
@@ -161,7 +161,7 @@ void index_sparse(std::vector<size_t>&index, size_t distinct_values, size_t seed
     DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!
 */
 template<typename T>
-void generate_data(
+size_t generate_data(
     T*& result, 
     size_t data_size,   // number of values to be generated
     size_t distinct_values, // number of distinct values
@@ -175,7 +175,7 @@ void generate_data(
         srand(std::time(nullptr));
         seed = std::rand();
     }
-    std::cout << "\tThe seed is:\t" << seed << std::endl;
+    // std::cout << "\tThe seed is:\t" << seed << std::endl;
     
     double mul = 1.5;
     size_t retries = 0;
@@ -227,8 +227,9 @@ retry:
             throw std::runtime_error("Unknown Distribution input");    
         }
     }else{
-        throw std::runtime_error("To many retries in data gen.");
+        throw std::runtime_error("To many retries during data generation.");
     }
+    return seed;
 }
 
 

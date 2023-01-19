@@ -11,7 +11,7 @@
 #define EMPTY_SPOT 0
 
 template <typename T>
-AVX512_group_count_SoA_v3<T>::AVX512_group_count_SoA_v3(size_t HSIZE, T (*hash_function)(T, size_t))
+AVX512_group_count_SoA_v3<T>::AVX512_group_count_SoA_v3(size_t HSIZE, size_t (*hash_function)(T, size_t))
     : Scalar_group_count<T>(HSIZE, hash_function)
 {}
 
