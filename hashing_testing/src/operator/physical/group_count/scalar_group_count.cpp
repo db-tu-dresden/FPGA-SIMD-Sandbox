@@ -7,11 +7,17 @@
 #define EMPTY_SPOT 0
 
 template <typename T>
-Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t))
+Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t), bool extend)
     : Group_count<T>(HSIZE, hash_function)
-{
-    m_hash_vec = (T*) aligned_alloc(64, HSIZE * sizeof(T));
-    m_count_vec = (T*) aligned_alloc(64, HSIZE * sizeof(T));
+{   
+    size_t elements = HSIZE;
+    if(extend){
+        size_t help = (512/8) / sizeof(T);
+        elements = (elements + help - 1) / help; // how many vectors
+        elements = elements * help;
+    }
+    m_hash_vec = (T*) aligned_alloc(64, elements * sizeof(T));
+    m_count_vec = (T*) aligned_alloc(64, elements * sizeof(T));
 
     for(size_t i = 0; i < HSIZE; i++){
         m_hash_vec[i] = 0;
@@ -117,6 +123,14 @@ void Scalar_group_count<T>::print(bool horizontal){
             count += m_count_vec[i];
         }
         std::cout << "Total Count:\t" << count << std::endl;
+    }
+}
+
+template <typename T>
+void Scalar_group_count<T>::clear(){
+    for(size_t i = 0; i < this->m_HSIZE; i++){
+        m_hash_vec[i] = 0;
+        m_count_vec[i] = 0;
     }
 }
 

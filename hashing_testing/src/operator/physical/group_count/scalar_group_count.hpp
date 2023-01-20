@@ -12,7 +12,7 @@ class Scalar_group_count : public Group_count<T>{
         T* m_count_vec;
 
     public:
-        Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t));
+        Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t), bool extend = false);
         ~Scalar_group_count();
         
         void create_hash_table(T* input, size_t dataSize);
@@ -26,6 +26,8 @@ class Scalar_group_count : public Group_count<T>{
         void print(bool horizontal);
 
         std::string identify();
+        
+        void clear();
 
 };
 

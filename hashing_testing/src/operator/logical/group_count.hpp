@@ -37,6 +37,8 @@ void printBits(size_t const size, void const * const ptr) {
 
         virtual std::string identify() = 0;
 
+        virtual void clear() = 0;
+
 };
 
 template class Group_count<uint32_t>;

@@ -93,8 +93,8 @@ int main(int argc, char** argv){
     std::string file_name;
 
     size_t all_distinct_values[] = {8, 32, 256, 2048, 8192};
-    float all_scales[] = {1.1f, 1.2f, 1.3f};//, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.f};
-    size_t all_data_sizes[] = {16 * 1024 * 1024, 17179869184};
+    float all_scales[] = {1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.f};
+    size_t all_data_sizes[] = {16 * 1024 * 1024};
     size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &force_collision}; 
     Density all_density[] = {Density::DENSE, Density::SPARSE};
     Generation all_generation[] = {Generation::FLAT, Generation::GRID};
@@ -104,12 +104,14 @@ int main(int argc, char** argv){
         Algorithm::SCALAR_GROUP_COUNT
         , Algorithm::AVX512_GROUP_COUNT_SOA_V1
         , Algorithm::AVX512_GROUP_COUNT_SOA_V2
-        , Algorithm::AVX512_GROUP_COUNT_SOA_V3
-        , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1
+        , 
+        Algorithm::AVX512_GROUP_COUNT_SOA_V3
+        , 
+        Algorithm::AVX512_GROUP_COUNT_SOAOV_V1
     };
 
-    size_t repeats_same_data = 1;
-    size_t repeats_different_data = 5;
+    size_t repeats_same_data = 3;
+    size_t repeats_different_data = 1;
 
     size_t all_distinct_values_size = sizeof(all_distinct_values)/sizeof(all_distinct_values[0]);
     size_t all_scales_size = sizeof(all_scales)/sizeof(all_scales[0]);
@@ -130,17 +132,18 @@ int main(int argc, char** argv){
         << repeats_same_data << " resulting in " << total_runs << " total runs\n";
 
     file_name = "benchmark_result.csv";
-    // return -1;
+
     create_result_file(file_name);
-//17179869184
-//18446744073709551615;
+
 
     //run variables
     ps_type* data = nullptr;
     Scalar_group_count<ps_type> *validation_baseline = nullptr;
+    
     // allocate data
     for(size_t adss = 0; adss < all_data_sizes_size; adss++){
         size_t data_size = all_data_sizes[adss];
+        std::cout << "size: " << data_size << std::endl;
 
         // ps_type* data = (ps_type*) aligned_alloc(64, data_size * sizeof(ps_type)); // alternative
         if(data != nullptr){
@@ -152,85 +155,112 @@ int main(int argc, char** argv){
         //create data
         for(size_t adv = 0; adv < all_distinct_values_size; adv++){
             size_t distinct_value_count = all_distinct_values[adv];
-            for(size_t rdd = 0; rdd < repeats_different_data; rdd++){
-                size_t seed = generate_data<ps_type>( // the seed is for rdd the run id
-                    data, 
-                    data_size, 
-                    distinct_value_count, 
-                    Density::SPARSE,        // create loops for this too
-                    Generation::FLAT,       // create loops for this too
-                    Distribution::UNIFORM   // create loops for this too
-                );
+            std::cout << "\tdistinct: " << distinct_value_count << std::endl;
 
-                if(validation_baseline != nullptr){
-                    delete validation_baseline;
-                    validation_baseline = nullptr;
-                }
+            for(size_t dense_id = 0; dense_id < all_density_size; dense_id++){
+                Density dense = all_density[dense_id];
+                std::string dense_str = density_to_string(dense);
 
-                validation_baseline = new Scalar_group_count<ps_type>(distinct_value_count * 2, &id_mod);
-                validation_baseline->create_hash_table(data, data_size);
-
-                //prepare runs
-                for(size_t ass = 0; ass < all_scales_size; ass++){
-                    float scale = all_scales[ass];
-                    size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
+                for(size_t gen_id = 0; gen_id < all_generation_size; gen_id++){
+                    Generation gen = all_generation[gen_id];
+                    std::string gen_str = generation_to_string(gen);
                     
-                    for(size_t rsd = 0; rsd < repeats_same_data; rsd++){ // could be seen as a run id
-                        for(size_t ahfs = 0; ahfs < all_hash_functions_size; ahfs++){ // sets the hashfunction. different functions may lead to different results
-                            size_t (*function)(ps_type, size_t) = all_hash_functions[ahfs];
+                    for(size_t dist_id = 0; dist_id = all_distribution_size; dist_id++){
+                        Distribution dist = all_distribution[dist_id];
+                        std::string dist_str = distribution_to_string(dist);
 
-                            for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
-                                Algorithm test = algorithms_undertest[aus];    
-                                size_t time = 0;
-                                std::string alg_identification = "";
-                                Group_count<ps_type> *run;
-                                switch(test){
-                                    case Algorithm::SCALAR_GROUP_COUNT:
-                                        run = new Scalar_group_count<ps_type>(HSIZE, function);
-                                        break;
-                                    case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
-                                        run = new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function);
-                                        break;
-                                    case Algorithm::AVX512_GROUP_COUNT_SOA_V2:
-                                        run = new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function);
-                                        break;
-                                    case Algorithm::AVX512_GROUP_COUNT_SOA_V3:
-                                        run = new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function);
-                                        break;
-                                    case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
-                                        run = new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function);
-                                        break;
-                                    default:
-                                        std::cout << "One of the Algorithms isn't supported yet!\n";
-                                        return -1;
-                                }
+                        for(size_t rdd = 0; rdd < repeats_different_data; rdd++){
+                            size_t seed = generate_data<ps_type>( // the seed is for rdd the run id
+                                data, 
+                                data_size, 
+                                distinct_value_count, 
+                                dense,
+                                gen,
+                                dist
+                            );
+
+                            if(validation_baseline != nullptr){
+                                delete validation_baseline;
+                                validation_baseline = nullptr;
+                            }
+
+                            validation_baseline = new Scalar_group_count<ps_type>(distinct_value_count * 2, &id_mod);
+                            validation_baseline->create_hash_table(data, data_size);
+                            std::cout << "\t\tseed: " << seed << std::endl;
+
+                            //prepare runs
+                            for(size_t ass = 0; ass < all_scales_size; ass++){
+                                float scale = all_scales[ass];
+                                size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
+                                std::cout << "\t\t\tscale: " << scale << " -> " << HSIZE << std::endl;
                                 
-                                alg_identification = run->identify();
+                                for(size_t ahfs = 0; ahfs < all_hash_functions_size; ahfs++){ // sets the hashfunction. different functions may lead to different results
+                                    size_t (*function)(ps_type, size_t) = all_hash_functions[ahfs];
+                                    std::cout << "\t\t\t\tfunction id: " << ahfs << std::endl;
 
-                                time = run_test<ps_type>(
-                                    run, 
-                                    data, 
-                                    data_size, 
-                                    validation_baseline,
-                                    distinct_value_count * 2,
-                                    false
-                                );
+                                    for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
+                                        Algorithm test = algorithms_undertest[aus];    
+                                        std::string alg_identification = "";
+                                        
+                                        Group_count<ps_type> *run;
+                                        switch(test){
+                                            case Algorithm::SCALAR_GROUP_COUNT:
+                                                run = new Scalar_group_count<ps_type>(HSIZE, function);
+                                                break;
+                                            case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
+                                                run = new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function);
+                                                break;
+                                            case Algorithm::AVX512_GROUP_COUNT_SOA_V2:
+                                                run = new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function);
+                                                break;
+                                            case Algorithm::AVX512_GROUP_COUNT_SOA_V3:
+                                                run = new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function);
+                                                break;
+                                            case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
+                                                run = new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function);
+                                                break;
+                                            default:
+                                                std::cout << "One of the Algorithms isn't supported yet!\n";
+                                                return -1;
+                                        }
+                                        
+                                        alg_identification = run->identify();
+                                        std::cout << "\t\t\t\t\t" << alg_identification << std::endl;
+                                        
+                                        for(size_t rsd = 0; rsd < repeats_same_data; rsd++){ // could be seen as a run id
+                                            std::cout << "\t\t\t\t\t\t" << rsd << "\ttime: " ;
+                                            run->clear();
 
-                                if(time != 0){
-                                    write_to_file(
-                                        file_name, //string
-                                        alg_identification, //string
-                                    // benchmark time
-                                        time, //size_t or uint64_t
-                                    // config
-                                        rsd, // run id (same config with same runs) size_t 
-                                        ahfs, // hash function index size_t 
-                                        HSIZE, // HASH Table Size size_t 
-                                        scale, // Scaleing factor for Hash Table double/float
-                                        seed, // Datageneration seed COULD BE REPLACED BY ANNOTHER ID BUT!  size_t 
-                                        distinct_value_count, // size_t 
-                                        data_size   // size_t 
-                                    );
+                                            size_t time = 0;
+                                            
+                                            time = run_test<ps_type>(
+                                                run, 
+                                                data, 
+                                                data_size, 
+                                                validation_baseline,
+                                                distinct_value_count * 2,
+                                                false,
+                                                false
+                                            );
+                                            std::cout << time << "ns\n";
+                                                if(time != 0){
+                                                write_to_file(
+                                                    file_name, //string
+                                                    alg_identification, //string
+                                                // benchmark time
+                                                    time, //size_t or uint64_t
+                                                // config
+                                                    data_size,   // size_t 
+                                                    distinct_value_count, // size_t 
+                                                    scale, // Scaleing factor for Hash Table double/float
+                                                    HSIZE, // HASH Table Size size_t 
+                                                    ahfs, // hash function index size_t 
+                                                    seed, // Datageneration seed COULD BE REPLACED BY ANNOTHER ID BUT!  size_t 
+                                                    rsd // run id (same config with same runs) size_t 
+                                                );
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -242,7 +272,7 @@ int main(int argc, char** argv){
 
 
 
-    
+/*   
     size_t distinct_value_count = 256; // setting the number of Distinct Values
     float scale = 1.1f; // setting the hash map scaling factor
     size_t data_size = 16777216;//0000;; // setting the number of entries
@@ -277,7 +307,9 @@ int main(int argc, char** argv){
     run_test<ps_type>(new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
+//*/
 
+    return 0;
 }
 
 
@@ -512,15 +544,15 @@ void write_to_file( std::string file_name, //string
     // benchmark time
     uint64_t time, //size_t or uint64_t
     // config
-    size_t rsd, // run id (same config with same runs) size_t 
-    size_t ahfs, // hash function index size_t 
-    size_t HSIZE, // HASH Table Size size_t 
-    float scale, // Scaleing factor for Hash Table double/float
-    size_t seed, // Datageneration seed COULD BE REPLACED BY ANNOTHER ID BUT!  size_t 
+    size_t data_size,   // size_t 
     size_t distinct_value_count, // size_t 
-    size_t data_size   // size_t 
+    float scale, // Scaleing factor for Hash Table double/float
+    size_t HSIZE, // HASH Table Size size_t 
+    size_t ahfs, // hash function index size_t 
+    size_t seed, // Datageneration seed COULD BE REPLACED BY ANNOTHER ID BUT!  size_t 
+    size_t rsd // run id (same config with same runs) size_t 
 ){
-std::cout << alg_identification << "\t" << time << "\t" << rsd << "\t" << scale << "\t" << distinct_value_count << "\t" << seed << "\t" << data_size << std::endl;
+//std::cout << alg_identification << "\t" << time << "\t" << rsd << "\t" << scale << "\t" << distinct_value_count << "\t" << seed << "\t" << data_size << std::endl;
 }
 
 

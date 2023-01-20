@@ -13,6 +13,16 @@
 */
 enum Density{DENSE, SPARSE};
 
+std::string density_to_string(Density x){
+    switch(x){
+        case Density::DENSE:
+            return "dense";
+        case Density::SPARSE:
+            return "sparse";
+    }
+    return "unknown";
+}
+
 /*
     The Distribution gives us another tuning factor.
     For this we disregard the order of the keys.
@@ -23,6 +33,16 @@ enum Density{DENSE, SPARSE};
 */
 enum Distribution{NORMAL, UNIFORM};
 
+std::string distribution_to_string(Distribution x){
+    switch(x){
+        case Distribution::NORMAL:
+            return "normal";
+        case Distribution::UNIFORM:
+            return "uniform";
+    }
+    return "unknown";
+}
+
 /*
     With Generation we try to achieve the same affect the paper: "A Seven-Dimensional 
         Analysis of Hashing Methods and its Implications on Query Processing"
@@ -31,6 +51,15 @@ enum Distribution{NORMAL, UNIFORM};
 */
 enum Generation{FLAT, GRID};
 
+std::string generation_to_string(Generation z){
+    switch(z){
+        case Generation::FLAT:
+            return "flat";
+        case Generation::GRID:
+            return "grid";
+    }
+    return "unknown";
+}
 
 template<typename T>
 T make_grid(size_t x){
