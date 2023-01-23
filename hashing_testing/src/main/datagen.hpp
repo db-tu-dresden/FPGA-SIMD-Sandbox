@@ -67,7 +67,7 @@ T make_grid(size_t x){
     size_t nr_half = 14;
     T result = 0;
 
-    for(size_t i = 0; x < sizeof(T); x++){
+    for(size_t i = 0; i < sizeof(T); i++){
         size_t k = x % nr_half;
         x /= nr_half;
      
@@ -205,6 +205,8 @@ size_t generate_data(
         seed = std::rand();
     }
     // std::cout << "\tThe seed is:\t" << seed << std::endl;
+// std::cout << "Generate " << data_size << " Entries with a seed of " << seed << " and following characteristics: " 
+//     << density_to_string(den) << " " << generation_to_string(gen) << " " << distribution_to_string(dis) << std::endl;
     
     double mul = 1.5;
     size_t retries = 0;
@@ -215,7 +217,6 @@ retry:
     {
         std::vector<size_t> index;
         std::vector<T> numbers;
-
         switch(den){
         case Density::DENSE:
             index_dense(index, distinct_values*mul, start);
@@ -226,7 +227,7 @@ retry:
         default:
             throw std::runtime_error("Unknown Density input");
         }
-
+        
         switch (gen){
         case Generation::FLAT:
             flat_number_gen<T>(numbers, index, distinct_values);
@@ -241,7 +242,6 @@ retry:
         if(numbers.size() < distinct_values){
             goto retry;
         }
-
         switch(dis){
         case Distribution::NORMAL:
             throw std::runtime_error("Normal Distribution not yet implemented");    

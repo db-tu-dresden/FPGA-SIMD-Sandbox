@@ -39,6 +39,10 @@ void printBits(size_t const size, void const * const ptr) {
 
         virtual void clear() = 0;
 
+        size_t get_HSIZE(){
+            return m_HSIZE;
+        }
+
 };
 
 template class Group_count<uint32_t>;

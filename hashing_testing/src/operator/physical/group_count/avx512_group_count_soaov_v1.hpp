@@ -24,6 +24,10 @@ class AVX512_group_count_SoAoV_v1 : public Scalar_group_count<T>{
         void create_hash_table(uint32_t* input, size_t data_size);
 
         std::string identify();
+
+        size_t get_HSIZE(){
+            return m_HSIZE_v * m_elements_per_vector;
+        }
 };
 
 
