@@ -46,8 +46,8 @@ using namespace std::chrono;
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-uint64_t distinctValues = 8000;
-//uint64_t distinctValues = 128;
+//int64_t distinctValues = 8000;
+uint64_t distinctValues = 128;
 uint64_t dataSize = 16*10000000;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
