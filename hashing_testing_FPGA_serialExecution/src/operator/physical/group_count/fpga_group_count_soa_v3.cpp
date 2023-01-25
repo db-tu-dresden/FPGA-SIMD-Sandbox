@@ -65,7 +65,64 @@ void FPGA_group_count_SoA_v3<T>::create_hash_table(T* input, size_t data_size){
 
 template <>
 void FPGA_group_count_SoA_v3<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
+    size_t HSIZE = this->m_HSIZE;
+    uint32_t* hashVec = this->m_hash_vec;
+    uint32_t* countVec = this->m_count_vec;
+
+    uint32_t one = 1;
+    uint32_t zero = 0;
+    fpvec<uint32_t> oneMask = set1(one);
+    fpvec<uint32_t> zeroMask = set1(zero);
+    fpvec<uint32_t> zeroM512iArray = set1(zero);
+    fpvec<uint32_t> oneM512iArray = set1(one);
+
+    int p = 0;
+    while (p < data_size) {
+        uint32_t inputValue = input[p];
+        uint32_t hash_key = this->m_hash_function(inputValue,HSIZE);
+
+        uint32_t aligned_start = (hash_key/16)*16;
+        uint32_t remainder = hash_key - aligned_start; // should be equal to hash_key % 16
+
+        fpvec<uint32_t> broadcastCurrentValue = set1(inputValue);
+
+        while (1) {
+
+            int32_t overflow = (aligned_start + 16) - HSIZE;
+            overflow = overflow < 0? 0: overflow;
+            uint32_t overflow_correction_mask_i = (1 << (16-overflow)) - 1; 
+            fpvec<uint32_t> overflow_correction_mask = cvtu32_mask16(overflow_correction_mask_i);
+
+            fpvec<uint32_t> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
+            fpvec<uint32_t> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
     
+            if (mask2int(compareRes) != 0) {
+                uint32_t matchPos = ctz_onceBultin(compareRes); 
+                countVec[aligned_start+matchPos]++;
+                p++;
+                break;
+            }   
+            else {
+                fpvec<uint32_t> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask,nextElements);
+				uint32_t innerMask = mask2int(checkForFreeSpace);
+                if(innerMask != 0) {                // CASE B1    
+                    uint32_t pos = ctz_onceBultin(checkForFreeSpace);
+                    
+                    hashVec[aligned_start+pos] = (uint32_t)inputValue;
+                    countVec[aligned_start+pos]++;
+                    p++;
+                    break;
+                }
+                else {                               // CASE B2
+                    remainder = 0;
+                    aligned_start += 16;
+                    if(aligned_start >= HSIZE){
+                        aligned_start = 0;
+                    }
+                }
+            }
+        }
+    }    
 }
 
 template <typename T>
