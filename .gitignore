@@ -1,2 +1,5 @@
 example_code_AggSUM/main.fpga_emu
 
+hashing_testing_FPGA_serialExecution/benchmark_result.csv
+hashing_testing_FPGA_serialExecution/test
+hashing_testing/test
