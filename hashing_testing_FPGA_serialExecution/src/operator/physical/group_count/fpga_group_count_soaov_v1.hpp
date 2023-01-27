@@ -31,7 +31,4 @@ class FPGA_group_count_SoAoV_v1 : public Scalar_group_count<T>{
         }
 };
 
-
-//void print512i(__m512i a, bool newline = true);
-
 #endif //TUD_HASHING_TESTING_FPGA_GROUP_COUNT_SOAOV_V1
