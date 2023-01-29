@@ -12,10 +12,15 @@
 
 ## Compile and execute on FPGA hardware
 
-(1) Build
+(1) Build lib
+(a)	`source /data/intel_fpga/devcloudLoginToolSetup.sh`
+(b) `qsub -l nodes=1:fpga_compile:ppn=2 -d . build_lib -l walltime=00:10:00`
+(c)	after 2-4 minutes the lib/lib.a file is created
+
+(2) Build
 `qsub -l nodes=1:fpga_compile:ppn=2 -d . build_fpga_hw.sh -l walltime=23:00:00`
 
-(2) Execute
+(3) Execute
 - Connect to FPGA
 (a) `source /data/intel_fpga/devcloudLoginToolSetup.sh`
 (b) `devcloud_login`
