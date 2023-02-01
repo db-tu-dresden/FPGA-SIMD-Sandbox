@@ -10,7 +10,7 @@ source /data/intel_fpga/devcloudLoginToolSetup.sh
 tools_setup -t S10OAPI
 export PATH=/glob/intel-python/python2/bin:$PATH
 
-cd ~/FPGA-SIMD-Sandbox/example_codeAggSUM 
+cd ~/FPGA-SIMD-Sandbox/example_code_AggSUM 
 
 # Running project in FPGA Hardware Mode (this takes approximately 1 hour)
 printf "\\n%s\\n" "Running in FPGA Hardware compile Mode:"
