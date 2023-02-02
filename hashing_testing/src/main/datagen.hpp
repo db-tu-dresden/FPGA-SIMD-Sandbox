@@ -119,27 +119,7 @@ T make_grid(size_t x){
     return result;
 }
 
-//TODO CHECK IF it is okay to use.
-uint64_t noise(size_t position, size_t seed){
-    size_t BIT_NOISE1 = 0x68E31DA4;
-    size_t BIT_NOISE2 = 0xB5297A4D;
-    size_t BIT_NOISE3 = 0x1B56C4E9;
 
-    // size_t BIT_NOISE1 = 0x7FFFFFFFFFFFFF5B;
-    // size_t BIT_NOISE2 = 0x68E31DA4B5297A4D;
-    // size_t BIT_NOISE3 = 0xA8F8628ADC17D6CB;
-
-    uint64_t mangled = position;
-    mangled *= BIT_NOISE1;
-    mangled += seed;
-    mangled ^= (mangled << 13);
-    mangled += BIT_NOISE2;
-    mangled ^= (mangled >> 7);
-    mangled *= BIT_NOISE3;
-    mangled ^= (mangled << 17);
-
-    return mangled;
-}
 
 
 /*
@@ -824,7 +804,6 @@ size_t p1_parameter_gen_max_cluster_length(size_t distinct_value, size_t HSIZE, 
     if(collisions == 0){
         collision_count = 0;
     }
-    
     if(collision_count == 0){
         size_t r =  (HSIZE / cluster) - 1;
         if(r > distinct_value){
@@ -1020,36 +999,40 @@ size_t generate_data_p1(
     }
     size_t total_free = HSIZE - distinct_values;
     size_t reserved_free = cluster > collision_groups ? cluster : collision_groups;
-    int64_t distributed_free = total_free - reserved_free - 1;
-    if(distributed_free <= 0){
-        distributed_free = 1;
-    }
+    reserved_free++;
+    size_t distributed_free = total_free <= reserved_free ? 1 : total_free - reserved_free ;
 
 
 
 
-    size_t mul = collisions != 0? collisions : 2;
-    size_t number_of_values = HSIZE * distinct_values * mul;
+    size_t mul = collisions < 100? collisions + 2 : 100;
+    size_t number_of_values = (HSIZE + 1) * mul;
 
     size_t expected_hsize = p1_parameter_gen_hsize(collision_groups, collisions, cluster, cluster_lenght);
     if(expected_hsize > HSIZE || expected_hsize == 0){
         return 0; // to many distinct values needed
     }
-    
+    std::cout << "Step1\n";
     //generate some values
     std::multimap<size_t, size_t> all_numbers;
+    size_t retry = 0;
     for(size_t i = 0; i < number_of_values; i++){
         size_t num;
         do{
-            num = noise(i, seed);
+            num = noise(i + retry, seed);
+            retry += num == 0;
         }while(num == 0);
         
         all_numbers.insert(std::pair<size_t, size_t>(hash_function(num, HSIZE), num));
     }
+    std::cout << "Step2\n";
 
-    // for(size_t i = 0; i < HSIZE; i++){
-    //     std::cout << "\t" << i <<" :\t" << all_numbers.count(i) << std::endl;
-    // }
+    for(size_t i = 0; i < HSIZE; i++){
+        std::cout << "\t" << i <<" :\t" << all_numbers.count(i) << "\t|\t";
+        if((i+1) % 10 == 0){
+            std::cout <<std::endl;
+        }
+    }
 
     size_t empty = HSIZE - distinct_values;
     //it might not be possible to create all the clusters the user wants.
@@ -1064,55 +1047,27 @@ size_t generate_data_p1(
 
     std::vector<size_t> numbers;
     std::vector<size_t> ids;
+    
+    size_t cluster_after_collition_length = cluster_lenght > collisions ? cluster_lenght - collisions : 0;
 
     for(size_t i = 1; i <= collision_groups; i++){
-        size_t group_pos_start = pos;
-        size_t left = collisions;
-    next:
-        std::multimap<size_t, size_t>::iterator itLow, itUp;
-        itLow = all_numbers.lower_bound(group_pos_start);
-        itUp = all_numbers.upper_bound(group_pos_start);
-        for (std::multimap<size_t, size_t>::iterator it = itLow; it != itUp && left > 0; it++) {
-            numbers.push_back(it->second);
-            ids.push_back(pos);
-            pos = (pos + 1) % HSIZE;
-            left --;
+
+        generate_collision(&numbers, &all_numbers, HSIZE, pos, collisions);
+
+        if(i <= cluster){
+            generate_cluster(&numbers, &all_numbers, HSIZE, pos, cluster_after_collition_length);
+            pos = (pos + cluster_after_collition_length) % HSIZE;
         }
         
-        group_pos_start = (group_pos_start + 1) % HSIZE;
-        if(left != 0){
-            goto next;
-        }
-
-        for(int64_t c = 0; c < (int64_t)(cluster_lenght - collisions) && i <= cluster; c++){
-            std::multimap<size_t, size_t>::iterator it = all_numbers.find(pos);
-            numbers.push_back(it->second);
-            ids.push_back(pos);
-            pos = (pos + 1) % HSIZE;
-        }
-        
-        // pos = (pos + 1) % HSIZE;
-
-        size_t next_pos = noise(distributed_free, seed + 2) % distributed_free;
-        distributed_free -= next_pos;
-        pos = (pos + 1  + next_pos) % HSIZE;
-
+        next_position(pos, distributed_free, HSIZE, seed + 2);
     }
+    std::cout << "Step3\n";
 
     for(int64_t i = (int64_t)(cluster - collision_groups); i > 0; i--){
-        for(size_t c = 0; c < cluster_lenght; c++){
-            std::multimap<size_t, size_t>::iterator it = all_numbers.find(pos);
-            numbers.push_back(it->second);
-            ids.push_back(pos);
-            pos = (pos + 1) % HSIZE;
-        }
-        // pos = (pos + 1) % HSIZE;
-        size_t next_pos = noise(distributed_free, seed + 2) % distributed_free;
-        distributed_free -= next_pos;
-        pos = (pos + 1  + next_pos) % HSIZE;
-    }
-    if(numbers.size() == 0){
-        return 0;
+        generate_cluster(&numbers, &all_numbers, HSIZE, pos, cluster_lenght);
+        pos = (pos + cluster_lenght) % HSIZE;
+
+        next_position(pos, distributed_free, HSIZE, seed + 2);
     }
 
     std::cout <<"DATA:";
@@ -1121,11 +1076,11 @@ size_t generate_data_p1(
     }
     std::cout << "\n";
 
-    for(size_t i = 0; i < data_size; i++){
-        size_t ran = noise(i, seed + 3) % numbers.size();
-        result[i] = numbers[ran];
+    if(numbers.size() == 0){
+        return 0;
     }
-    
+
+    generate_benchmark_data<T>(result, data_size, &numbers, seed+3);    
     return numbers.size();
 }
 
