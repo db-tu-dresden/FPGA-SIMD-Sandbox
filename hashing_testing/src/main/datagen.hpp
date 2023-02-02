@@ -1012,7 +1012,7 @@ size_t generate_data_p1(
     if(expected_hsize > HSIZE || expected_hsize == 0){
         return 0; // to many distinct values needed
     }
-    std::cout << "Step1\n";
+
     //generate some values
     std::multimap<size_t, size_t> all_numbers;
     size_t retry = 0;
@@ -1025,14 +1025,13 @@ size_t generate_data_p1(
         
         all_numbers.insert(std::pair<size_t, size_t>(hash_function(num, HSIZE), num));
     }
-    std::cout << "Step2\n";
 
-    for(size_t i = 0; i < HSIZE; i++){
-        std::cout << "\t" << i <<" :\t" << all_numbers.count(i) << "\t|\t";
-        if((i+1) % 10 == 0){
-            std::cout <<std::endl;
-        }
-    }
+    // for(size_t i = 0; i < HSIZE; i++){
+    //     std::cout << "\t" << i <<" :\t" << all_numbers.count(i) << "\t|\t";
+    //     if((i+1) % 10 == 0){
+    //         std::cout <<std::endl;
+    //     }
+    // }
 
     size_t empty = HSIZE - distinct_values;
     //it might not be possible to create all the clusters the user wants.
@@ -1061,7 +1060,6 @@ size_t generate_data_p1(
         
         next_position(pos, distributed_free, HSIZE, seed + 2);
     }
-    std::cout << "Step3\n";
 
     for(int64_t i = (int64_t)(cluster - collision_groups); i > 0; i--){
         generate_cluster(&numbers, &all_numbers, HSIZE, pos, cluster_lenght);
@@ -1070,11 +1068,11 @@ size_t generate_data_p1(
         next_position(pos, distributed_free, HSIZE, seed + 2);
     }
 
-    std::cout <<"DATA:";
-    for(size_t i = 0; i < numbers.size(); i++){
-        std::cout << "\t" << hash_function(numbers[i], HSIZE);
-    }
-    std::cout << "\n";
+    // std::cout <<"DATA:";
+    // for(size_t i = 0; i < numbers.size(); i++){
+    //     std::cout << "\t" << hash_function(numbers[i], HSIZE);
+    // }
+    // std::cout << "\n";
 
     if(numbers.size() == 0){
         return 0;

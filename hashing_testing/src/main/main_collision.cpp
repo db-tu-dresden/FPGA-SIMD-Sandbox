@@ -562,7 +562,7 @@ void create_result_file(std::string filename){
     std::ofstream myfile;
     myfile.open (filename);
     if(myfile.is_open()){
-        myfile << "Algorithm,time,data size,bytes,distinct value count,scale,hash table size,hash function ID,seed,run ID\n";
+        myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_lenght,cluster_count,cluster_count\n";
         myfile.close();
     } else {
         throw std::runtime_error("Could not open file to write results!");
