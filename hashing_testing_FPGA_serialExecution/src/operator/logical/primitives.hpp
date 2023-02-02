@@ -2,6 +2,7 @@
 #define PRIMITIVES_HPP
 
 #include <array>
+class primitives;
 
 /**
  * This file contains the scalar primitves of the Intel Intrinsics, which are used 
@@ -347,5 +348,27 @@ uint32_t ctz_onceBultin(fpvec<T>& src) {
 	}
 	return res;
 }
+
+/** #16
+ * Store single element of type uint32_t into fpvec<T> register at a certain position.
+ * 
+*/
+/**			// currently not needed
+template<typename T>
+void storeSingleElement_uint(fpvec<T>* result, uint32_t storeIdx, uint32_t data) {
+	result->elements[storeIdx] = data;
+}
+*/
+
+/** #17
+ * Store single element of type fpvec<T> into fpvec<T> register at a certain position.
+ * 
+*/
+/**			// currently not needed
+template<typename T>
+void storeSingleElement_vec(fpvec<T>* result, uint32_t storeIdx, fpvec<T>& data) {
+	result->elements[storeIdx] = data;
+}
+*/
 
 #endif // PRIMITIVES_HPP
