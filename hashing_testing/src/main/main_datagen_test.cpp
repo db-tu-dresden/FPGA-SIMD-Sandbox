@@ -107,113 +107,72 @@ using ps_type = uint64_t;
 
 int main(int argc, char** argv){
 
-    // size_t nr_of_values = 100000;
-    // size_t data_size = nr_of_values *= 20;
-    // ps_type* data = new ps_type[nr_of_values];
-    // std::cout << "Data generation\n";
-    // generate_data2<ps_type>(data, data_size, nr_of_values, Density::SPARSE);  
-    // std::cout << "Analyse 1\n";
-    // analyse1<ps_type>(data, nr_of_values);
-    // std::cout << "Analyse 2\n";
-    // analyse2<ps_type>(data, nr_of_values);
-
-    // bool blocked [] = {0, 0, 1, 0, 0, 1, 0};
-    // size_t res = find_place(blocked, 7, 1, 3);
-    // std::cout << "RESULT:\t" << res << std::endl;
-
-    size_t data_size = 40;
+    size_t data_size = 2048;
     uint32_t *data = new uint32_t[data_size];
 
-    size_t distinct = 27;
-    double s = 3;
+    size_t distinct = 2048;
+    double s = 1.1;
     size_t HSIZE = distinct * s;
     double spielraum = 0.00;
 
-// size_t generate_collision_data(
-//     T*& result, 
-//     size_t data_size,   // number of values to be generated
-//     size_t distinct_values, // number of distinct values
-//     size_t HSIZE, // hash_table_size
-//     size_t collision_groups = 0,  // 0 means no collisions!
-//     double collisions = 0.0, //[0, 1] 0 no collision 1 all collision
-//     // Generation gen = Generation::FLAT,
-//     Distribution dis = Distribution::UNIFORM,
-//     Alignment ali = Alignment::BAD,
-//     size_t allign_size = 16,
-//     size_t start = 0,   // starting offset for consecutive numbers (dense)
-//     size_t seed = 0     // for sparse number generation 0 true random, 1.. reproducible
-// )
-    // generate_collision_data<uint32_t>(data, 60, 27, 33, 3, 1);
 
-//     template<typename T>
-// generate_data_p1(
-//     T*& result,
-//     size_t data_size,
-//     size_t distinct_values,
-//     size_t HSIZE,
-//     size_t (*hash_function)(T, size_t),
-//     size_t seed = 0,
-//     size_t collision_groups = 0,
-//     size_t collisions = 0,
-//     size_t cluster = 0,
-//     size_t cluster_lenght = 0
-// ){
     size_t p1_max_col_group = p1_parameter_gen_max_collision_group(distinct, HSIZE);
     size_t valid_combinations = 0;
     std::unordered_map<std::string, int64_t> configuarations = {{"", 1}};
 
-    for(size_t col_group = 0; col_group <= p1_max_col_group && p1_parameter_gen_hsize(col_group) <= HSIZE; col_group++){
+    // for(size_t col_group = 0; col_group <= p1_max_col_group && p1_parameter_gen_hsize(col_group) <= HSIZE; col_group++){
 
-        size_t p1_max_cols = p1_parameter_gen_max_collisions(distinct, HSIZE, col_group);
-        for(size_t cols = 1; cols <= p1_max_cols && p1_parameter_gen_hsize(col_group, cols) <= HSIZE; cols++){//might not be correct ! cols might have to start at 0
+    //     size_t p1_max_cols = p1_parameter_gen_max_collisions(distinct, HSIZE, col_group);
+    //     for(size_t cols = 1; cols <= p1_max_cols && p1_parameter_gen_hsize(col_group, cols) <= HSIZE; cols++){//might not be correct ! cols might have to start at 0
 
-            size_t p1_max_clust = p1_parameter_gen_max_cluster(distinct, HSIZE, col_group, cols);
-            for(size_t clust = 0; clust <= p1_max_clust && p1_parameter_gen_hsize(col_group, cols, clust) <= HSIZE; clust++){
+    //         size_t p1_max_clust = p1_parameter_gen_max_cluster(distinct, HSIZE, col_group, cols);
+    //         for(size_t clust = 0; clust <= p1_max_clust && p1_parameter_gen_hsize(col_group, cols, clust) <= HSIZE; clust++){
                 
-                size_t p1_max_clust_len = p1_parameter_gen_max_cluster_length(distinct, HSIZE, col_group, cols, clust);
-                for(size_t clust_len = 0; clust_len <= p1_max_clust_len && p1_parameter_gen_hsize(col_group,cols, clust, clust_len) <= HSIZE; clust_len++){
+    //             size_t p1_max_clust_len = p1_parameter_gen_max_cluster_length(distinct, HSIZE, col_group, cols, clust);
+    //             for(size_t clust_len = 0; clust_len <= p1_max_clust_len && p1_parameter_gen_hsize(col_group,cols, clust, clust_len) <= HSIZE; clust_len++){
                     
                     
-                    size_t r_dis1 = p1_parameter_gen_distinct(col_group, cols, clust, clust_len);
-                    size_t r_hsize = p1_parameter_gen_hsize(col_group, cols, clust, clust_len);
+    //                 size_t r_dis1 = p1_parameter_gen_distinct(col_group, cols, clust, clust_len);
+    //                 size_t r_hsize = p1_parameter_gen_hsize(col_group, cols, clust, clust_len);
 
-                    std::string *trans = p1_stringify( HSIZE, col_group, cols, clust, clust_len);
-                    std::string config = *trans;
-                    delete(trans);
-                    bool IS_DISTINCT_VALUE = r_dis1 == distinct;
-                    bool DISTINCT_IS_IN_RANGE = (r_dis1 <= HSIZE/(s-spielraum) && r_dis1 >= HSIZE/(s+spielraum));
-                    bool NEEDED_HSIZE_FITS = r_hsize <= HSIZE;
+    //                 std::string *trans = p1_stringify( HSIZE, col_group, cols, clust, clust_len);
+    //                 std::string config = *trans;
+    //                 delete(trans);
+    //                 bool IS_DISTINCT_VALUE = r_dis1 == distinct;
+    //                 bool DISTINCT_IS_IN_RANGE = (r_dis1 <= HSIZE/(s-spielraum) && r_dis1 >= HSIZE/(s+spielraum));
+    //                 bool NEEDED_HSIZE_FITS = r_hsize <= HSIZE;
 
-                    bool NOT_USED_CONFIG = configuarations.count(config) == 0;
+    //                 bool NOT_USED_CONFIG = configuarations.count(config) == 0;
 
 
-                    if((IS_DISTINCT_VALUE || DISTINCT_IS_IN_RANGE) && NEEDED_HSIZE_FITS && NOT_USED_CONFIG){
-                        // std::cout << " ( " << IS_DISTINCT_VALUE << " || " << DISTINCT_IS_IN_RANGE << " ) && " << NEEDED_HSIZE_FITS << " && " << NOT_USED_CONFIG << std::endl; 
-                        configuarations.insert(std::make_pair(config, 1));
+    //                 if((IS_DISTINCT_VALUE || DISTINCT_IS_IN_RANGE) && NEEDED_HSIZE_FITS && NOT_USED_CONFIG){
+    //                     // std::cout << " ( " << IS_DISTINCT_VALUE << " || " << DISTINCT_IS_IN_RANGE << " ) && " << NEEDED_HSIZE_FITS << " && " << NOT_USED_CONFIG << std::endl; 
+    //                     configuarations.insert(std::make_pair(config, 1));
 
-                        // std::cout << distinct << " -> " << HSIZE<< "\t" << p1_max_col_group << " -> " << col_group <<"\t" << p1_max_cols << " -> " << cols << "\t" << p1_max_clust  << " -> " << clust 
-                        //     << "\t" << p1_max_clust_len  << " -> " << clust_len << "\n";
-                        std::cout << "config:\t" << col_group <<"\t" << cols << "\t" << clust  << "\t" << clust_len << "\t\t" << config << std::endl;
-                        size_t r_dis2 = generate_data_p1(data, data_size, distinct, HSIZE, &mod, col_group, cols, clust, clust_len, 1);
-                        // std::cout << "RESULT:\t" << r_dis1 << " = " <<  r_dis2<< std::endl ;//<< std::endl; 
-                        valid_combinations++;
-                    }
-                }
-            }
-        }
-    }
+    //                     // std::cout << distinct << " -> " << HSIZE<< "\t" << p1_max_col_group << " -> " << col_group <<"\t" << p1_max_cols << " -> " << cols << "\t" << p1_max_clust  << " -> " << clust 
+    //                     //     << "\t" << p1_max_clust_len  << " -> " << clust_len << "\n";
+    //                     std::cout << "config:\t" << col_group <<"\t" << cols << "\t" << clust  << "\t" << clust_len << "\t\t" << config << std::endl;
+    //                     size_t r_dis2 = generate_data_p1(data, data_size, distinct, HSIZE, &mod, col_group, cols, clust, clust_len, 1);
+    //                     // std::cout << "RESULT:\t" << r_dis1 << " = " <<  r_dis2<< std::endl ;//<< std::endl; 
+    //                     valid_combinations++;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
     // std::cout << "debugging\n";
     // std::string *k = p1_stringify(6, 1, 3, 2, 1);
     // std::cout << "results in: " << *k << std::endl;
     // delete k;
 
-    delete []data;
     std::cout << "VALID COMBINATIONS\t" << valid_combinations << std::endl;
-    // size_t ok;
-    // ok = generate_data_p1(data, data_size, distinct, HSIZE, &mod, 2, 5, 3, 6, 0);
+    size_t ok;
+    ok = generate_data_p1(data, data_size, distinct, HSIZE, &mod, 1, distinct, 0, 0, 1);
 
-    // for(size_t i = 0; i < data_size; i++){
-    //     std::cout << data[i] << "\t" << mod(data[i], HSIZE) <<std::endl;
-    // }
+    for(size_t i = 0; i < data_size &&  i < 10; i++){
+        std::cout << data[i] << "\t" << mod(data[i], HSIZE) <<std::endl;
+    }
+    delete []data;
 
 }

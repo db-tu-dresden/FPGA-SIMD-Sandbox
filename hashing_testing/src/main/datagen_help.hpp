@@ -30,13 +30,18 @@ uint64_t noise(size_t position, size_t seed){
 
 
 
-
-
-
-
-
-
-
+template<typename T>
+bool vector_contains(
+    std::vector<T> *vec,
+    T value
+){
+    for(T val: *vec){
+        if(value == val){
+            return true;
+        }
+    }
+    return false;
+}
 
 void next_position(size_t &pos, size_t &budget, size_t HSIZE, size_t seed){
     if(budget == 0){
@@ -50,10 +55,30 @@ void next_position(size_t &pos, size_t &budget, size_t HSIZE, size_t seed){
     pos = (pos + 1 + offset) % HSIZE;
 }
 
+template<typename T>
+void generate_random_values(
+    std::multimap<size_t, T> &numbers,
+    size_t (*hash_function)(T, size_t),
+    size_t number_of_values,
+    size_t HSIZE,
+    size_t seed
+){
+    size_t retry = 0;
+    for(size_t i = 0; i < number_of_values; i++){
+        T num;
+        do{
+            num = noise(i + retry, seed);
+            retry += num == 0;
+        }while(num == 0);
+        
+        numbers.insert(std::pair<size_t, T>(hash_function(num, HSIZE), num));
+    }
+}
 
+template<typename T>
 void generate_collision(
-    std::vector<size_t> *result,
-    std::multimap<size_t, size_t> *numbers,
+    std::vector<T> *result,
+    std::multimap<size_t, T> *numbers,
     size_t HSIZE,
     size_t start_pos,
     size_t collision_lenght
@@ -67,23 +92,27 @@ void generate_collision(
     
     bool GENERATE = data_to_generate > 0;
     
+    typename std::multimap<size_t, T>::iterator itLow, itUp, it;
     while(GENERATE){
-        std::multimap<size_t, size_t>::iterator itLow, itUp;
         itLow = numbers->lower_bound(pos);
         itUp = numbers->upper_bound(pos);
 
-        for(std::multimap<size_t, size_t>::iterator it = itLow; it != itUp && GENERATE; it++){
-            result->push_back(it->second);
-            GENERATE = --data_to_generate > 0;
+        for(it = itLow; it != itUp && GENERATE; it++){
+            T n_val = it->second;
+            bool contains = vector_contains<T>(result, n_val);
+            if(!contains){
+                result->push_back(it->second);
+                GENERATE = --data_to_generate > 0;
+            }
         }
         pos = (pos + 1) % HSIZE;
     }
 }
 
-
+template<typename T>
 void generate_cluster(
-    std::vector<size_t> *result,
-    std::multimap<size_t, size_t> *numbers,
+    std::vector<T> *result,
+    std::multimap<size_t, T> *numbers,
     size_t HSIZE,
     size_t start_pos,
     size_t cluster_lenght
@@ -94,7 +123,8 @@ void generate_cluster(
 
     size_t pos = start_pos % HSIZE;
     for(size_t i = 0; i < cluster_lenght; i++){
-        std::multimap<size_t, size_t>::iterator it = numbers->find(pos);
+        typename std::multimap<size_t, T>::iterator it;
+        it = numbers->find(pos);
         result->push_back(it->second);
         pos = (pos + 1) % HSIZE;
     }
@@ -105,7 +135,7 @@ template<typename T>
 void generate_benchmark_data(
     T*& result, 
     size_t data_size,
-    std::vector<size_t> *numbers,
+    std::vector<T> *numbers,
     size_t seed
 ){
     for(size_t i = 0; i < data_size; i++){

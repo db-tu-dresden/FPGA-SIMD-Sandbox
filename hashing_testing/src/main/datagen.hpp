@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <map>
+
 #include <sstream>
 #include <string>
 
@@ -993,38 +994,29 @@ size_t generate_data_p1(
     size_t cluster_lenght = 0,
     size_t seed = 0
 ){
+    size_t expected_hsize = p1_parameter_gen_hsize(collision_groups, collisions, cluster, cluster_lenght);
+    if(expected_hsize > HSIZE || expected_hsize == 0){
+        return 0; // HSIZE is to small for the given configuration to fit.
+    }
     if(seed == 0){
         srand(std::time(nullptr));
         seed = std::rand();
     }
+
+    // get the total free space to distribute the data more randomly
     size_t total_free = HSIZE - distinct_values;
     size_t reserved_free = cluster > collision_groups ? cluster : collision_groups;
     reserved_free++;
     size_t distributed_free = total_free <= reserved_free ? 1 : total_free - reserved_free ;
 
-
-
-
-    size_t mul = collisions < 100? collisions + 2 : 100;
+    // create some random numbers. 
+    size_t mul = collisions < 100? collisions + 2 : 100;    // TODO: maybe use instead of plain 100 -> log(collisions) * 50
     size_t number_of_values = (HSIZE + 1) * mul;
 
-    size_t expected_hsize = p1_parameter_gen_hsize(collision_groups, collisions, cluster, cluster_lenght);
-    if(expected_hsize > HSIZE || expected_hsize == 0){
-        return 0; // to many distinct values needed
-    }
 
     //generate some values
-    std::multimap<size_t, size_t> all_numbers;
-    size_t retry = 0;
-    for(size_t i = 0; i < number_of_values; i++){
-        size_t num;
-        do{
-            num = noise(i + retry, seed);
-            retry += num == 0;
-        }while(num == 0);
-        
-        all_numbers.insert(std::pair<size_t, size_t>(hash_function(num, HSIZE), num));
-    }
+    std::multimap<size_t, T> all_numbers;
+    generate_random_values(all_numbers, hash_function, number_of_values, HSIZE, seed);
 
     // for(size_t i = 0; i < HSIZE; i++){
     //     std::cout << "\t" << i <<" :\t" << all_numbers.count(i) << "\t|\t";
@@ -1044,17 +1036,16 @@ size_t generate_data_p1(
             group_pos_start = (group_pos_start + 1  + next_pos) % HSIZE;
     */
 
-    std::vector<size_t> numbers;
-    std::vector<size_t> ids;
+    std::vector<T> numbers;
     
     size_t cluster_after_collition_length = cluster_lenght > collisions ? cluster_lenght - collisions : 0;
 
     for(size_t i = 1; i <= collision_groups; i++){
 
-        generate_collision(&numbers, &all_numbers, HSIZE, pos, collisions);
+        generate_collision<T>(&numbers, &all_numbers, HSIZE, pos, collisions);
 
         if(i <= cluster){
-            generate_cluster(&numbers, &all_numbers, HSIZE, pos, cluster_after_collition_length);
+            generate_cluster<T>(&numbers, &all_numbers, HSIZE, pos, cluster_after_collition_length);
             pos = (pos + cluster_after_collition_length) % HSIZE;
         }
         
@@ -1062,7 +1053,7 @@ size_t generate_data_p1(
     }
 
     for(int64_t i = (int64_t)(cluster - collision_groups); i > 0; i--){
-        generate_cluster(&numbers, &all_numbers, HSIZE, pos, cluster_lenght);
+        generate_cluster<T>(&numbers, &all_numbers, HSIZE, pos, cluster_lenght);
         pos = (pos + cluster_lenght) % HSIZE;
 
         next_position(pos, distributed_free, HSIZE, seed + 2);
