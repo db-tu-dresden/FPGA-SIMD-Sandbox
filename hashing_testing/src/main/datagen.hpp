@@ -4,6 +4,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <vector>
+#include <map>
+#include <sstream>
+#include <string>
+
+#include "datagen_help.hpp"
 
 /*
     Density sets the information about the data layout between the values.
@@ -11,7 +16,7 @@
         with a step size of 1.
     In the SPARSE case the numbers are taken at random from the full range of values.    
 */
-enum Density{DENSE, SPARSE};
+enum class Density{DENSE, SPARSE};
 
 std::string density_to_string(Density x){
     switch(x){
@@ -31,7 +36,7 @@ std::string density_to_string(Density x){
     With UNIFORM we try to achieve a uniform distribution. This includes some variations
         in the relative frequencies.
 */
-enum Distribution{NORMAL, UNIFORM};
+enum class Distribution{NORMAL, UNIFORM};
 
 std::string distribution_to_string(Distribution x){
     switch(x){
@@ -49,7 +54,7 @@ std::string distribution_to_string(Distribution x){
     With the FLAT generation we have no prerequirements of how the data should look like.
     GRID on the other hand has the prerequrement that every 
 */
-enum Generation{FLAT, GRID};
+enum class Generation{FLAT, GRID};
 
 std::string generation_to_string(Generation z){
     switch(z){
@@ -62,7 +67,11 @@ std::string generation_to_string(Generation z){
 }
 
 
-enum Alignment{UNALIGNED, BAD, GOOD};
+
+/*
+    How collisions groups should be aligned. BAD and GOOD come with another parameter on which it should be alignt 
+*/
+enum class Alignment{UNALIGNED, BAD, GOOD};
 
 std::string alignment_to_string(Alignment x){
     switch(x){
@@ -76,7 +85,24 @@ std::string alignment_to_string(Alignment x){
     return "unknown";
 }
 
+/*
+    How collisions groups should be aligned. BAD and GOOD come with another parameter on which it should be alignt 
+*/
+enum Groupsize{UNIFORM, QUADRATIC};
+std::string alignment_to_string(Groupsize x){
+    
+    switch(x){
+        case Groupsize::UNIFORM:
+            return "uniform";
+        case Groupsize::QUADRATIC:
+            return "quadratic";
+    }
+    
+    return "unknown";
+}
 
+
+//Creates a GRID number described by the paper: A Seven Dimensional Analysis of Hashing Methods and its Implications on Query Processing
 template<typename T>
 T make_grid(size_t x){
     size_t halfword[] ={0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE};
@@ -196,8 +222,6 @@ bool in_interval(size_t a, size_t s, size_t e){
 }
 
 size_t find_place(bool * blocked, size_t HSIZE, size_t place, size_t elements_to_place){
-
-
     size_t fist_blocked = HSIZE;
     bool loop = true;
     size_t etp = elements_to_place;
@@ -244,9 +268,9 @@ size_t find_place(bool * blocked, size_t HSIZE, size_t place, size_t elements_to
 
 
 
-    for(size_t i = 0; i < start_space.size(); i++){
-        std::cout << i << ":\t" << start_space[i] << ",\t" << empty_space[i] << std::endl;
-    }
+    // for(size_t i = 0; i < start_space.size(); i++){
+    //     std::cout << i << ":\t" << start_space[i] << ",\t" << empty_space[i] << std::endl;
+    // }
 
 
     if(!enough_space){   // we have not enough space for this collision!
@@ -273,13 +297,13 @@ size_t find_place(bool * blocked, size_t HSIZE, size_t place, size_t elements_to
 
     entry %= empty_space.size();
     size_t i = entry;
-    std::cout << "\nwish starting place: " << place << std::endl;
+    // std::cout << "\nwish starting place: " << place << std::endl;
     do{
-        std::cout << "\twish entry: " << entry << "\ttest entry: " << i << std::endl;
+        // std::cout << "\twish entry: " << entry << "\ttest entry: " << i << std::endl;
         if(empty_space[i] >= elements_to_place){
             start = start_space[i];
             end = ((start + empty_space[i] + HSIZE - 1) % HSIZE);
-            std::cout << "\t\t[" << start << ", " << end << "]\n";
+            // std::cout << "\t\t[" << start << ", " << end << "]\n";
             
 
             size_t s2, e2;
@@ -288,7 +312,7 @@ size_t find_place(bool * blocked, size_t HSIZE, size_t place, size_t elements_to
             e2 = (s2 + elements_to_place - 1) % HSIZE;
             s_okay = in_interval(s2, start, end);
             e_okay = in_interval(e2, start, end);
-            std::cout << "\t\t\t[" << s2 << ", " << e2 << "]\t" << s_okay << " " << e_okay << std::endl;
+            // std::cout << "\t\t\t[" << s2 << ", " << e2 << "]\t" << s_okay << " " << e_okay << std::endl;
 
             while(!s_okay || !e_okay){
                 if(s_okay && !e_okay){
@@ -300,9 +324,9 @@ size_t find_place(bool * blocked, size_t HSIZE, size_t place, size_t elements_to
                 e2 = (s2 + elements_to_place - 1) % HSIZE;
                 s_okay = in_interval(s2, start, end);
                 e_okay = in_interval(e2, start, end);
-                std::cout << "\t\t\t[" << s2 << ", " << e2 << "]\t" << s_okay << " " << e_okay << std::endl;
+                // std::cout << "\t\t\t[" << s2 << ", " << e2 << "]\t" << s_okay << " " << e_okay << std::endl;
             }
-            std::cout << "FOUND A PLACE: " << s2 << std::endl;
+            // std::cout << "FOUND A PLACE: " << s2 << std::endl;
             return s2;
         }
         i = (i + 1) % empty_space.size();
@@ -311,59 +335,6 @@ size_t find_place(bool * blocked, size_t HSIZE, size_t place, size_t elements_to
     return 0; //some error occured
     // gives us all the sizes of the concecutive empty spaces.
 
-}
-
-size_t make_place(size_t*& member_count, bool*& blocked, size_t HSIZE, size_t place, size_t elements_to_place){
-    // this method should only be used for the unaligned usecase. otherwise the alignment suffers.
-    
-    std::vector<size_t> used_space;
-    std::vector<size_t> start_used_space;
-
-    std::vector<size_t> empty_space;
-    std::vector<size_t> start_space;
-
-    size_t space_used_total = 0;
-    for(size_t i = 0; i < HSIZE; i++){
-        if(member_count[i] != 0){
-            start_used_space.push_back(i);
-            used_space.push_back(member_count[i]);
-            space_used_total += member_count[i];
-        }
-    }
-
-    if(used_space.size() <= 1 || elements_to_place + space_used_total > HSIZE){
-        // Problem with the hashtable. Only one entry and this method got called.
-        return HSIZE;
-    }
-
-    size_t start, end, empty, max = 0, max_pos;
-
-    for(size_t i = 0; i < start_used_space.size() - 1; i++){
-        start = start_used_space[i] + used_space[i];
-        end = start_used_space[i + 1];
-        empty = (((end + HSIZE) - start) + HSIZE) % HSIZE;
-        
-        if(max < empty){
-            max = empty;
-            max_pos = empty_space.size();
-        }
-
-        empty_space.push_back(empty);
-        start_space.push_back(start);
-    }
-    
-    size_t missing = elements_to_place - max;
-    std::vector<size_t> place_to_steal;
-
-    while(missing > 0){
-
-
-    }
-
-
-
-
-    return HSIZE;
 }
 
 
@@ -415,31 +386,270 @@ void place_collisions_unaligned(size_t*& individual_group_size, size_t*& member_
     }
 }
 
-void place_collisions_aligned(size_t*& individual_group_size, size_t*& member_count, bool*& blocked, size_t HSIZE, size_t groups, size_t to_place_total, size_t alignment){
+
+//returns a number of unplaceable entries because of alignment conflicts. 
+size_t place_collisions_aligned_good(size_t*& individual_group_size, size_t*& member_count, bool*& blocked, size_t HSIZE, size_t groups, size_t to_place_total, size_t alignment){
     size_t unused = HSIZE - to_place_total;
     size_t groups_left = groups;
     size_t still_to_place = to_place_total;
     size_t running_pos = 0;
     size_t elements_to_place = 0;
+    size_t elements_placed = 0;
     
     size_t n_pos, k;
+    size_t max_offset;
+    size_t retries = 0;
+    size_t max_retires = groups > HSIZE/alignment ? groups : HSIZE/alignment;
+
+    size_t offset, bucket;
     for(size_t i = 0; i < groups; i++){
+        retries = 0;
         elements_to_place = individual_group_size[i];
+        max_offset = alignment - (size_t)(elements_to_place/2. + 0.5);
+
+retry:
         n_pos = find_place(blocked, HSIZE, running_pos, elements_to_place);
+        if(n_pos == HSIZE){
+            return to_place_total - elements_placed;
+        }
+
+        if(retries >= max_retires){
+            goto placing;
+        }
+        
+        bucket = n_pos / alignment;
+        offset = n_pos - bucket * alignment;
+        
+        if(!(offset <= max_offset)){
+            running_pos = (running_pos + 1) % HSIZE;
+            retries++;
+            goto retry;
+        }
+
+placing:
         entry_place(member_count, blocked, HSIZE, n_pos, elements_to_place);
+        elements_placed += elements_to_place;
+        running_pos = (running_pos + elements_to_place) % HSIZE;
+    }
+    return 0;
+}
 
-        k = unused / groups_left;
+size_t count_alignment_blocks(size_t HSIZE, size_t alignment, size_t position, size_t elements){
+    std::cout << "\t\tcab\tpos: " << position;
+    size_t count = 1;
+    position = (position + 1) % HSIZE ;
+    elements--;
+    while(elements > 0){
+        count += (position % alignment) == 0;
+        position = (position + 1) % HSIZE; 
+        elements --;
 
-        running_pos = n_pos + elements_to_place + k;
-        unused -= k;
-        groups_left--;
+    }
+    std::cout <<"\tcount: " << count << std::endl;
+    return count;
+}
+
+size_t get_worst_alignment(size_t HSIZE, size_t alignment, size_t pos1, int64_t block_count1, size_t gap1, size_t pos2, int64_t block_count2, size_t gap2){
+    
+    //one has more blocks
+    if(block_count1 > block_count2){
+        return pos1;
+    }else if(block_count2 > block_count1){
+        return pos2;
     }
 
+    //one is HSIZE and they have the same block count
+    if(pos1 == HSIZE || pos2 == HSIZE){
+        return HSIZE;
+    }
+
+    if(gap1 < gap2){
+        return pos1;
+    }else if(gap2 < gap1){
+        return pos2;
+    }
+
+    //6 and 7 with 3 and 10
+    //both have same block count. Search for the worse alignment.
+
+    size_t elements_in_last_block = HSIZE % alignment;
+    elements_in_last_block = elements_in_last_block == 0 ? alignment : elements_in_last_block;
+    size_t patch = alignment - elements_in_last_block;
+    
+    bool last_block1 = (((pos1 / alignment) + 1) * alignment) % HSIZE < pos1; // checks if the block we are curretnly in is the last block. 
+    bool last_block2 = (((pos2 / alignment) + 1) * alignment) % HSIZE < pos2; // checks if the block we are curretnly in is the last block. 
+
+    size_t m_1 = pos1 % alignment;
+    size_t m_2 = pos2 % alignment;
+    if(last_block1){
+        m_1 += patch;
+    }
+    if(last_block2){
+        m_2 += patch;
+    }
+
+    if(m_2 > m_1){
+        return pos2;
+    }
+    return pos1;
 }
+
+size_t get_gap_created(bool * blocked, size_t HSIZE, size_t pos, int64_t block_count){
+    size_t gap = 0;
+    size_t s = pos;
+    size_t e = (pos + block_count) % HSIZE;
+    size_t gap_help = 0;
+    
+    //search right
+    for(size_t p = e; p != s; p = (p+1)%HSIZE){
+        if(blocked[p]){
+            break;
+        }else{
+            gap_help++;
+        }
+    }
+    gap = gap_help;
+    gap_help = 0;
+    std::cout << "RIGHT: " << gap;
+    //search left
+    for(size_t p = (s+HSIZE-1)%HSIZE; p != e; p = (p+HSIZE-1)%HSIZE){
+        if(blocked[p]){
+            break;
+        }else{
+            gap_help++;
+        }
+    }
+    
+    std::cout << "\tLEFT: " << gap_help;
+    if(gap_help < gap){
+        gap = gap_help;
+    }
+
+    std::cout << "\tGAP: " << gap << std::endl;
+
+    return gap;
+}
+ 
+size_t get_most_alignment_block_position(bool * blocked, size_t HSIZE, size_t alignment, size_t elements, size_t empty_space_allowed, bool override_gap = false){
+    int64_t count[HSIZE];
+    size_t gap[HSIZE];
+
+std::cout << "GET MOST\tGAP:" << empty_space_allowed << std::endl;
+    for(size_t i = 0; i < HSIZE; i++){
+        count[i] = -1;
+        gap[i] = 0;
+    }
+
+    for(size_t i = 0; i < HSIZE; i++){
+        if(count[i] == -1){
+            size_t pos = find_place(blocked, HSIZE, i, elements);
+            size_t gap_i = get_gap_created(blocked, HSIZE, pos, elements);
+            
+
+            if(pos > HSIZE){
+                return HSIZE;
+            }
+            
+            bool NOT_ALREADY_SET = count[pos] == -1;
+            bool BIG_ENOUGH_GAP = gap_i >= elements; // the gap is big enough to contain another element of the same size
+            bool SMALL_ENOUGH_GAP = gap_i <= empty_space_allowed; // the gap is smaller than the allowed free space
+
+            if(NOT_ALREADY_SET && (BIG_ENOUGH_GAP || SMALL_ENOUGH_GAP || override_gap)){
+                gap[pos] = gap_i;
+                count[pos] = count_alignment_blocks(HSIZE, alignment, pos, elements);
+                std::cout << "\t\t\t\t" << gap_i << std::endl;;
+            }
+        }
+    }
+
+    size_t max_id = HSIZE;
+    int64_t max_val = 0;
+    int64_t min_gap = 0;
+
+    std::cout << "\t\t\tmax 1\t" << max_id << "\t" << max_val << std::endl;
+    for(size_t i = 0; i < HSIZE; i++){
+
+        max_id = get_worst_alignment(HSIZE, alignment, max_id, max_val, min_gap, i, count[i], gap[i]);
+        if(i == max_id){
+            max_val = count[i];
+            min_gap = gap[i];
+            std::cout << "\t\t\tmax\t" << max_id << "\t" << max_val << std::endl;
+        }
+    }
+    return max_id;
+}
+
+
+//returns a number of unplaceable entries because of alignment conflicts. 
+size_t place_collisions_aligned_bad(size_t*& individual_group_size, size_t*& member_count, bool*& blocked, size_t HSIZE, size_t groups, size_t to_place_total, size_t alignment){
+    
+    size_t groups_left = groups;
+    size_t still_to_place = to_place_total;
+    size_t running_pos = HSIZE - 1;
+    size_t elements_to_place = 0;
+    size_t elements_placed = 0;
+
+    size_t empty_space = HSIZE - to_place_total;
+    
+    size_t n_pos, k;
+    size_t max_loads, min_loads;    
+    size_t min_offset;
+
+    size_t retries = 0;
+    size_t max_retires = groups > HSIZE/alignment ? groups : HSIZE/alignment;
+
+    for(size_t i = 0; i < groups; i++){
+
+        elements_to_place = individual_group_size[i];   //elements_to_place get smaller per iteration
+        n_pos = get_most_alignment_block_position(blocked, HSIZE, alignment, elements_to_place, empty_space, i==0); 
+        
+        if(n_pos == HSIZE){
+            return to_place_total - elements_placed;
+        }
+
+        size_t k = get_gap_created(blocked, HSIZE, n_pos, elements_to_place);
+        if(k <= elements_to_place && k <= individual_group_size[(i+1) %HSIZE]){
+            empty_space -= k;
+        }else if(empty_space > 0){
+            empty_space--; // due to unlucky placement we might get a "memory" leak.
+        }
+        
+        entry_place(member_count, blocked, HSIZE, n_pos, elements_to_place);
+        elements_placed += elements_to_place;
+        running_pos = (running_pos + elements_to_place) % HSIZE;
+    }
+
+    std::cout << "ALL BLOCKS PLACED!\n";
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //returns 0 iff their was a problem during generation
 // static perfect hashing (mod HSIZE)
+// I COULD ADD THE FUNCTION TOO since it is just a simple search for values that hash to it. so it shouldn't take "that" long.
 template<typename T>
 size_t generate_collision_data(
     T*& result, 
@@ -450,7 +660,8 @@ size_t generate_collision_data(
     double collisions = 0.0, //[0, 1] 0 no collision 1 all collision
     // Generation gen = Generation::FLAT,
     Distribution dis = Distribution::UNIFORM,
-    Alignment ali = Alignment::UNALIGNED,
+    Groupsize gro = Groupsize::UNIFORM,
+    Alignment ali = Alignment::BAD,
     size_t allign_size = 16,
     size_t start = 0,   // starting offset for consecutive numbers (dense)
     size_t seed = 0     // for sparse number generation 0 true random, 1.. reproducible
@@ -459,12 +670,15 @@ size_t generate_collision_data(
         srand(std::time(nullptr));
         seed = std::rand();
     }
+
     bool create_collisions = true;
+
     if(collision_groups == 0){
         collision_groups = 0;
         collisions = 0;
         create_collisions = false;
     }
+
     collisions = collisions <= 1 ? collisions : 1;
     size_t collisions_total = distinct_values * collisions;
     size_t non_collisions = distinct_values - collisions_total;
@@ -484,24 +698,30 @@ size_t generate_collision_data(
 
     if(create_collisions){
         size_t *individual_group_size = new size_t[collision_groups];
-        
-        if(true){   //uniform
-            size_t help = collisions_total;
+        size_t help;
+
+        switch(gro){
+        case Groupsize::UNIFORM:
+            help = collisions_total;
             for(size_t i = collision_groups; i > 0; i--){
                 size_t current = help / i;
                 help -= current;
                 individual_group_size[i-1] = current;
             }
-        }else if(false){    //quadratic //important for not enough collisions quadratic might act like uniform
-            size_t help = collisions_total;
+
+            break;
+        case Groupsize::QUADRATIC:
+            help = collisions_total;
             for(size_t i = collision_groups; i > 0; i--){
                 size_t current = (help / ((1<<i) - 1.)) + 0.5;
                 current = current > 2 ? current : 2;
                 help -= current;
                 individual_group_size[i-1] = current;
             }
-        }else{
-            return 0;
+            break;
+        default:
+            throw std::runtime_error("Unknown groupsize distribution");    
+
         }
 
         bool placed_all = false;
@@ -518,62 +738,402 @@ size_t generate_collision_data(
         
         size_t elements_to_place = individual_group_size[to_place_id];
         size_t place, next_place;
-            
+        std::cout << "point 1\n";
 
+        size_t error = 0;
         switch (ali)
         {
             case Alignment::UNALIGNED:
-                place = noise(to_place_id + t, seed)  % HSIZE;
+                place = noise(to_place_id + t, seed + 1)  % HSIZE;
 
-                place_collisions_unaligned(individual_group_size, member_count, blocked, HSIZE, collision_groups, collisions_total, place);
-
+                place_collisions_unaligned(individual_group_size, member_count, blocked, HSIZE, collision_groups, collisions_total, place); //can't fail!
+                break;
             case Alignment::GOOD:   // try to place the blocks as good as possible for avx/sse
-
+                error = place_collisions_aligned_good(individual_group_size, member_count, blocked, HSIZE, collision_groups, collisions_total, allign_size);
                 break;
             case Alignment::BAD:    // try to place the blocks as badly as possible for avx/sse
+                error = place_collisions_aligned_bad(individual_group_size, member_count, blocked, HSIZE, collision_groups, collisions_total, allign_size);
                 break;
             default:
                 break;
         }
 
-        do{
-            switch (ali)
-            {
-            case Alignment::UNALIGNED:
-                place = noise(to_place_id + t, seed)  % HSIZE;
-                next_place = find_place(blocked, HSIZE, place, elements_to_place);
-                if(next_place >= HSIZE){ //we need to "defragment" our hash table other wise we might create more complex collisions
-                    next_place = make_place(member_count, blocked, HSIZE, place, elements_to_place);
-                }
-                entry_place(member_count, blocked, HSIZE, next_place, elements_to_place);
-                to_place_id++;
-                break;
+        if(error != 0){
+            return 0; // we don't want to kill the execution due to an error during the creation. BUT we signal out that there was an error.
+        }
+    }
 
-            case Alignment::GOOD:   // try to place the blocks as good as possible for avx/sse
+    // for(size_t i = 0; i < non_collisions; i++){
+    //     size_t pos = find_place(blocked, HSIZE, noise(i, seed + 2) % HSIZE, 1);
+    //     entry_place(member_count, blocked, HSIZE, pos, elements_to_place);
+    // }
 
-                break;
-            case Alignment::BAD:    // try to place the blocks as badly as possible for avx/sse
-                break;
-            default:
+
+    //generate DATA HERE:
+
+    return seed;
+}
+
+
+
+size_t p1_parameter_gen_max_collision_group(size_t distinct_value, size_t HSIZE){
+    // std::cout << "col_group\n";
+    return HSIZE/2;
+}
+
+size_t p1_parameter_gen_max_collisions(size_t distinct_value, size_t HSIZE, size_t collision_count){
+    // std::cout << "cols\n";
+
+    if(collision_count == 0){
+        return 0;
+    }
+
+    size_t r =  (HSIZE/collision_count) - 1;
+    
+    if(r > HSIZE){
+        return 0;
+    }
+    return r;
+}
+
+size_t p1_parameter_gen_max_cluster(size_t distinct_value, size_t HSIZE, size_t collision_count, size_t collisions){
+    // std::cout << "clust\n";
+    if(collisions == 0){
+        collision_count = 0;
+    }
+
+    if(collision_count == 0){
+        return HSIZE/2;
+    }
+    int64_t x = distinct_value - collision_count * collisions;
+    if(x <= 0){
+        return 0;
+    }
+
+    size_t left = HSIZE - collision_count * (collisions + 1);
+    return left/2 + collision_count;
+}
+
+size_t p1_parameter_gen_max_cluster_length(size_t distinct_value, size_t HSIZE, size_t collision_count, size_t collisions, size_t cluster){
+    // std::cout << "clust_len\n";
+    // std::cout << distinct_value << "\t" << HSIZE << "\t" << collision_count << "\t" << collisions << "\t" << cluster << "\n";
+    // 5 6 cc 1 cs 5 clu 1
+    if(cluster == 0){
+        return 0;
+    }
+    if(collisions == 0){
+        collision_count = 0;
+    }
+    
+    if(collision_count == 0){
+        size_t r =  (HSIZE / cluster) - 1;
+        if(r > distinct_value){
+            // std::cout << "r0\n";
+            return 0;
+        }
+        // std::cout << "r1\n";
+        return r;
+    }
+
+    size_t x = (HSIZE / cluster) - 1;
+    if(x > HSIZE){ 
+        x = 0;
+    }
+
+    if(x > collisions){
+        // for p1 the cluster can extend a collision groups size so that it achieves the necessary cluster length.
+        // std::cout << "r2\n";
+        return x;
+    }
+
+    size_t remaining_clusters = cluster - collision_count;
+    if(remaining_clusters > cluster || remaining_clusters == 0){
+        // std::cout << "r3\n";
+        return 0;
+    }
+
+    size_t left = HSIZE - collision_count * (collisions + 1);
+    // std::cout << "\t" << left << "\t" << remaining_clusters << "\t" << left/remaining_clusters - 1 << std::endl;
+    // std::cout << "r4\n";
+    return left/remaining_clusters - 1;
+}
+
+
+size_t p1_parameter_gen_distinct(size_t collision_count, size_t collisions, size_t cluster, size_t cluster_lenght){
+    // std::cout << "distinct_calc\n";
+    size_t a = collision_count;
+    size_t a_l = collisions;
+    size_t b = cluster;
+    size_t b_l = cluster_lenght;
+
+    if(a == 0){
+        a_l = 0;
+    }
+    if(b == 0){
+        b_l = 0;
+    }
+
+    size_t c = a < b ? a : b;
+
+    a = a - c;
+    b = b - c;
+
+    size_t m = a_l > b_l ? a_l : b_l;
+
+    size_t res = c * m + a * a_l + b * b_l;
+    return res;
+}
+
+size_t p1_parameter_gen_hsize(size_t collision_count, size_t collisions = 0, size_t cluster = 0, size_t cluster_lenght = 0){
+    // std::cout << "hsize_calc\n";
+    size_t a = collision_count;
+    size_t a_l = collisions;
+    size_t b = cluster;
+    size_t b_l = cluster_lenght;
+
+    size_t c = a < b ? a : b;
+
+    if(a == 0){
+        a_l = 0;
+    }
+    if(b == 0){
+        b_l = 0;
+    }
+
+    a = a - c;
+    b = b - c;
+
+    a_l += 1;
+    b_l += 1;
+
+    size_t m = a_l > b_l ? a_l : b_l;
+
+    size_t res = c * m + a * a_l + b * b_l;
+    return res;
+}
+
+std::string* p1_stringify_number(size_t max_val, size_t val){
+    val--;
+    max_val--;
+    size_t m = max_val;
+    size_t c = 0;
+    while(m > 0){
+        m /= 26;
+        c++;
+    }
+    std::stringstream result;
+    bool first = true;
+    for(size_t i = 0; i < c; i++){
+        if(i==0){
+            result << (char)('A' + (val%26));
+        }else{
+            result << (char)('a' + (val%26));
+        }
+            val /= 26;
+    }
+    return new std::string(result.str());
+}
+
+
+std::string* p1_stringify( size_t HSIZE, size_t collision_count, size_t collisions, size_t cluster, size_t cluster_lenght){
+    int64_t table [HSIZE];
+    int64_t col_a = 0;
+    int64_t clu_a = 0;
+    size_t h_val = 1;
+    size_t pos = 0;
+
+
+    if(p1_parameter_gen_hsize(collision_count, collisions, cluster, cluster_lenght) > HSIZE){
+        // *res = new std::string("");
+        // return;
+        return new std::string("");
+    }
+
+    for(size_t i = 0; i < HSIZE; i++){
+        table[i] = 0;
+    }
+
+    for(; col_a < collision_count; col_a++, clu_a++){
+        int64_t i = 0;
+        for( ; i < collisions; i++){
+            table[i + pos] = h_val;
+        }
+        pos += collisions;
+        h_val++;
+        for(; i < cluster_lenght && clu_a < cluster;  i++){
+            table[pos] = h_val;
+            pos++;
+            h_val++;
+        }
+        pos++;
+    }
+
+    for(; clu_a < cluster; clu_a++){
+        for(int64_t i = 0; i < cluster_lenght && clu_a < cluster;  i++){
+            table[pos] = h_val;
+            pos++;
+            h_val++;
+        }
+        pos++;
+    }
+    // std::stringstream result;
+    // result("");
+    std::stringstream result;
+    result << h_val << ":";
+    for(size_t i = 0; i < HSIZE; i++){
+        if(table[i] == 0){
+            if((i+1) < HSIZE && table[i+1] != 0){
+                result << "_";
+            }else{
                 break;
             }
-            t++;
-        }while(to_place_id < collision_groups);
-        
+        }else{
+            std::string *helper;
+            helper = p1_stringify_number(h_val, table[i]) ;
+            result << *helper;
+            delete helper; 
+        }
+        // if(i+1 < HSIZE){
+        //     result << " ";
+        // }
+    }
+    return new std::string(result.str());
+}
 
-
-
-    
+//Data Generator that can create collision_groups
+template<typename T>
+size_t generate_data_p1(
+    T*& result,
+    size_t data_size,
+    size_t distinct_values,
+    size_t HSIZE,
+    size_t (*hash_function)(T, size_t),
+    size_t collision_groups = 0,
+    size_t collisions = 0,
+    size_t cluster = 0,
+    size_t cluster_lenght = 0,
+    size_t seed = 0
+){
+    if(seed == 0){
+        srand(std::time(nullptr));
+        seed = std::rand();
+    }
+    size_t total_free = HSIZE - distinct_values;
+    size_t reserved_free = cluster > collision_groups ? cluster : collision_groups;
+    int64_t distributed_free = total_free - reserved_free - 1;
+    if(distributed_free <= 0){
+        distributed_free = 1;
     }
 
 
 
 
+    size_t mul = collisions != 0? collisions : 2;
+    size_t number_of_values = HSIZE * distinct_values * mul;
 
+    size_t expected_hsize = p1_parameter_gen_hsize(collision_groups, collisions, cluster, cluster_lenght);
+    if(expected_hsize > HSIZE || expected_hsize == 0){
+        return 0; // to many distinct values needed
+    }
+    
+    //generate some values
+    std::multimap<size_t, size_t> all_numbers;
+    for(size_t i = 0; i < number_of_values; i++){
+        size_t num;
+        do{
+            num = noise(i, seed);
+        }while(num == 0);
+        
+        all_numbers.insert(std::pair<size_t, size_t>(hash_function(num, HSIZE), num));
+    }
 
+    // for(size_t i = 0; i < HSIZE; i++){
+    //     std::cout << "\t" << i <<" :\t" << all_numbers.count(i) << std::endl;
+    // }
 
-    return seed;
+    size_t empty = HSIZE - distinct_values;
+    //it might not be possible to create all the clusters the user wants.
+
+    size_t pos = noise(HSIZE * distinct_values, seed + 1) % HSIZE;
+
+    /*
+            size_t next_pos = noise(distributed_free, seed + 1) % distributed_free;
+            distributed_free -= next_pos;
+            group_pos_start = (group_pos_start + 1  + next_pos) % HSIZE;
+    */
+
+    std::vector<size_t> numbers;
+    std::vector<size_t> ids;
+
+    for(size_t i = 1; i <= collision_groups; i++){
+        size_t group_pos_start = pos;
+        size_t left = collisions;
+    next:
+        std::multimap<size_t, size_t>::iterator itLow, itUp;
+        itLow = all_numbers.lower_bound(group_pos_start);
+        itUp = all_numbers.upper_bound(group_pos_start);
+        for (std::multimap<size_t, size_t>::iterator it = itLow; it != itUp && left > 0; it++) {
+            numbers.push_back(it->second);
+            ids.push_back(pos);
+            pos = (pos + 1) % HSIZE;
+            left --;
+        }
+        
+        group_pos_start = (group_pos_start + 1) % HSIZE;
+        if(left != 0){
+            goto next;
+        }
+
+        for(int64_t c = 0; c < (int64_t)(cluster_lenght - collisions) && i <= cluster; c++){
+            std::multimap<size_t, size_t>::iterator it = all_numbers.find(pos);
+            numbers.push_back(it->second);
+            ids.push_back(pos);
+            pos = (pos + 1) % HSIZE;
+        }
+        
+        // pos = (pos + 1) % HSIZE;
+
+        size_t next_pos = noise(distributed_free, seed + 2) % distributed_free;
+        distributed_free -= next_pos;
+        pos = (pos + 1  + next_pos) % HSIZE;
+
+    }
+
+    for(int64_t i = (int64_t)(cluster - collision_groups); i > 0; i--){
+        for(size_t c = 0; c < cluster_lenght; c++){
+            std::multimap<size_t, size_t>::iterator it = all_numbers.find(pos);
+            numbers.push_back(it->second);
+            ids.push_back(pos);
+            pos = (pos + 1) % HSIZE;
+        }
+        // pos = (pos + 1) % HSIZE;
+        size_t next_pos = noise(distributed_free, seed + 2) % distributed_free;
+        distributed_free -= next_pos;
+        pos = (pos + 1  + next_pos) % HSIZE;
+    }
+    if(numbers.size() == 0){
+        return 0;
+    }
+
+    std::cout <<"DATA:";
+    for(size_t i = 0; i < numbers.size(); i++){
+        std::cout << "\t" << hash_function(numbers[i], HSIZE);
+    }
+    std::cout << "\n";
+
+    for(size_t i = 0; i < data_size; i++){
+        size_t ran = noise(i, seed + 3) % numbers.size();
+        result[i] = numbers[ran];
+    }
+    
+    return numbers.size();
 }
+
+
+
+
+
+
 
 /*
     Data generator with different options for data layout. 
@@ -652,79 +1212,25 @@ retry:
 }
 
 
-/*
-    Data generator with different options for data layout. 
-    DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!
-*/
-template<typename T>
-void generate_data2(
-    T*& result, 
-    size_t data_size,   // number of values to be generated
-    size_t distinct_values, // number of distinct values
-    Density den = Density::DENSE,
-    Generation gen = Generation::FLAT,
-    Distribution dis = Distribution::UNIFORM,
-    size_t start = 0,   // starting offset for consecutive numbers (dense)
-    size_t seed = 0     // for sparse number generation 0 true random, 1.. reproducible
-){
-    if(seed == 0){
-        srand(std::time(nullptr));
-        seed = std::rand();
-    }
-    std::cout << "\tThe seed is:\t" << seed << std::endl;
-    double mul = 1.5;
-    size_t retries = 0;
-retry:
-    mul++;
-    retries++;
-    if(retries < 10)
-    {
-        std::vector<size_t> index;
-        std::vector<T> numbers;
 
-        switch(den){
-        case Density::DENSE:
-            index_dense(index, distinct_values*mul, start);
-            break;
-        case Density::SPARSE:
-            index_sparse(index, distinct_values*mul, seed);
-            break;    
-        default:
-            throw std::runtime_error("Unknown Density input");
-        }
 
-        switch (gen){
-        case Generation::FLAT:
-            flat_number_gen<T>(numbers, index, distinct_values);
-            break;
-        case Generation::GRID:
-            grid_number_gen<T>(numbers, index, distinct_values);
-            break;
-        default:
-            throw std::runtime_error("Unknown Generation methoed input");    
-        }
-        
-        if(numbers.size() < distinct_values){
-            goto retry;
-        }
 
-        switch(dis){
-        case Distribution::NORMAL:
-            throw std::runtime_error("Normal Distribution not yet implemented");    
-            break;
-        case Distribution::UNIFORM:
-            for(size_t i = 0; i < data_size; i++){
-                size_t ran = noise(i, seed + start + 1) % distinct_values;
-                result[i] = numbers[ran];
-            }
-            break;
-        default:
-            throw std::runtime_error("Unknown Distribution input");    
-        }
-    }else{
-        throw std::runtime_error("To many retries in data gen.");
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endif //TUD_HASHING_TESTING_DATAGEN
