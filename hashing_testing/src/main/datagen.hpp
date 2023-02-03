@@ -981,6 +981,7 @@ std::string* p1_stringify( size_t HSIZE, size_t collision_count, size_t collisio
 }
 
 //Data Generator that can create collision_groups
+
 template<typename T>
 size_t generate_data_p1(
     T*& result,
@@ -988,13 +989,13 @@ size_t generate_data_p1(
     size_t distinct_values,
     size_t HSIZE,
     size_t (*hash_function)(T, size_t),
-    size_t collision_groups = 0,
-    size_t collisions = 0,
-    size_t cluster = 0,
-    size_t cluster_lenght = 0,
+    size_t collision_count = 0,
+    size_t collision_size = 0,
+    size_t cluster_count = 0,
+    size_t cluster_size = 0,
     size_t seed = 0
 ){
-    size_t expected_hsize = p1_parameter_gen_hsize(collision_groups, collisions, cluster, cluster_lenght);
+    size_t expected_hsize = p1_parameter_gen_hsize(collision_count, collision_size, cluster_count, cluster_size);
     if(expected_hsize > HSIZE || expected_hsize == 0){
         return 0; // HSIZE is to small for the given configuration to fit.
     }
@@ -1003,72 +1004,64 @@ size_t generate_data_p1(
         seed = std::rand();
     }
 
-    // get the total free space to distribute the data more randomly
     size_t total_free = HSIZE - distinct_values;
-    size_t reserved_free = cluster > collision_groups ? cluster : collision_groups;
-    reserved_free++;
+    size_t reserved_free = cluster_count> collision_count ? cluster_count: collision_count;
+    reserved_free += 1;
     size_t distributed_free = total_free <= reserved_free ? 1 : total_free - reserved_free ;
 
-    // create some random numbers. 
-    size_t mul = collisions < 100? collisions + 2 : 100;    // TODO: maybe use instead of plain 100 -> log(collisions) * 50
+    size_t mul = collision_size < 100? collision_size + 2 : 101;    // TODO: maybe use instead of plain 100 -> log(collision_size) * 50
     size_t number_of_values = (HSIZE + 1) * mul;
+    
+    size_t cluster_after_collition_length = cluster_size > collision_size ? cluster_size - collision_size : 0;
+    size_t pos = noise(HSIZE * distinct_values, seed + 1) % HSIZE;
 
-
-    //generate some values
     std::multimap<size_t, T> all_numbers;
+    std::vector<T> numbers;
+
     generate_random_values(all_numbers, hash_function, number_of_values, HSIZE, seed);
 
     // for(size_t i = 0; i < HSIZE; i++){
-    //     std::cout << "\t" << i <<" :\t" << all_numbers.count(i) << "\t|\t";
-    //     if((i+1) % 10 == 0){
-    //         std::cout <<std::endl;
-    //     }
+    //     std::cout << i << " -> " << all_numbers.count(i) << "\t\t";
     // }
+    // std::cout << std::endl;
 
-    size_t empty = HSIZE - distinct_values;
-    //it might not be possible to create all the clusters the user wants.
+    size_t i = 0;
+    bool CREATE_CLUSTER = i < cluster_count;
+    bool CREATE_COLLISION = i < collision_count;
+    size_t remaining_cluster_length;
 
-    size_t pos = noise(HSIZE * distinct_values, seed + 1) % HSIZE;
-
-    /*
-            size_t next_pos = noise(distributed_free, seed + 1) % distributed_free;
-            distributed_free -= next_pos;
-            group_pos_start = (group_pos_start + 1  + next_pos) % HSIZE;
-    */
-
-    std::vector<T> numbers;
-    
-    size_t cluster_after_collition_length = cluster_lenght > collisions ? cluster_lenght - collisions : 0;
-
-    for(size_t i = 1; i <= collision_groups; i++){
-
-        generate_collision<T>(&numbers, &all_numbers, HSIZE, pos, collisions);
-
-        if(i <= cluster){
-            generate_cluster<T>(&numbers, &all_numbers, HSIZE, pos, cluster_after_collition_length);
-            pos = (pos + cluster_after_collition_length) % HSIZE;
+    while(CREATE_CLUSTER || CREATE_COLLISION){
+        remaining_cluster_length = cluster_size;
+        if(CREATE_COLLISION){
+            generate_collision<T>(&numbers, &all_numbers, HSIZE, pos, collision_size);
+            pos = (pos + collision_size) % HSIZE;
+            remaining_cluster_length = cluster_after_collition_length;
         }
         
-        next_position(pos, distributed_free, HSIZE, seed + 2);
-    }
-
-    for(int64_t i = (int64_t)(cluster - collision_groups); i > 0; i--){
-        generate_cluster<T>(&numbers, &all_numbers, HSIZE, pos, cluster_lenght);
-        pos = (pos + cluster_lenght) % HSIZE;
+        if(CREATE_CLUSTER){
+            generate_cluster<T>(&numbers, &all_numbers, HSIZE, pos, remaining_cluster_length);
+            pos = (pos + remaining_cluster_length) %HSIZE;
+        }
 
         next_position(pos, distributed_free, HSIZE, seed + 2);
+
+        i++;
+        CREATE_COLLISION = i < collision_count;
+        CREATE_CLUSTER = i < cluster_count;
     }
 
-    // std::cout <<"DATA:";
-    // for(size_t i = 0; i < numbers.size(); i++){
-    //     std::cout << "\t" << hash_function(numbers[i], HSIZE);
+    // for(i = 0; i < numbers.size(); i++){
+    //     std::cout << hash_function(numbers[i], HSIZE) << ":" << numbers[i] << "\t";
+    //     if((i+1) % 20 == 0){
+    //         std::cout << std::endl;
+    //     }
     // }
-    // std::cout << "\n";
+    // std::cout << std::endl;
 
     if(numbers.size() == 0){
         return 0;
     }
-
+    std::cout << std::endl;
     generate_benchmark_data<T>(result, data_size, &numbers, seed+3);    
     return numbers.size();
 }

@@ -26,9 +26,18 @@ uint64_t noise(size_t position, size_t seed){
 
 
 
-
-
-
+template<typename T>
+bool enough_values_per_bucket(
+    std::multimap<size_t, T> &numbers,
+    size_t HSIZE
+){
+    for(size_t i = 0; i < HSIZE; i++){
+        if(numbers.count(i) <= 1){
+            return false;
+        }
+    }
+    return true;
+}
 
 template<typename T>
 bool vector_contains(
@@ -49,6 +58,7 @@ void next_position(size_t &pos, size_t &budget, size_t HSIZE, size_t seed){
     }
     if(budget == 1){
         pos = (pos + 1) % HSIZE;
+        return;
     }
     size_t offset = noise(budget + pos, seed) % budget;
     budget -= offset;
@@ -64,17 +74,22 @@ void generate_random_values(
     size_t seed
 ){
     size_t retry = 0;
-    for(size_t i = 0; i < number_of_values; i++){
-        T num;
-        do{
-            num = noise(i + retry, seed);
-            retry += num == 0;
-        }while(num == 0);
-        
-        numbers.insert(std::pair<size_t, T>(hash_function(num, HSIZE), num));
-    }
+    do{
+        while(numbers.size() < number_of_values){
+            T num;
+            do{
+                num = noise(numbers.size() + retry, seed);
+                retry += num == 0;
+            }while(num == 0);
+            
+            numbers.insert(std::pair<size_t, T>(hash_function(num, HSIZE), (T)(num)));
+        }
+        number_of_values += HSIZE;
+    }while(!enough_values_per_bucket(numbers, HSIZE));
 }
 
+// tries to generate a collision big enough form one bucket. 
+// might need to get data from neighbouring buckets.
 template<typename T>
 void generate_collision(
     std::vector<T> *result,
