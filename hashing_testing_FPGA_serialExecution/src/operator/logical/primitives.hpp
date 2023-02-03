@@ -16,6 +16,12 @@ struct fpvec {
     [[intel::fpga_register]] std::array<T, 64/sizeof(T)> elements;
 };
 
+/* // print a fpvec<T> result register
+	for (int i=0; i<(64/sizeof(T)); i++) {
+		std::cout << reg.elements[i] << " ";
+	} 
+*/
+
 /**	#1
  * serial primitive for Intel Intrinsic:
  * _mm512_setzero_epi32
@@ -33,9 +39,11 @@ fpvec<T> setzero() {
 
 /**	#2
  * serial primitive for Intel Intrinsic:
- * _mm512_setr_epi32
+ * __m512i _mm512_setr_epi32 (int e15, int e14, int e13, int e12, 
+ * int e11, int e10, int e9, int e8, int e7, int e6, int e5, int e4, int e3, 
+ * int e2, int e1, int e0)
  * 
- * function will (currently) only be working for arrys with 16 elements a 32bit integers!
+ * function will (currently) only be working for arrys with 16 elements of 32bit integers!
  */
 template<typename T>
 fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uint32_t e11, uint32_t e10, uint32_t e9,
@@ -63,7 +71,7 @@ fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uin
 
 /**	#3
 * serial primitive for Intel Intrinsic:
-* _mm512_set1_epi32
+* __m512i _mm512_set1_epi32 (int a)
 */
 template<typename T>
 fpvec<T> set1(T value) {
@@ -77,7 +85,7 @@ fpvec<T> set1(T value) {
 
 /**	#4
 * serial primitive for Intel Intrinsic:
-* _cvtu32_mask16
+* __mmask16 _cvtu32_mask16 (unsigned int a)
 * original description: "Convert integer value a into an 16-bit mask, and store the result in k."*
 */
 template<typename T>
@@ -90,16 +98,13 @@ fpvec<T> cvtu32_mask16(T n) {
         reg.elements[lastElement] = (n >> lastElement) & 0x1;;
 		lastElement = lastElement-1;
     }
-	/* // print fpvec result register
-	for (int i=0; i<(64/sizeof(T)); i++) {
-		std::cout << reg.elements[i] << " ";
-	} */
-
 	return reg;
 }
 
 /**	#5
 * serial primitive for two Intel Intrinsics:
+* __m512i _mm512_maskz_loadu_epi32 (__mmask16 k, void const* mem_addr)
+* __m512i _mm512_mask_loadu_epi32 (__m512i src, __mmask16 k, void const* mem_addr)
 * _mm512_maskz_loadu_epi32	:	original description: "Load packed 32-bit integers from memory 
 *								into dst using zeromask k (elements are zeroed out when the 
 *								corresponding mask bit is not set). mem_addr does not need to 
@@ -133,7 +138,7 @@ fpvec<T> mask_loadu(fpvec<T>& writeMask, uint32_t* data, uint32_t startIndex, ui
 
 /**	#6
 * serial primitive for Intel Intrinsic:
-* _mm512_mask_cmpeq_epi32_mask
+* __mmask16 _mm512_mask_cmpeq_epi32_mask (__mmask16 k1, __m512i a, __m512i b)
 * original description: "Compare packed 32-bit integers in a and b for equality, and store the results in mask vector k 
 * using zeromask k1 (elements are zeroed out when the corresponding mask bit is not set)."
 */
@@ -159,7 +164,7 @@ fpvec<T> mask_cmpeq_epi32_mask(fpvec<T>& zeroMask, fpvec<T>& a, fpvec<T>& b) {
 
 /**	#7
 * serial primitive for Intel Intrinsic:
-* _mm512_mask_add_epi32
+* __m512i _mm512_mask_add_epi32 (__m512i src, __mmask16 k, __m512i a, __m512i b)
 * original description: "Add packed 32-bit integers in a and b, and store the results in dst using writemask k 
 * (elements are copied from src when the corresponding mask bit is not set)."
 */
@@ -180,7 +185,7 @@ fpvec<T> mask_add_epi32(fpvec<T>& src, fpvec<T>& writeMask, fpvec<T>& a, fpvec<T
 
 /**	#8
 * serial primitive for Intel Intrinsic:
-* _mm512_mask_storeu_epi32
+* void _mm512_mask_storeu_epi32 (void* mem_addr, __mmask16 k, __m512i a)
 * original description: "Store packed 32-bit integers from a (=data) into memory using writemask k. 
 * mem_addr does not need to be aligned on any particular boundary."
 *
@@ -197,19 +202,13 @@ void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fp
 	for (int i=0; i<(64/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			result[(startIndex+i)%HSIZE] = data.elements[i];
-			//result[startIndex+i] = data.elements[i];
-		}
-		else {
-			// old result[(startIndex+i)%HSIZE] = result[(startIndex+i)%HSIZE];
-			// result[startIndex+i] = result[startIndex+i];		// not necessary? do nothing?
-			int hello = 0; // do nothing		
 		}
 	}
 }
 
 /**	#9
 * serial primitive for Intel Intrinsic:
-* _mm512_mask2int
+* int _mm512_mask2int (__mmask16 k1)
 * original description: "Converts bit mask k1 into an integer value, storing the results in dst."
 * own (simplified implementation):
 * return 1 if at least 1 bit of mask is set;
@@ -229,7 +228,7 @@ uint32_t mask2int(fpvec<T>& mask) {
 
 /**	#10
 * serial primitive for Intel Intrinsic:
-* _mm512_knot
+* __mmask16 _mm512_knot (__mmask16 a)
 * original description: "Compute the bitwise NOT of 16-bit mask a, and store the result in k."
 */
 template<typename T>
@@ -250,7 +249,7 @@ fpvec<T> knot(fpvec<T>& src) {
 
 /**	#11
 * serial primitive for Built-in Function Provided by GCC:
-* __builtin_clz
+* int __builtin_clz (unsigned int x)
 * original description: "Built-in Function: int __builtin_clz (unsigned int x)
 * Returns the number of leading 0-bits in x, starting at the most significant bit position. 
 * If x is 0, the result is undefined."
@@ -271,7 +270,7 @@ uint32_t clz_onceBultin(fpvec<T>& src) {
 
 /**	#12
 * serial primitive for Intel Intrinsic:
-* _mm512_load_epi32
+* __m512i _mm512_load_epi32 (void const* mem_addr)
 * original description: "Load 512-bits (composed of 16 packed 32-bit integers) from memory into dst. 
 * mem_addr must be aligned on a 64-byte boundary or a general-protection exception may be generated."
 *
@@ -293,7 +292,7 @@ fpvec<T> load_epi32(fpvec<T>& templateMask, uint32_t* data, uint32_t startIndex,
 
 /**	#13
 * serial primitive for Intel Intrinsic:
-* _mm512_cmpeq_epi32_mask
+* __mmask16 _mm512_cmpeq_epi32_mask (__m512i a, __m512i b)
 * original description: "Compare packed 32-bit integers in a and b for equality, and store the results in mask vector k."
 */
 template<typename T>
@@ -313,7 +312,7 @@ fpvec<T> cmpeq_epi32_mask(fpvec<T>& a, fpvec<T>& b) {
 
 /**	#14
 * serial primitive for Intel Intrinsic:
-* _mm512_permutexvar_epi32
+* __m512i _mm512_permutexvar_epi32 (__m512i idx, __m512i a)
 * original description: "Shuffle 32-bit integers in a across lanes using the corresponding index in idx, and store the results in dst."
 */
 template<typename T>
@@ -330,7 +329,7 @@ fpvec<T> permutexvar_epi32(fpvec<T>& idx, fpvec<T>& a) {
 
 /**	#15
 * serial primitive for Built-in Function Provided by GCC:
-* __builtin_ctz
+* int __builtin_ctz (unsigned int x)
 * original description: "Built-in Function: int __builtin_ctz (unsigned int x)
 * Returns the number of trailing 0-bits in x, starting at the least significant bit position. 
 * If x is 0, the result is undefined."
@@ -349,26 +348,50 @@ uint32_t ctz_onceBultin(fpvec<T>& src) {
 	return res;
 }
 
-/** #16
- * Store single element of type uint32_t into fpvec<T> register at a certain position.
- * 
-*/
-/**			// currently not needed
-template<typename T>
-void storeSingleElement_uint(fpvec<T>* result, uint32_t storeIdx, uint32_t data) {
-	result->elements[storeIdx] = data;
-}
-*/
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+//// New functions for SoAoV approach only - not in SoA-implementations ////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
-/** #17
- * Store single element of type fpvec<T> into fpvec<T> register at a certain position.
- * 
+/**	#16 
+* serial primitive for Intel Intrinsic:
+* __m512i _mm512_mask_set1_epi32 (__m512i src, __mmask16 k, int a)
+* original description: "Broadcast 32-bit integer a to all elements of dst using 
+* writemask k (elements are copied from src when the corresponding mask bit is not set)."
 */
-/**			// currently not needed
 template<typename T>
-void storeSingleElement_vec(fpvec<T>* result, uint32_t storeIdx, fpvec<T>& data) {
-	result->elements[storeIdx] = data;
+fpvec<T> mask_set1(fpvec<T>& src, fpvec<T>& writeMask, uint32_t value) {
+	auto reg = fpvec<T>{};
+	#pragma unroll
+	for (int i=0; i<(64/sizeof(T)); i++) {
+		if(writeMask.elements[i] == 1) {
+			reg.elements[i] = value;
+		} else {
+			reg.elements[i] = src.elements[i];
+		}		
+	}
+	return reg;
 }
+
+/**	#17
+* serial primitive for Intel Intrinsic:
+* void _mm512_store_epi32 (void* mem_addr, __m512i a)
+* original description: "Store 512-bits (composed of 16 packed 32-bit integers) from a into memory. 
+* mem_addr must be aligned on a 64-byte boundary or a general-protection exception may be generated."
+*
+* customized store  - function:
+* @param result : array, in which the data is stored; function store 512-bits
+* @param startIndex : first index - position of data from where the data should be stored
+* @param data : register-array which contains the data that should be stored
 */
+template<typename T>
+void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T>& data) {
+#pragma unroll
+	for (int i=0; i<(64/sizeof(T)); i++) {
+		result[(startIndex+i)] = data.elements[i];
+	}
+}
+
 
 #endif // PRIMITIVES_HPP
