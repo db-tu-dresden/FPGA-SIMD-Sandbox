@@ -177,19 +177,17 @@ int main(int argc, char** argv){
 
         size_t data_size = all_data_sizes[adss];
         data = (ps_type*) aligned_alloc(64, data_size * sizeof(ps_type)); // alternative
-        std::cout << "data size: " << data_size << std::endl;
         
         for(size_t conf = 0; conf < configuration_count; conf++){// iterate over all configurations of collisions and clusters
-            std::cout <<"\tcluster config: " << conf << std::endl;
 
             for(size_t ahfs = 0; ahfs < all_hash_functions_size; ahfs++){ // sets the hashfunction. different functions lead to different data    
                 size_t (*function)(ps_type, size_t) = all_hash_functions[ahfs];
-                std::cout << "\t\tfunction id: " << ahfs << std::endl;
             
                 for(size_t ass = 0; ass < all_scales_size; ass++){
                     float scale = all_scales[ass];
                     size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
-                    std::cout << "\t\t\tscale: " << scale << "\tHSIZE: " << HSIZE << std::endl;
+                    std::cout << "data size: " << data_size <<"\tcluster config: " << conf 
+                        << "\tfunction id: " << ahfs << "\tscale: " << scale << "\tHSIZE: " << HSIZE;
                 
                     for(size_t rdd = 0; rdd < repeats_different_data; rdd++){
                         size_t seed = noise(noise_id++, 0);
@@ -562,7 +560,7 @@ void create_result_file(std::string filename){
     std::ofstream myfile;
     myfile.open (filename);
     if(myfile.is_open()){
-        myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_lenght,cluster_count,cluster_count\n";
+        myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_lenght,cluster_count,cluster_length\n";
         myfile.close();
     } else {
         throw std::runtime_error("Could not open file to write results!");
