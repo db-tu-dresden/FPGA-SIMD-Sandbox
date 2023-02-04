@@ -1,7 +1,7 @@
 # FPGA-SIMD-Sandbox
 
-# # monitor running batch-jobs via
-# watch -n 1 qstat -n -1
+> monitor running batch-jobs via
+> `watch -n 1 qstat -n -1`
 
 ## Emulator
 (0) Build lib 
