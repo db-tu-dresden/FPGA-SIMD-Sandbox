@@ -1,7 +1,7 @@
 
 ########################################################################
-#      Date:           Tue 31 Jan 2023 05:48:53 AM PST
-#    Job ID:           2160117.v-qsvr-1.aidevcloud
+#      Date:           Sat 04 Feb 2023 03:14:28 AM PST
+#    Job ID:           2167628.v-qsvr-1.aidevcloud
 #      User:           u177951
 # Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:00:00
 ########################################################################
@@ -9,7 +9,7 @@
 sourcing /opt/intel/inteloneapi/setvars.sh
  
 :: initializing oneAPI environment ...
-   2160117.v-qsvr-1.aidevcloud.SC: BASH_VERSION = 5.0.17(1)-release
+   2167628.v-qsvr-1.aidevcloud.SC: BASH_VERSION = 5.0.17(1)-release
    args: Using "$@" for setvars.sh arguments: -t S10OAPI
 :: advisor -- latest
 :: ccl -- latest
@@ -47,14 +47,10 @@ sourcing /opt/intel/inteloneapi/setvars.sh
 :: vtune -- latest
 :: oneAPI environment initialized ::
  
-
-Running in FPGA Hardware compile Mode:
-dpcpp -Wall  -v -fintelfpga -Xshardware -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga kernels.cpp main.cpp  
-warning: -reuse-exe file 'main.fpga' not found; ignored
-aoc: Compiling for FPGA. This process may take several hours to complete.  Prior to performing this compile, be sure to check the reports to ensure the design will meet your performance targets.  If the reports indicate performance targets are not being met, code edits may be required.  Please refer to the oneAPI FPGA Optimization Guide for information on performance tuning applications for FPGAs.
+icpx -fsycl -Wall  -fintelfpga -DFPGA_EMULATOR kernels.cpp main.cpp lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o main.fpga_emu  
 
 ########################################################################
-# End of output for job 2160117.v-qsvr-1.aidevcloud
-# Date: Tue 31 Jan 2023 07:54:35 AM PST
+# End of output for job 2167628.v-qsvr-1.aidevcloud
+# Date: Sat 04 Feb 2023 03:14:50 AM PST
 ########################################################################
 

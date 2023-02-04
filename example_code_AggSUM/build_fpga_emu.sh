@@ -14,5 +14,7 @@ tools_setup -t S10OAPI
 
 export PATH=/glob/intel-python/python2/bin:$PATH
 
+cd ~/FPGA-SIMD-Sandbox/example_code_AggSUM 
+
 
 make emu
