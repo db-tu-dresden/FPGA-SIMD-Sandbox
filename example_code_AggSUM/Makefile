@@ -1,15 +1,16 @@
 ALL_CXXFLAGS=-Wall $(CXXFLAGS)
 SRC=main.cpp
 TARGET=main
+TARGET_KERNEL=kernel.a
 BOARD=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm
 
 
 # Directories
 INC_DIRS := ../common/inc
-LIB_DIRS :=
+LIB_DIRS := 
 
 # Files
-INCS := $(wildcard *.hpp)
+INCS := $(wildcard )
 SRC := $(wildcard *.cpp)
 LIBS :=
 
@@ -50,8 +51,6 @@ build_hls: $(SRC) Makefile
 
 emu: $(SRC) Makefile
 	icpx -fsycl $(ALL_CXXFLAGS) -fintelfpga -DFPGA_EMULATOR $(SRC) lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o $(TARGET).fpga_emu $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L)
-	
-
 
 
 ## ## ## ## ##
@@ -105,26 +104,6 @@ link: $(SRC) Makefile
 	icpx -fsycl $(ALL_CXXFLAGS) -v -fintelfpga lib/lib_rtl_add.o lib/lib_sycl.o $(TARGET)_host.o $(TARGET_KERNEL) -o $(TARGET)_linked.fpga
 
 
-
-#######################
-
-# emu: $(SRC) Makefile
-#	dpcpp $(ALL_CXXFLAGS) -fintelfpga -DFPGA_EMULATOR $(SRC) $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L) -o $(TARGET).fpga_emu
-
-
-# emu_lib: $(SRC) Makefile
-#	dpcpp $(ALL_CXXFLAGS) -fintelfpga -DFPGA_EMULATOR -fsycl-link=image kernels.cpp -o kernels_emu.a 
-#	dpcpp $(ALL_CXXFLAGS) -fintelfpga -DFPGA_EMULATOR main.cpp -c -o main_emu.o
-#	dpcpp $(ALL_CXXFLAGS) -fintelfpga -DFPGA_EMULATOR main_emu.o kernels_emu.a -o $(TARGET).fpga_emu
-
-# report: $(SRC) Makefile
-#	dpcpp $(ALL_CXXFLAGS) -fintelfpga $(SRC) $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L) -Xshardware -Xsboard=$(BOARD) -Xssave-temps  -fsycl-link -o $(TARGET)_report
-
-# hw: $(SRC) Makefile
-#	dpcpp $(ALL_CXXFLAGS) -v -fintelfpga -Xshardware -Xssave-temps -reuse-exe=$(TARGET).fpga -Xsoutput-report-folder=$(TARGET).prj -Xsboard=$(BOARD) -o $(TARGET).fpga $(SRC) $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L)
-
-
-########################
 
 
 
