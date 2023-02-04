@@ -1,5 +1,6 @@
 ###############################
-## Created: Intel Corporation 
+## Based on Template by:
+##          Intel Corporation 
 ##          Christian Faerber
 ##          PSG CE EMEA TS-FAE 
 ##          June 2022
@@ -9,13 +10,13 @@
 This is easily working inside Intel devCloud.
 From the login-2 node this should already work fine:
 
--	cd group_count_FPGA
+-	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA 
 -	source /data/intel_fpga/devcloudLoginToolSetup.sh
 -	qsub -l nodes=1:fpga_compile:ppn=2 -d . build_lib -l walltime=00:10:00
 -	after 2-4 minutes the lib/lib.a file is created
 -	qsub -l nodes=1:fpga_compile:ppn=2 -d . build_hw_a -l walltime=23:59:00
 -	after 3-4 hours the fpga.a file is created
--	cd so_rtl_interface_example_devCloud/so
+-	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA/so
 -	qsub -l nodes=1:fpga_compile:ppn=2 -d . build_so -l walltime=00:10:00
 -	qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_gcc_app -l walltime=00:05:00
 
@@ -24,5 +25,3 @@ You can check the status of all stages with: watch -n 1 qstat -n -1
 Or after the process in the queue is done:
 Check the log files .e... and .o...
 
-Much fun :)
-Christian

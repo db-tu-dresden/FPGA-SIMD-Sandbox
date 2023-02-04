@@ -1,6 +1,22 @@
 #!/bin/bash
-tools_setup -t S10OAPI
+
+# # run this by
+# qsub -l nodes=1:fpga_compile:ppn=2 -d . build_fpga_emu.sh -l walltime=23:00:00
+# # monitor job via
+# watch -n 1 qstat -n -1
+
+# Initial Setup
 source /data/intel_fpga/devcloudLoginToolSetup.sh
-source /opt/intel/inteloneapi/setvars.sh 
-source /glob/development-tools/versions/oneapi/2022.3/oneapi/setvars.sh --force
-make hw
+tools_setup -t S10OAPI
+export PATH=/glob/intel-python/python2/bin:$PATH
+
+
+cd ~/FPGA-SIMD-Sandbox/group_count_FPGA 
+
+# Running project in FPGA Hardware Mode (this takes approximately 1 hour)
+printf "\\n%s\\n" "Running in FPGA Hardware compile Mode:"
+
+
+# make hw
+make hw_a
+# error_check
