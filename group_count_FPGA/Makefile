@@ -63,8 +63,6 @@ build_hls: $(SRC) Makefile
 
 emu: $(SRC) Makefile
 	icpx -fsycl $(ALL_CXXFLAGS) -fintelfpga -DFPGA_EMULATOR $(SRC) lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o $(TARGET).fpga_emu $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L)
-	
-
 
 
 ## ## ## ## ##

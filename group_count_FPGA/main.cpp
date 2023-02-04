@@ -80,8 +80,6 @@ bool validate(T *in_host, T *out_host, size_t size);
 
 void exception_handler(exception_list exceptions);
 
-// Function prototypes
-
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,8 +90,8 @@ void exception_handler(exception_list exceptions);
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-uint64_t distinctValues = 8000;
-//uint64_t distinctValues = 128;
+//uint64_t distinctValues = 8000;
+uint64_t distinctValues = 128;
 uint64_t dataSize = 16*10000000;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
@@ -149,8 +147,9 @@ int  main(int argc, char** argv){
     // Define for Allocate input/output data in pinned host memory
     // Used in all three tests, for convenience
     using Type = uint32_t;  // type to use for the test
-    Type *arr, *hashVec, *countVec;
-//  Type *arr_d, *hashVec_d, *countVec_d;
+    Type *arr_h, *arr_d; 
+    Type *hashVec_d, *countVec_d;
+    long *out_v1_h, *out_v1_d
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,46 +170,54 @@ int  main(int argc, char** argv){
 	printf("Number CL buckets: %zd \n", number_CL_buckets);
     printf("Number CLs: %zd \n", number_CL);
 
-    // Allocate input/output data in pinned host memory
+//  Allocate input/output data in pinned host memory
 //  arr = (uint32_t *) aligned_alloc(64,dataSize * sizeof(uint32_t));
 //  hashVec = (uint32_t *) aligned_alloc(64, HSIZE * sizeof (uint32_t));
 //  countVec = (uint32_t *) aligned_alloc(64, HSIZE * sizeof (uint32_t));
     
     // Host buffer 
-    if ((arr = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'in arr'\n";
+    if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
         std::terminate();
     }
-    if ((hashVec = malloc_host<Type>(HSIZE * sizeof (uint32_t), q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out hashVec'\n";
+    if ((out_v1_h = malloc_host<long>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'out_v1_h'\n";
         std::terminate();
     }
-    if ((countVec = malloc_host<Type>(HSIZE * sizeof (uint32_t), q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out countVec'\n";
+    if ((hashVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'hashVec_h'\n";
         std::terminate();
     }
-/*
+    if ((countVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'countVec_h'\n";
+        std::terminate();
+    }  
+
     // Device buffer  
-    if ((arr_d = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'in arr_d'\n";
+    if ((arr_h = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
         std::terminate();
     }
-    if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof (uint32_t), q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out hashVec_d'\n";
+    if ((out_v1_d = malloc_device<long>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'out_v1_d'\n";
         std::terminate();
     }
-    if ((countVec_d = malloc_device<Type>(HSIZE * sizeof (uint32_t), q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out countVec_d'\n";
+    if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'hashVec_d'\n";
         std::terminate();
     }
-*/
-    // check if memory for input array and HashTable (hashVec and countVec) is allocated correctly
-    if (arr != NULL) {
+    if ((countVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'countVec_d'\n";
+        std::terminate();
+    }  
+
+    // check if memory for input array and HashTable (hashVec and countVec) is allocated correctly (on host)
+    if (arr_h != NULL) {
         std::cout << "Memory allocated - " << dataSize << " values, between 1 and " << distinctValues << std::endl;
     } else {
         std::cout << "Memory not allocated!" << std::endl;
     }
-    if (hashVec != NULL ||  countVec != NULL) {
+    if (hashVec_h != NULL ||  countVec_h != NULL) {
         std::cout << "HashTable allocated - " <<HSIZE<< " values" << std::endl;
     } else {
         std::cout << "HashTable not allocated" << std::endl;
@@ -220,11 +227,22 @@ int  main(int argc, char** argv){
     generateData(arr, distinctValues, dataSize);    
     std::cout <<"Generation of initial data done."<< std::endl; 
 
-    // Init hashMap (= output buffer)
+    // Copy input host buffer to input device buffer
+ // *4 Why?   	
+    q.memcpy(arr_d, arr_h, dataSize * sizeof(uint32_t)*4);
+    q.wait();	
+
+    // init HashMap
     initializeHashMap(hashVec,countVec,HSIZE);
+    
+    // Copy with zero initialized HashMap (hashVec, countVec) from host to device
+    q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
+    q.wait();
+    q.memcpy(countVev_d, countVev_h, HSIZE * sizeof(uint32_t));
+    q.wait();
 
     // track timing information, in ms
-    double pcie_time=0.0;
+    double pcie_time_v1=0.0;
 
 //SIMD for FPGA function v1 
     try {
@@ -234,38 +252,59 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with an dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant1(q, arr, hashVec, countVec, dataSize, HSIZE, number_CL*16);
+        // old LinearProbingFPGA_variant1(q, arr, hashVec, countVec, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_v1_d, dataSize, HSIZE, number_CL*16);
 
         // measured run on FPGA
         auto begin = chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant1(q, arr, hashVec, countVec, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_v1_d, dataSize, HSIZE, number_CL*16);
         auto end = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff = end - start;
-        pcie_time=diff.count();
 
-        std::cout<<"calculated time: "<< (pcie_time * 1e-3) <<std::endl;
+        std::cout<<"Kernel runtime of function_v1 in ms: "<< (diff.count()) <<std::endl;
         std::cout <<"=============================="<<std::endl;
+        pcie_time_v1=diff.count();
         ////////////////////////////////////////////////////////////////////////////
     } 
     catch (exception const& e) {
         std::cout << "Caught a synchronous SYCL exception: " << e.what() << "\n";
         std::terminate();
     }   
+
+    // Copy output device buffer to output host buffer 
+    q.memcpy(out_v1_h, out_v1_d, 8);
+    q.wait();  
     
-    // check result for correctness
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+//    // check result for correctness
+//    validate(dataSize, hashVec,countVec, HSIZE);
+//    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
      
+    std::cout << "Value in variable dataSize: " << dataSize << std::endl;
+    std::cout << "Result value in out_v1_h[0]: " << out_v1_h[0] << std::endl;
+
+
+
+
     // free USM memory
-    sycl::free(arr, q);
-    sycl::free(hashVec, q);
-    sycl::free(countVec, q);
+    sycl::free(arr_h, q);
+    sycl::free(hashVec_h, q);
+    sycl::free(countVec_h, q)
+    sycl::free(out_v1_h, q);
+    
+    sycl::free(arr_d, q);
+    sycl::free(hashVec_d, q);
+    sycl::free(countVec_d, q);
+    sycl::free(out_v1_d, q);
+    
 
     // print result
-    double input_size_mb = size * sizeof(Type) * 1e-6;
-	printf("input_size_mb %lf \n", input_size_mb);
+    double input_size_mb = dataSize * sizeof(Type) * 1e-6;
+	printf("Input_size_mb: %lf \n", input_size_mb);
 
-    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb / (pcie_time * 1e-3)) << " MB/s\n";
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb / (pcie_time_v1 * 1e-3)) << " MB/s\n";
+
+
+
 //// end of LinearProbingFPGA_variant1()
 ////////////////////////////////////////////////////////////////////////////////
 
