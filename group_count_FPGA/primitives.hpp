@@ -393,4 +393,24 @@ void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T>& data) {
 }
 
 
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////// New functions for compile and execute on FPGA hardware //////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+/**	#18
+* Own function to load 16 elements (= complete CL (register)) in one clock cycle from input array
+*/
+template<typename T>
+fpvec<T> load(T* p, int i_cnt) {
+    auto reg = fpvec<T> {};
+    #pragma unroll
+    for (uint idx = 0; idx < 16; idx++) {
+          reg.elements[idx] = p[idx + i_cnt*16];
+    }
+    return reg;
+}
+
+
 #endif // PRIMITIVES_HPP
