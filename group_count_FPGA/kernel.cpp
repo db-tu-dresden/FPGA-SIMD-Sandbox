@@ -125,7 +125,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 // not used fpvec<uint32_t> resVec;
 
 			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
-			#pragma unroll 1
+			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				// Load complete CL (register) in one clock cycle
 				dataVec = load<uint32_t>(input, i_cnt);
@@ -135,9 +135,10 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				* @param p current element of input data array
 				**/ 	
 				int p = 0;
+				#pragma nounroll
 				while (p < 16) {
-						// get single value from input at position p
-						uint32_t inputValue = input[p];
+						// get single value from current dataVec register at position p
+						uint32_t inputValue = dataVec.elements[p];
 
 						// compute hash_key of the input value
 						uint32_t hash_key = hashx(inputValue,HSIZE);
@@ -294,7 +295,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<uint32_t> dataVec;
 
 			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
-			#pragma unroll 1
+			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				// Load complete CL (register) in one clock cycle
 				dataVec = load<uint32_t>(input, i_cnt);
@@ -304,9 +305,10 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				* @param p current element of input data array
 				**/ 	
 				int p = 0;
+				#pragma nounroll
 				while (p < 16) {
-					// get single value from input at position p
-					uint32_t inputValue = input[p];
+					// get single value from current dataVec register at position p
+					uint32_t inputValue = dataVec.elements[p];
 
 					// compute hash_key of the input value
 					uint32_t hash_key = hashx(inputValue,HSIZE);
@@ -494,7 +496,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<uint32_t> dataVec;
 
 			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
-			#pragma unroll 1
+			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				// Load complete CL (register) in one clock cycle
 				dataVec = load<uint32_t>(input, i_cnt);
@@ -504,6 +506,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				* @param p current element of input data array
 				**/ 	
 				int p = 0;
+				#pragma nounroll
 				while (p < 16) {
 
 					// load 16 input values --> use the 16 elements of dataVec	/// !! change compared to the serial implementation !!
@@ -553,16 +556,16 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 							if (mask2int(compareRes) != 0) {
 								// compute the matching position indicated by a one within the compareRes mask
 								// the position can be calculated two ways.
-			// example: 00010000 is our matching mask
-			// we could count the leading zeros and get the position like 7 - leadingzeros
-			// we calculate the trailing zeros and get the position implicitly 
+								// example: 00010000 is our matching mask
+								// we could count the leading zeros and get the position like 7 - leadingzeros
+								// we calculate the trailing zeros and get the position implicitly 
 								uint32_t matchPos = ctz_onceBultin(compareRes); 
 								
-			//WE COULD DO THIS LIKE VARIANT ONE.
-			//  This would mean we wouldn't calculate the match pos since it is clear already.                
+								//WE COULD DO THIS LIKE VARIANT ONE.
+								//  This would mean we wouldn't calculate the match pos since it is clear already.                
 								// increase the counter in countVec
 								countVec[aligned_start+matchPos]++;
-			// out[0]++; only for testing
+// out[0]++; only for testing
 								out[0]++;					
 								i++;
 								break;
@@ -590,15 +593,15 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 									
 									hashVec[aligned_start+pos] = (uint32_t)inputValue;
 									countVec[aligned_start+pos]++;
-			// out[0]++; only for testing
+// out[0]++; only for testing
 									out[0]++;						
 									i++;
 									break;
 								}   
 								else {    			               // CASE B2                    
 									//aligned_start = (aligned_start+16) % HSIZE;
-			// since we now use the overflow mask we can do this to change our position
-			// we ALSO need to set the remainder to 0.
+									// since we now use the overflow mask we can do this to change our position
+									// we ALSO need to set the remainder to 0.
 									remainder = 0;
 									aligned_start += 16;
 									if(aligned_start >= HSIZE){
