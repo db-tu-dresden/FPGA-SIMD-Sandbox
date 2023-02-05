@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<iostream>
 
-//#include "helper.cpp"
+#include "helper_kernel.cpp"
 
 void LinearProbingScalar(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, int HSIZE) {
 

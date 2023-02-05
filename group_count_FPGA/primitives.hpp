@@ -44,11 +44,11 @@ fpvec<T> setzero() {
  * 
  * function will (currently) only be working for arrys with 16 elements of 32bit integers!
  */
+/** Not used in current code version
 template<typename T>
 fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uint32_t e11, uint32_t e10, uint32_t e9,
 	uint32_t e8, uint32_t e7, uint32_t e6, uint32_t e5, uint32_t e4, uint32_t e3, uint32_t e2, uint32_t e1, uint32_t e0) {
 	auto reg = fpvec<T>{};
-#pragma unroll
 	reg.elements[0] = e0;
 	reg.elements[1] = e1;
 	reg.elements[2] = e2;
@@ -67,6 +67,7 @@ fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uin
 	reg.elements[15] = e15;
 	return reg;
 }
+*/
 
 /**	#3
 * serial primitive for Intel Intrinsic:

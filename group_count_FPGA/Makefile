@@ -23,7 +23,7 @@ LIB_DIRS :=
 
 # Files
 INCS := $(wildcard )
-SRC := $(wildcard *.cpp)
+SRC := $(wildcard main.cpp)
 LIBS :=
 
 

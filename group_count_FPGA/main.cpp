@@ -41,7 +41,7 @@
 
 #include "kernel.hpp"
 #include "kernel.cpp"
-#include "LinearProbing_scalar.cpp"
+//#include "LinearProbing_scalar.cpp"       // not used in this version of project
 #include "helper_main.cpp"
 
 using namespace sycl;
@@ -50,6 +50,7 @@ using namespace std::chrono;
 ////////////////////////////////////////////////////////////////////////////////
 //// Board globals. Can be changed from command line.
 // default to values in pac_s10_usm BSP
+/*                          
 #ifndef DDR_CHANNELS
 #define DDR_CHANNELS 4
 #endif
@@ -62,29 +63,32 @@ using namespace std::chrono;
 #define PCIE_WIDTH 64 // bytes (512 bits)
 #endif
 
+constexpr size_t kDDRChannels = DDR_CHANNELS;
+constexpr size_t kDDRWidth = DDR_WIDTH;
+// note: definition of kDDRInterleavedChunkSize is done before in kernel.cpp
+constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
+constexpr size_t kPCIeWidth = PCIE_WIDTH;
+*/
+
 #ifndef DDR_INTERLEAVED_CHUNK_SIZE
 #define DDR_INTERLEAVED_CHUNK_SIZE 4096 // bytes
 #endif
 
-constexpr size_t kDDRChannels = DDR_CHANNELS;
-constexpr size_t kDDRWidth = DDR_WIDTH;
-constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
-constexpr size_t kPCIeWidth = PCIE_WIDTH;
+
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //// Forward declare functions
-//// Forward declar kernel names to reduce name mangling
 template<typename T>
 bool validate(T *in_host, T *out_host, size_t size);
-
 void exception_handler(exception_list exceptions);
-
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
+//// Define global parameters (on host) for data generation
 /**
- * define global parameters for data generation
  * @param distinctValues determines the generated values between 1 and distinctValues
  * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
@@ -95,6 +99,7 @@ uint64_t distinctValues = 128;
 uint64_t dataSize = 16*10000000;
 float scale = 1.4;
 uint64_t HSIZE = distinctValues*scale;
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 // main
@@ -148,14 +153,16 @@ int  main(int argc, char** argv){
     // Used in all three tests, for convenience
     using Type = uint32_t;  // type to use for the test
     Type *arr_h, *arr_d; 
-    Type *hashVec_d, *countVec_d;
-    long *out_v1_h, *out_v1_d
+    Type *hashVec_h, *hashVec_d;
+    Type *countVec_h, *countVec_d;
+    long *out_h, *out_d;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //// Forward declare LinearProbingFPGA_variant1()
-
-	printf("\n \n ### aggregation ### \n\n");
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 1 ### \n\n");
 	size_t number_CL_buckets = 0;
     size_t number_CL = 0;
 	
@@ -180,8 +187,8 @@ int  main(int argc, char** argv){
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
         std::terminate();
     }
-    if ((out_v1_h = malloc_host<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_v1_h'\n";
+    if ((out_h = malloc_host<long>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'out_h'\n";
         std::terminate();
     }
     if ((hashVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -194,12 +201,12 @@ int  main(int argc, char** argv){
     }  
 
     // Device buffer  
-    if ((arr_h = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
+    if ((arr_d = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
         std::terminate();
     }
-    if ((out_v1_d = malloc_device<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_v1_d'\n";
+    if ((out_d = malloc_device<long>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'out_d'\n";
         std::terminate();
     }
     if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -224,21 +231,20 @@ int  main(int argc, char** argv){
     }
 
     // Init input buffer
-    generateData(arr, distinctValues, dataSize);    
+    generateData(arr_h, distinctValues, dataSize);    
     std::cout <<"Generation of initial data done."<< std::endl; 
 
     // Copy input host buffer to input device buffer
- // *4 Why?   	
-    q.memcpy(arr_d, arr_h, dataSize * sizeof(uint32_t)*4);
+    q.memcpy(arr_d, arr_h, dataSize * sizeof(uint32_t));
     q.wait();	
 
     // init HashMap
-    initializeHashMap(hashVec,countVec,HSIZE);
+    initializeHashMap(hashVec_h,countVec_h,HSIZE);
     
     // Copy with zero initialized HashMap (hashVec, countVec) from host to device
     q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
     q.wait();
-    q.memcpy(countVev_d, countVev_h, HSIZE * sizeof(uint32_t));
+    q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(uint32_t));
     q.wait();
 
     // track timing information, in ms
@@ -248,63 +254,67 @@ int  main(int argc, char** argv){
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
-        std::cout <<"Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
-        std::cout << "Running on FPGA Hardware with an dataSize of " << dataSize << " values!" << std::endl;
+        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        // old LinearProbingFPGA_variant1(q, arr, hashVec, countVec, dataSize, HSIZE, number_CL*16);
-        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_v1_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
 
         // measured run on FPGA
         auto begin = chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_v1_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
         auto end = std::chrono::high_resolution_clock::now();
-        duration<double, std::milli> diff = end - start;
+        duration<double, std::milli> diff = end - begin;
 
-        std::cout<<"Kernel runtime of function_v1 in ms: "<< (diff.count()) <<std::endl;
+        std::cout<<"Kernel runtime of function LinearProbingFPGA_variant1(): "<< (diff.count()) << " ms." <<std::endl;
         std::cout <<"=============================="<<std::endl;
         pcie_time_v1=diff.count();
         ////////////////////////////////////////////////////////////////////////////
     } 
-    catch (exception const& e) {
+    catch (sycl::exception const& e) {
         std::cout << "Caught a synchronous SYCL exception: " << e.what() << "\n";
         std::terminate();
     }   
 
     // Copy output device buffer to output host buffer 
-    q.memcpy(out_v1_h, out_v1_d, 8);
+    q.memcpy(out_h, out_d, 8);
+    q.wait();  
+    q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(uint32_t));
+    q.wait();  
+    q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(uint32_t));
     q.wait();  
     
-//    // check result for correctness
-//    validate(dataSize, hashVec,countVec, HSIZE);
-//    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
-     
+
     std::cout << "Value in variable dataSize: " << dataSize << std::endl;
-    std::cout << "Result value in out_v1_h[0]: " << out_v1_h[0] << std::endl;
+    std::cout << "Result value in out_h[0]: " << out_h[0] << std::endl;
+    std::cout<< " " <<std::endl;
 
-
-
+    // check result for correctness
+    validate(dataSize, hashVec_h, countVec_h, HSIZE);
+    validate_element(arr_h, dataSize, hashVec_h, countVec_h, HSIZE);
+    std::cout<< " " <<std::endl;
 
     // free USM memory
     sycl::free(arr_h, q);
     sycl::free(hashVec_h, q);
-    sycl::free(countVec_h, q)
-    sycl::free(out_v1_h, q);
+    sycl::free(countVec_h, q);
+    sycl::free(out_h, q);
     
     sycl::free(arr_d, q);
     sycl::free(hashVec_d, q);
     sycl::free(countVec_d, q);
-    sycl::free(out_v1_d, q);
+    sycl::free(out_d, q);
     
 
     // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
     double input_size_mb = dataSize * sizeof(Type) * 1e-6;
-	printf("Input_size_mb: %lf \n", input_size_mb);
-
+	std::cout << "Input_size_mb: " << input_size_mb <<std::endl;
     std::cout << "HOST-DEVICE Throughput: " << (input_size_mb / (pcie_time_v1 * 1e-3)) << " MB/s\n";
 
-
-
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 1 ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
 //// end of LinearProbingFPGA_variant1()
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -359,7 +369,7 @@ void exception_handler (exception_list exceptions) {
   for (std::exception_ptr const& e : exceptions) {
     try {
         std::rethrow_exception(e);
-    } catch(exception const& e) {
+    } catch(sycl::exception const& e) {
         std::cout << "Caught asynchronous SYCL exception:\n"
             << e.what() << std::endl;
     }

@@ -43,21 +43,15 @@
 constexpr size_t kDDRChannels = DDR_CHANNELS;
 constexpr size_t kDDRWidth = DDR_WIDTH;
 constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
-constexpr size_t kPCIeWidth = PCIE_WIDTH;
+// constexpr size_t kPCIeWidth = PCIE_WIDTH;
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+//// declaration of the classes
 class LinearProbingFPGA_variant1;
 class LinearProbingFPGA_variant2;
 class LinearProbingFPGA_variant3;
 
-////////////////////////////////////////////////////////////////////////////////
-//// declare some (global) basic masks and arrays
-uint32_t one = 1;
-uint32_t zero = 0;
-fpvec<uint32_t> oneMask = set1(one);
-fpvec<uint32_t> zeroMask = set1(zero);
-fpvec<uint32_t> zeroM512iArray = set1(zero);
-fpvec<uint32_t> oneM512iArray = set1(one);
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -70,7 +64,7 @@ fpvec<uint32_t> oneM512iArray = set1(one);
  * @param countVec store the count of occurence of k at position hashx(k)
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  */
-void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, long *out_v1_d, uint64_t dataSize, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, long *out_d, uint64_t dataSize, uint64_t HSIZE, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config) & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -92,6 +86,8 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 	size_t iterations = chunks_per_lsu * kIterationsPerChunk; 
 ////////////////////////////////////////////////////////////////////////////////
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
 
@@ -99,25 +95,37 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 // the input array contains dataSize lines 
 // per cycle we can load 16 elements
 // !! That means dataSize must be a multiple of 16 !! 
-	size_t iterations =  (dataSize / 16);
+	iterations =  (dataSize / 16);
 	assert(dataSize % 16 == 0);
 
 	q.submit([&](handler& h) {
-		h.single_task<kernels>([=]() [[intel::kernel_args_restrict]] {
+		h.single_task<kernel>([=]() [[intel::kernel_args_restrict]] {
 
 		device_ptr<uint32_t> input(arr_d);
 		device_ptr<uint32_t> hashVec(hashVec_d);
 		device_ptr<uint32_t> countVec(countVec_d);
-		device_ptr<long> out(out_v1_d);
+		device_ptr<long> out(out_d);
+
+		////////////////////////////////////////////////////////////////////////////////
+		//// declare some basic masks and arrays
+		uint32_t one = 1;
+		uint32_t zero = 0;
+		fpvec<uint32_t> oneMask = set1(one);
+		fpvec<uint32_t> zeroMask = set1(zero);
+		////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////
+
+		out[0] = 0;
 
 			// define two registers
-			fpvec<int> dataVec;
-			fpvec<int> resVec;
+			fpvec<uint32_t> dataVec;
+// not used fpvec<uint32_t> resVec;
 
 			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
+			#pragma unroll 1
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				// Load complete CL (register) in one clock cycle
-				dataVec = load<int>(input, i_cnt);
+				dataVec = load<uint32_t>(input, i_cnt);
 
 				/**
 				* iterate over input data / always step by step through the currently 16 loaded elements
@@ -159,7 +167,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 								fpvec<uint32_t> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
 							
 								// increment by one at the corresponding location
-								nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneM512iArray);
+								nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneMask);
 							
 								// selective store of changed value
 								mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);

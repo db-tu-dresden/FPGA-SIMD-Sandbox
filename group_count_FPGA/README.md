@@ -4,6 +4,7 @@
 > `watch -n 1 qstat -n -1`
 
 ## Emulator
+### Run as Batchjob
 (0) Build lib 
 -	`cd ~/FPGA-SIMD-Sandbox/group_count_FPGA` 
 -	`source /data/intel_fpga/devcloudLoginToolSetup.sh`
@@ -28,6 +29,30 @@
 
 (6) only if necessary / not mandatory?
 `make host_o`
+
+### Run interactive directly on a FPGA node
+(1)
+`source /data/intel_fpga/devcloudLoginToolSetup.sh`
+
+(2)
+`devcloud_login`
+> select "4) Stratix 10 - OneAPI, OpenVINO"
+
+(3) Build lib 
+-	`cd ~/FPGA-SIMD-Sandbox/group_count_FPGA` 
+-	`source /data/intel_fpga/devcloudLoginToolSetup.sh`
+-	`qsub -l nodes=1:fpga_compile:ppn=2 -d . build_lib -l walltime=00:10:00`
+-	after 2-4 minutes the lib/lib.a file is created
+
+(4) make Emulation
+-   `cd ~/FPGA-SIMD-Sandbox/group_count_FPGA`
+-   `source /data/intel_fpga/devcloudLoginToolSetup.sh`
+-   `tools_setup -t S10OAPI`
+-   `make emu`
+
+(5) Execute
+-   `./main.fpga_emu`
+
 
 ## Compile and execute on FPGA hardware
 
