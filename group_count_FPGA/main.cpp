@@ -473,44 +473,161 @@ int  main(int argc, char** argv){
 //// end of LinearProbingFPGA_variant2()
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-//SIMD for FPGA function v2 
-    initializeHashMap(hashVec,countVec,HSIZE);
-    std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant 2:"<<std::endl;
-    begin = chrono::high_resolution_clock::now();
-//  LinearProbingFPGA_variant2(q, arr, hashVec, countVec, dataSize, HSIZE, number_CL*16);
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    std::cout<<mis<<std::endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE); 
-*/
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //// Forward declare LinearProbingFPGA_variant3()
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 3 ### \n\n");
 
-/*
-//SIMD for FPGA function v3 
-    initializeHashMap(hashVec,countVec,HSIZE);
-    std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant 3:"<<std::endl;
-    begin = chrono::high_resolution_clock::now();
-//  LinearProbingFPGA_variant3(q, arr, hashVec, countVec, dataSize, HSIZE, number_CL*16);
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    std::cout<<mis<<std::endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
-*/
+    /**                 unused - @TODO : adjust and use  
+	if(size % (4096) == 0) {
+		number_CL_buckets = size / (4096);
+	} else {
+		number_CL_buckets = size / (4096) + 1;
+	}
+    number_CL = number_CL_buckets * (4096/16);
+    */
+	printf("Number CL buckets: %zd \n", number_CL_buckets);
+    printf("Number CLs: %zd \n", number_CL);
+  
+    // Host buffer 
+    if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
+        std::terminate();
+    }
+    if ((out_h = malloc_host<long>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'out_h'\n";
+        std::terminate();
+    }
+    if ((hashVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'hashVec_h'\n";
+        std::terminate();
+    }
+    if ((countVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'countVec_h'\n";
+        std::terminate();
+    }  
 
+    // Device buffer  
+    if ((arr_d = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
+        std::terminate();
+    }
+    if ((out_d = malloc_device<long>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'out_d'\n";
+        std::terminate();
+    }
+    if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'hashVec_d'\n";
+        std::terminate();
+    }
+    if ((countVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'countVec_d'\n";
+        std::terminate();
+    }  
+
+    // check if memory for input array and HashTable (hashVec and countVec) is allocated correctly (on host)
+    if (arr_h != NULL) {
+        std::cout << "Memory allocated - " << dataSize << " values, between 1 and " << distinctValues << std::endl;
+    } else {
+        std::cout << "Memory not allocated!" << std::endl;
+    }
+    if (hashVec_h != NULL ||  countVec_h != NULL) {
+        std::cout << "HashTable allocated - " <<HSIZE<< " values" << std::endl;
+    } else {
+        std::cout << "HashTable not allocated" << std::endl;
+    }
+
+    // Init input buffer
+    generateData(arr_h, distinctValues, dataSize);    
+    std::cout <<"Generation of initial data done."<< std::endl; 
+
+    // Copy input host buffer to input device buffer
+    q.memcpy(arr_d, arr_h, dataSize * sizeof(uint32_t));
+    q.wait();	
+
+    // init HashMap
+    initializeHashMap(hashVec_h,countVec_h,HSIZE);
+    
+    // Copy with zero initialized HashMap (hashVec, countVec) from host to device
+    q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
+    q.wait();
+    q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(uint32_t));
+    q.wait();
+
+    // track timing information, in ms
+    double pcie_time_v3=0.0;
+
+//SIMD for FPGA function v3
+    try {
+        ////////////////////////////////////////////////////////////////////////////
+        std::cout <<"=============================="<<std::endl;
+        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 3:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
+
+        // dummy run to program FPGA, dont care first run for measurement
+        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+
+        // measured run on FPGA
+        auto begin_v3 = std::chrono::high_resolution_clock::now();
+        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+        auto end_v3 = std::chrono::high_resolution_clock::now();
+        duration<double, std::milli> diff_v3 = end_v3 - begin_v3;
+
+        std::cout<<"Kernel runtime of function LinearProbingFPGA_variant3(): "<< (diff_v3.count()) << " ms." <<std::endl;
+        std::cout <<"=============================="<<std::endl;
+        pcie_time_v3=diff_v3.count();
+        ////////////////////////////////////////////////////////////////////////////
+    } 
+    catch (sycl::exception const& e) {
+        std::cout << "Caught a synchronous SYCL exception: " << e.what() << "\n";
+        std::terminate();
+    }   
+
+    // Copy output device buffer to output host buffer 
+    q.memcpy(out_h, out_d, 8);
+    q.wait();  
+    q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(uint32_t));
+    q.wait();  
+    q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(uint32_t));
+    q.wait();  
+    
+
+    std::cout << "Value in variable dataSize: " << dataSize << std::endl;
+    std::cout << "Result value in out_h[0]: " << out_h[0] << std::endl;
+    std::cout<< " " <<std::endl;
+
+    // check result for correctness
+    validate(dataSize, hashVec_h, countVec_h, HSIZE);
+    validate_element(arr_h, dataSize, hashVec_h, countVec_h, HSIZE);
+    std::cout<< " " <<std::endl;
+
+    // free USM memory
+    sycl::free(arr_h, q);
+    sycl::free(hashVec_h, q);
+    sycl::free(countVec_h, q);
+    sycl::free(out_h, q);
+    
+    sycl::free(arr_d, q);
+    sycl::free(hashVec_d, q);
+    sycl::free(countVec_d, q);
+    sycl::free(out_d, q);
+    
+
+    // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    double input_size_mb_v3 = dataSize * sizeof(Type) * 1e-6;
+	std::cout << "Input_size_mb: " << input_size_mb_v3 <<std::endl;
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v3 / (pcie_time_v3 * 1e-3)) << " MB/s\n";
+
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 3 ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
 //// end of LinearProbingFPGA_variant3()
 ////////////////////////////////////////////////////////////////////////////////
 }
-
+// end of main()
 
 void exception_handler (exception_list exceptions) {                     
   for (std::exception_ptr const& e : exceptions) {
@@ -522,22 +639,3 @@ void exception_handler (exception_list exceptions) {
     }
   }
 }
-
-
-/** 	scalar version currently not used
-
-    //scalar version
-    initializeHashMap(hashVec,countVec,HSIZE);
-    cout <<"=============================="<<endl;
-    cout <<"Linear Probing - scalar:"<<endl;
-    auto begin = chrono::high_resolution_clock::now();
-    LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    cout<<mis<<endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
-
-
-*/
