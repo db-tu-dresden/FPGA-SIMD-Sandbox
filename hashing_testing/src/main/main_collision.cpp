@@ -86,13 +86,10 @@ void write_to_file( std::string filename, //string
 );
 
 
-//---------------------------------------
-// MAIN!
-//---------------------------------------
-// using ps_type = uint64_t;
-using ps_type = uint32_t; 
 
-int main(int argc, char** argv){
+
+template <typename T> 
+int test1(){
     std::chrono::high_resolution_clock::time_point time_begin, time_end;
     time_begin = time_now();
 //Test Parameter Declaration!
@@ -129,7 +126,7 @@ int main(int argc, char** argv){
 
     float all_scales[] = {1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.f};
     size_t all_data_sizes[] = {32 * 1024 * 1024, 1024*1024*1024};
-    size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod}; // {&hashx, &force_collision}; 
+    size_t (*all_hash_functions[])(T, size_t) = {&hashx, &id_mod}; // {&hashx, &force_collision}; 
 
     Algorithm algorithms_undertest [] = {
         Algorithm::SCALAR_GROUP_COUNT
@@ -160,8 +157,8 @@ int main(int argc, char** argv){
 
 
     //run variables
-    ps_type* data = nullptr;
-    Scalar_group_count<ps_type> *validation_baseline = nullptr;
+    T* data = nullptr;
+    Scalar_group_count<T> *validation_baseline = nullptr;
 
     size_t noise_id = 1;
     //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
@@ -176,22 +173,22 @@ int main(int argc, char** argv){
         }
 
         size_t data_size = all_data_sizes[adss];
-        data = (ps_type*) aligned_alloc(64, data_size * sizeof(ps_type)); // alternative
+        data = (T*) aligned_alloc(64, data_size * sizeof(T)); // alternative
         
         for(size_t conf = 0; conf < configuration_count; conf++){// iterate over all configurations of collisions and clusters
 
             for(size_t ahfs = 0; ahfs < all_hash_functions_size; ahfs++){ // sets the hashfunction. different functions lead to different data    
-                size_t (*function)(ps_type, size_t) = all_hash_functions[ahfs];
+                size_t (*function)(T, size_t) = all_hash_functions[ahfs];
             
-                for(size_t ass = 0; ass < all_scales_size; ass++){
-                    float scale = all_scales[ass];
+                // for(size_t ass = 0; ass < all_scales_size; ass++){
+                    float scale = 1.1f;//all_scales[ass];
                     size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
                     std::cout << "data size: " << data_size <<"\tcluster config: " << conf 
                         << "\tfunction id: " << ahfs << "\tscale: " << scale << "\tHSIZE: " << HSIZE;
                 
                     for(size_t rdd = 0; rdd < repeats_different_data; rdd++){
                         size_t seed = noise(noise_id++, 0);
-                        generate_data_p1<ps_type>( // the seed is for rdd the run id
+                        generate_data_p1<T>( // the seed is for rdd the run id
                             data, 
                             data_size, 
                             distinct_value_count, 
@@ -209,7 +206,7 @@ int main(int argc, char** argv){
                             validation_baseline = nullptr;
                         }
 
-                        validation_baseline = new Scalar_group_count<ps_type>(distinct_value_count * 2, &id_mod);
+                        validation_baseline = new Scalar_group_count<T>(distinct_value_count * 2, &id_mod);
                         validation_baseline->create_hash_table(data, data_size);
                         std::cout << "\t\t\t\t" << rdd << "\tseed: " << seed << std::endl;
 
@@ -218,22 +215,22 @@ int main(int argc, char** argv){
                             std::string alg_identification = "";
                             size_t internal_HSIZE = HSIZE;
 
-                            Group_count<ps_type> *run;
+                            Group_count<T> *run;
                             switch(test){
                                 case Algorithm::SCALAR_GROUP_COUNT:
-                                    run = new Scalar_group_count<ps_type>(HSIZE, function);
+                                    run = new Scalar_group_count<T>(HSIZE, function);
                                     break;
                                 case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
-                                    run = new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function);
+                                    run = new AVX512_group_count_SoA_v1<T>(HSIZE, function);
                                     break;
                                 case Algorithm::AVX512_GROUP_COUNT_SOA_V2:
-                                    run = new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function);
+                                    run = new AVX512_group_count_SoA_v2<T>(HSIZE, function);
                                     break;
                                 case Algorithm::AVX512_GROUP_COUNT_SOA_V3:
-                                    run = new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function);
+                                    run = new AVX512_group_count_SoA_v3<T>(HSIZE, function);
                                     break;
                                 case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
-                                    run = new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function);
+                                    run = new AVX512_group_count_SoAoV_v1<T>(HSIZE, function);
                                     break;
                                 default:
                                     std::cout << "One of the Algorithms isn't supported yet!\n";
@@ -251,7 +248,7 @@ int main(int argc, char** argv){
 
                                 size_t time = 0;
                                 
-                                time = run_test<ps_type>(
+                                time = run_test<T>(
                                     run, 
                                     data, 
                                     data_size, 
@@ -269,7 +266,7 @@ int main(int argc, char** argv){
                                     time, //size_t or uint64_t
                                 // config
                                     data_size,   // size_t 
-                                    sizeof(ps_type),
+                                    sizeof(T),
                                     distinct_value_count, // size_t 
                                     scale, // Scaleing factor for Hash Table double/float
                                     internal_HSIZE, // HASH Table Size size_t 
@@ -285,7 +282,7 @@ int main(int argc, char** argv){
                             delete run;
                         }
                     }
-                }
+                // }
             }
         }
     }
@@ -294,44 +291,17 @@ int main(int argc, char** argv){
     size_t duration = duration_time(time_begin, time_end);
     std::cout << "\n\n\tIT TOOK\t" << duration << " ns OR\t" << (uint32_t)(duration / 1000000000.0) << " s OR\t" << (uint32_t)(duration / 60000000000.0)  << " min\n\n";
 
-/*   
-    size_t distinct_value_count = 256; // setting the number of Distinct Values
-    float scale = 1.1f; // setting the hash map scaling factor
-    size_t data_size = 16777216;//0000;; // setting the number of entries
-    
-    // ps_type* data; 
-    data = new ps_type[data_size];  
-
-    size_t (*function) (ps_type, size_t) = &hashx;//&force_collision; // setting the function
-    size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
-
-
-//Generate and prepare Validation data.
-    std::cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    std::cout << "Generate Data\n\t" << data_size << " entries with " << distinct_value_count << " distinct values with " << sizeof(ps_type) * 8 << "bit\n";    
-    generate_data<ps_type>(data, data_size, distinct_value_count, Density::SPARSE, Generation::FLAT, Distribution::UNIFORM, 0, 330854072);
-    // generate_data<ps_type>(data, data_size, distinct_value_count, Density::SPARSE);
-    
-    // for(size_t i = 0; i < data_size; i++){
-    //     data[i] = data[i] % (HSIZE * 30);
-    // }
-
-    //generating data for validation so that we only need to calculate it once per data
-    ps_type *table_value;
-    ps_type *table_count;
-    std::cout << "Prepare Validation data\n";
-    size_t validation_size = createCountValidationTable(&table_value, &table_count, data, data_size, HSIZE);
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
-
-    // Run test with the given configuaration
-    run_test<ps_type>(new Scalar_group_count<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-//*/
-
     return 0;
+}
+
+//---------------------------------------
+// MAIN!
+//---------------------------------------
+// using ps_type = uint64_t;
+using ps_type = uint32_t; 
+
+int main(int argc, char** argv){
+    test1<ps_type>();
 }
 
 
