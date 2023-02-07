@@ -260,6 +260,13 @@ int  main(int argc, char** argv){
         // dummy run to program FPGA, dont care first run for measurement
         LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
 
+        // Re-Initialize HashMap after dummy run
+        initializeHashMap(hashVec_h,countVec_h,HSIZE);
+        q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
+        q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
+
         // measured run on FPGA
         auto begin_v1 = std::chrono::high_resolution_clock::now();
         LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
@@ -413,6 +420,13 @@ int  main(int argc, char** argv){
 
         // dummy run to program FPGA, dont care first run for measurement
         LinearProbingFPGA_variant2(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+    	
+        // Re-Initialize HashMap after dummy run
+        initializeHashMap(hashVec_h,countVec_h,HSIZE);
+        q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
+        q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
 
         // measured run on FPGA
         auto begin_v2 = std::chrono::high_resolution_clock::now();
@@ -568,6 +582,13 @@ int  main(int argc, char** argv){
 
         // dummy run to program FPGA, dont care first run for measurement
         LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+
+        // Re-Initialize HashMap after dummy run
+        initializeHashMap(hashVec_h,countVec_h,HSIZE);
+        q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
+        q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
 
         // measured run on FPGA
         auto begin_v3 = std::chrono::high_resolution_clock::now();

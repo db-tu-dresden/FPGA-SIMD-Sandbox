@@ -122,7 +122,6 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 			// define two registers
 			fpvec<uint32_t> dataVec;
-// not used fpvec<uint32_t> resVec;
 
 			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
 			#pragma nounroll
