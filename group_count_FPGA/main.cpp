@@ -41,8 +41,8 @@
 
 #include "kernel.hpp"
 #include "kernel.cpp"
-//#include "LinearProbing_scalar.cpp"       // not used in this version of project
 #include "helper_main.cpp"
+#include "global_settings.h"
 
 using namespace sycl;
 using namespace std::chrono;
@@ -86,24 +86,9 @@ void exception_handler(exception_list exceptions);
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-//// Define global parameters (on host) for data generation
-/**
- * @param distinctValues determines the generated values between 1 and distinctValues
- * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
- * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
- * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
- */
-//uint64_t distinctValues = 8000;
-uint64_t distinctValues = 128;
-uint64_t dataSize = 16*10000000;
-float scale = 1.4;
-uint64_t HSIZE = distinctValues*scale;
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 // main
 int  main(int argc, char** argv){
+
     // make default input size enough to hide overhead
     #ifdef FPGA_EMULATOR
     long size = kDDRInterleavedChunkSize * 4;
@@ -147,11 +132,11 @@ int  main(int argc, char** argv){
      std::cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< std::endl;
     // print hashsize of current settings
     std::cout << "Configured HSIZE : " << HSIZE << std::endl;
-
-
+    std::cout << "Configured DATATYPE within registers : " << typeid(Type).name() << std::endl;
+    std::cout << "Configured byteSize for data transfer : " << byteSize << " byte (= " << (byteSize*8) << " bit)" << std::endl;
+   
     // Define for Allocate input/output data in pinned host memory
     // Used in all three tests, for convenience
-    using Type = uint32_t;  // type to use for the test
     Type *arr_h, *arr_d; 
     Type *hashVec_h, *hashVec_d;
     Type *countVec_h, *countVec_d;
