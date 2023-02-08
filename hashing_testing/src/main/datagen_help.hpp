@@ -177,9 +177,7 @@ void generate_cluster_soaov(
     size_t elements,
     size_t cluster_lenght
 ){
-    std::cout << "generate_cluster_soaov\t" << ", " << HSIZE << ", " << h_pos << ", " << e_pos << ", " << elements << ", " << cluster_lenght << std::endl;
     if(cluster_lenght > (HSIZE * elements) || (HSIZE * elements) == 0){
-        std::cout << "ABBRUCH!\n";
         return;
     }
 

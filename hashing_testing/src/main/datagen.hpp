@@ -1023,15 +1023,15 @@ size_t generate_data_p1_SoAoV(
     size_t h_pos = noise(HSIZE * distinct_values, seed + 1) % soaov_hsize;
     size_t e_pos = 0;
     
-    for(size_t i = 0; i < soaov_hsize; i++){
-        std::cout << i << " -> " << all_numbers.count(i) << "\t\t";
-        if((i+1) % 10 == 0){
-            std::cout << std::endl;
-        }
-    }
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
+    // for(size_t i = 0; i < soaov_hsize; i++){
+    //     std::cout << i << " -> " << all_numbers.count(i) << "\t\t";
+    //     if((i+1) % 10 == 0){
+    //         std::cout << std::endl;
+    //     }
+    // }
+    // std::cout << std::endl;
+    // std::cout << std::endl;
+    // std::cout << std::endl;
 
     size_t i = 0;
     bool CREATE_CLUSTER = i < cluster_count;
@@ -1074,23 +1074,23 @@ size_t generate_data_p1_SoAoV(
     // std::cout << std::endl;
 
     if(numbers.size() == 0){
-        std::cout << "NO DATA GENERATED!\n";
+        // std::cout << "NO DATA GENERATED!\n";
         return 0;
     }
     generate_benchmark_data<T>(result, data_size, &numbers, seed+3);
 
     // testing for validitiy!
-    std::multimap<size_t, T> numbers2;
-    for(T x: numbers){
-        numbers2.insert(std::pair<size_t, T>(hash_function(x, soaov_hsize), (T)(x)));
-    }
-    for(size_t i = 0; i < soaov_hsize; i++){
-        std::cout << i << " -> " << numbers2.count(i) << "\t\t";
-        if((i+1) % 10 == 0){
-            std::cout << std::endl;
-        }
-    }
-    std::cout << std::endl;
+    // std::multimap<size_t, T> numbers2;
+    // for(T x: numbers){
+    //     numbers2.insert(std::pair<size_t, T>(hash_function(x, soaov_hsize), (T)(x)));
+    // }
+    // for(size_t i = 0; i < soaov_hsize; i++){
+    //     std::cout << i << " -> " << numbers2.count(i) << "\t\t";
+    //     if((i+1) % 10 == 0){
+    //         std::cout << std::endl;
+    //     }
+    // }
+    // std::cout << std::endl;
 
     return numbers.size();
 }
