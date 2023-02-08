@@ -39,9 +39,7 @@ void printBits(size_t const size, void const * const ptr) {
 
         virtual void clear() = 0;
 
-        size_t get_HSIZE(){
-            return m_HSIZE;
-        }
+        virtual size_t get_HSIZE() = 0;
 
 };
 
