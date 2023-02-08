@@ -29,10 +29,11 @@ uint64_t noise(size_t position, size_t seed){
 template<typename T>
 bool enough_values_per_bucket(
     std::multimap<size_t, T> &numbers,
-    size_t HSIZE
+    size_t HSIZE,
+    size_t min_numbers
 ){
     for(size_t i = 0; i < HSIZE; i++){
-        if(numbers.count(i) <= 1){
+        if(numbers.count(i) < min_numbers){
             return false;
         }
     }
@@ -71,7 +72,8 @@ void generate_random_values(
     size_t (*hash_function)(T, size_t),
     size_t number_of_values,
     size_t HSIZE,
-    size_t seed
+    size_t seed,
+    size_t min_numbers = 2
 ){
     size_t retry = 0;
     do{
@@ -85,7 +87,7 @@ void generate_random_values(
             numbers.insert(std::pair<size_t, T>(hash_function(num, HSIZE), (T)(num)));
         }
         number_of_values += HSIZE;
-    }while(!enough_values_per_bucket(numbers, HSIZE));
+    }while(!enough_values_per_bucket(numbers, HSIZE, min_numbers));
 }
 
 // tries to generate a collision big enough form one bucket. 
@@ -123,6 +125,91 @@ void generate_collision(
         pos = (pos + 1) % HSIZE;
     }
 }
+
+// tries to generate a collision big enough form one bucket. 
+// might need to get data from neighbouring buckets.
+template<typename T>
+void generate_collision_soaov(
+    std::vector<T> *result,
+    std::multimap<size_t, T> *numbers,
+    size_t HSIZE,
+    size_t &h_pos,
+    size_t &e_pos,
+    size_t elements,
+    size_t collision_lenght
+){
+    if(collision_lenght > (HSIZE * elements) || (HSIZE * elements) == 0){
+        return;
+    }
+
+    size_t pos = h_pos % HSIZE;
+    size_t data_to_generate = collision_lenght;
+    
+    bool GENERATE = data_to_generate > 0;
+    
+    typename std::multimap<size_t, T>::iterator itLow, itUp, it;
+    while(GENERATE){
+        itLow = numbers->lower_bound(pos);
+        itUp = numbers->upper_bound(pos);
+
+        for(it = itLow; it != itUp && GENERATE; it++){
+            T n_val = it->second;
+            bool CONTAINS = vector_contains<T>(result, n_val);
+            
+            if(!CONTAINS){
+                result->push_back(n_val);
+                GENERATE = --data_to_generate > 0;
+                e_pos = (e_pos + 1) % elements;
+                h_pos = (h_pos + (e_pos == 0)) % HSIZE;
+            }
+        }
+        pos = (pos + 1) % HSIZE;
+    }
+}
+
+template<typename T>
+void generate_cluster_soaov(
+    std::vector<T> *result,
+    std::multimap<size_t, T> *numbers,
+    size_t HSIZE,
+    size_t &h_pos,
+    size_t &e_pos,
+    size_t elements,
+    size_t cluster_lenght
+){
+    std::cout << "generate_cluster_soaov\t" << ", " << HSIZE << ", " << h_pos << ", " << e_pos << ", " << elements << ", " << cluster_lenght << std::endl;
+    if(cluster_lenght > (HSIZE * elements) || (HSIZE * elements) == 0){
+        std::cout << "ABBRUCH!\n";
+        return;
+    }
+
+    typename std::multimap<size_t, T>::iterator itLow, itUp, it;
+    itLow = numbers->lower_bound(h_pos);
+    itUp = numbers->upper_bound(h_pos);
+    it = itLow;
+    size_t i = 0;
+    while(i < cluster_lenght){
+        T n_val = it->second;
+        bool CONTAINS = vector_contains<T>(result, n_val);
+        if(!CONTAINS){
+            result->push_back(n_val);
+            e_pos = (e_pos + 1) % elements;
+            h_pos = (h_pos + (e_pos == 0)) % HSIZE;
+            i++;
+        }
+
+        if(e_pos == 0 && !CONTAINS){
+            itLow = numbers->lower_bound(h_pos);
+            itUp = numbers->lower_bound(h_pos);
+            it = itLow;
+        }else{
+            it++;
+        }
+    }
+
+}
+
+
 
 template<typename T>
 void generate_cluster(

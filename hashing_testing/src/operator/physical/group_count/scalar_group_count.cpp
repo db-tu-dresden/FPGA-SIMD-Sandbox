@@ -134,6 +134,10 @@ void Scalar_group_count<T>::clear(){
     }
 }
 
+template <typename T>
+size_t Scalar_group_count<T>::get_HSIZE(){
+    return this->m_HSIZE;
+}
 
 template class Scalar_group_count<uint32_t>;
 template class Scalar_group_count<uint64_t>;

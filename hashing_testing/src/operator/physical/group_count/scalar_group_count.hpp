@@ -27,6 +27,8 @@ class Scalar_group_count : public Group_count<T>{
 
         std::string identify();
         
+        size_t get_HSIZE();
+        
         void clear();
 
 };
