@@ -23,12 +23,6 @@
 #include "lib/lib.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-//// SET GLOBAL BYTESIZE
-// define byte-size, which defines the amount of data that is load within one clock cycle
-//constexpr int byteSize = 64; 
- 	// Note: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
-	
-////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +103,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 // the input array contains dataSize lines 
 // per cycle we can load #(byteSize/sizeof(Type)) elements
 // !! That means dataSize must be a multiple of (byteSize/sizeof(Type)) !! 
-	iterations =  (dataSize / (byteSize/sizeof(Type)));
+	iterations =  loops;
 	assert(dataSize % (byteSize/sizeof(Type)) == 0);
 
 	q.submit([&](handler& h) {
@@ -147,7 +141,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				**/ 	
 				int p = 0;
 				#pragma nounroll
-				while (p < (byteSize/sizeof(Type))) {
+				while (p < elementCount) {
 						// get single value from current dataVec register at position p
 						uint32_t inputValue = dataVec.elements[p];
 
@@ -159,9 +153,9 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 						while (1) {
 							// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-							int32_t overflow = (hash_key + (byteSize/sizeof(Type))) - HSIZE;
+							int32_t overflow = (hash_key + elementCount) - HSIZE;
 							overflow = overflow < 0? 0: overflow;
-							uint32_t overflow_correction_mask_i = (1 << ((byteSize/sizeof(Type))-overflow)) - 1; 
+							uint32_t overflow_correction_mask_i = (1 << (elementCount-overflow)) - 1; 
 							fpvec<uint32_t, byteSize> overflow_correction_mask = cvtu32_mask16<uint32_t, byteSize>(overflow_correction_mask_i);
 
 							// Load 16 consecutive elements from hashVec, starting from position hash_key
@@ -219,7 +213,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 									break;
 								} 
 								else {         			          // CASE B2   
-									hash_key += (byteSize/sizeof(Type));
+									hash_key +=elementCount;
 									if(hash_key >= HSIZE){
 										hash_key = 0;
 									}
@@ -283,8 +277,8 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 // the input array contains dataSize lines 
 // per cycle we can load #(byteSize/sizeof(Type)) elements
 // !! That means dataSize must be a multiple of (byteSize/sizeof(Type)) !! 
-	iterations =  (dataSize / (byteSize/sizeof(Type)));
-	assert(dataSize % (byteSize/sizeof(Type)) == 0);
+	iterations =  loops;
+	assert(dataSize % elementCount == 0);
 
 	q.submit([&](handler& h) {
 		h.single_task<kernelV2>([=]() [[intel::kernel_args_restrict]] {
@@ -320,7 +314,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				**/ 	
 				int p = 0;
 				#pragma nounroll
-				while (p < (byteSize/sizeof(Type))) {
+				while (p < elementCount) {
 					// get single value from current dataVec register at position p
 					uint32_t inputValue = dataVec.elements[p];
 
@@ -328,8 +322,8 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					uint32_t hash_key = hashx(inputValue,HSIZE);
 
 					// compute the aligned start position within the hashMap based the hash_key
-					uint32_t aligned_start = (hash_key/(byteSize/sizeof(Type)))*(byteSize/sizeof(Type));
-					uint32_t remainder = hash_key - aligned_start; // should be equal to hash_key % (byteSize/sizeof(Type))
+					uint32_t aligned_start = (hash_key/elementCount)*elementCount;
+					uint32_t remainder = hash_key - aligned_start; // should be equal to hash_key % elementCount
 					
 					/**
 					* broadcast element p of input[] to vector of type fpvec<uint32_t>
@@ -339,12 +333,12 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 					while(1) {
 						// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-						int32_t overflow = (aligned_start + (byteSize/sizeof(Type))) - HSIZE;
+						int32_t overflow = (aligned_start + elementCount) - HSIZE;
 						overflow = overflow < 0? 0: overflow;
-						uint32_t overflow_correction_mask_i = (1 << ((byteSize/sizeof(Type))-overflow)) - 1; 
+						uint32_t overflow_correction_mask_i = (1 << (elementCount-overflow)) - 1; 
 						fpvec<uint32_t, byteSize> overflow_correction_mask = cvtu32_mask16<uint32_t, byteSize>(overflow_correction_mask_i);
 
-						int32_t cutlow = (byteSize/sizeof(Type)) - remainder; // should be in a range from 1-(byteSize/sizeof(Type))
+						int32_t cutlow = elementCount - remainder; // should be in a range from 1-(byteSize/sizeof(Type))
 						uint32_t cutlow_mask_i = (1 << cutlow) -1;
 						cutlow_mask_i <<= remainder;
 
@@ -421,7 +415,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// since we now use the overflow mask we can do this to change our position
 			// we ALSO need to set the remainder to 0.  
 								remainder = 0;
-								aligned_start += (byteSize/sizeof(Type));
+								aligned_start +=elementCount;
 								if(aligned_start >= HSIZE){
 									aligned_start = 0;
 								}
@@ -486,8 +480,8 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 // the input array contains dataSize lines 
 // per cycle we can load #(byteSize/sizeof(Type)) elements
 // !! That means dataSize must be a multiple of (byteSize/sizeof(Type)) !! 
-	iterations =  (dataSize / (byteSize/sizeof(Type)));
-	assert(dataSize % (byteSize/sizeof(Type)) == 0);
+	iterations =  loops;
+	assert(dataSize % elementCount == 0);
 
 	q.submit([&](handler& h) {
 		h.single_task<kernelV3>([=]() [[intel::kernel_args_restrict]] {
@@ -523,14 +517,14 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				**/ 	
 				int p = 0;
 				#pragma nounroll
-				while (p < (byteSize/sizeof(Type))) {
+				while (p < elementCount) {
 
 					// load (byteSize/sizeof(Type)) input values --> use the 16 elements of dataVec	/// !! change compared to the serial implementation !!
 					fpvec<uint32_t, byteSize> iValues = dataVec;
 
 					//iterate over the input values
 					int i=0;
-					while (i<(byteSize/sizeof(Type))) {
+					while (i<elementCount) {
 
 						// broadcast single value from input at postion i into a new SIMD register
 						fpvec<uint32_t, byteSize> idx = set1<uint32_t, byteSize>((uint32_t)i);
@@ -540,16 +534,16 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						uint32_t hash_key = hashx(inputValue,HSIZE);
 
 						// compute the aligned start position within the hashMap based the hash_key
-						uint32_t aligned_start = (hash_key/(byteSize/sizeof(Type)))*(byteSize/sizeof(Type));
+						uint32_t aligned_start = (hash_key/elementCount)*elementCount;
 						uint32_t remainder = hash_key - aligned_start; // should be equal to hash_key % 16
 					
 						while (1) {
-							int32_t overflow = (aligned_start + (byteSize/sizeof(Type))) - HSIZE;
+							int32_t overflow = (aligned_start + elementCount) - HSIZE;
 							overflow = overflow < 0? 0: overflow;
-							uint32_t overflow_correction_mask_i = (1 << ((byteSize/sizeof(Type))-overflow)) - 1; 
+							uint32_t overflow_correction_mask_i = (1 << (elementCount-overflow)) - 1; 
 							fpvec<uint32_t, byteSize> overflow_correction_mask = cvtu32_mask16<uint32_t, byteSize>(overflow_correction_mask_i);
 
-							int32_t cutlow = (byteSize/sizeof(Type)) - remainder; // should be in a range from 1 - (byteSize/sizeof(Type))
+							int32_t cutlow = elementCount - remainder; // should be in a range from 1 - (byteSize/sizeof(Type))
 							uint32_t cutlow_mask_i = (1 << cutlow) -1;
 							cutlow_mask_i <<= remainder;
 
@@ -619,7 +613,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 									// since we now use the overflow mask we can do this to change our position
 									// we ALSO need to set the remainder to 0.
 									remainder = 0;
-									aligned_start += (byteSize/sizeof(Type));
+									aligned_start +=elementCount;
 									if(aligned_start >= HSIZE){
 										aligned_start = 0;
 									}
@@ -627,7 +621,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 							}
 						}
 					}
-					p+= (byteSize/sizeof(Type));	
+					p+=elementCount;	
 				}	
 			}
 		});

@@ -3,6 +3,9 @@
 > monitor running batch-jobs via
 > `watch -n 1 qstat -n -1`
 
+## Global parameters
+-   All parameters that can be configured are in "global_parameters.h" and should be adjusted only there at the beginning.
+
 ## Emulator
 ### Run as Batchjob
 (0) Build lib 

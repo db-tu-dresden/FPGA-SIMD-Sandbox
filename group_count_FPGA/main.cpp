@@ -125,9 +125,12 @@ int  main(int argc, char** argv){
 	} else {
 		size = atoi(argv[1]);
 	}
-    printf("Vector length: %zd \n", size);
+//  printf("Vector length: %zd \n", size);
 
     // print global settings
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"============= Program Start =================="<<std::endl; 
+    std::cout <<"=============================================="<<std::endl;    
      std::cout << "Global configuration:"<<  std::endl;
      std::cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< std::endl;
     // print hashsize of current settings
@@ -159,14 +162,9 @@ int  main(int argc, char** argv){
 	
     number_CL = number_CL_buckets * (4096/16);
     
-	printf("Number CL buckets: %zd \n", number_CL_buckets);
-    printf("Number CLs: %zd \n", number_CL);
+//	printf("Number CL buckets: %zd \n", number_CL_buckets);
+//  printf("Number CLs: %zd \n", number_CL);
 
-//  Allocate input/output data in pinned host memory
-//  arr = (uint32_t *) aligned_alloc(64,dataSize * sizeof(uint32_t));
-//  hashVec = (uint32_t *) aligned_alloc(64, HSIZE * sizeof (uint32_t));
-//  countVec = (uint32_t *) aligned_alloc(64, HSIZE * sizeof (uint32_t));
-    
     // Host buffer 
     if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
@@ -325,8 +323,8 @@ int  main(int argc, char** argv){
 	}
     number_CL = number_CL_buckets * (4096/16);
     */
-	printf("Number CL buckets: %zd \n", number_CL_buckets);
-    printf("Number CLs: %zd \n", number_CL);
+//	printf("Number CL buckets: %zd \n", number_CL_buckets);
+//  printf("Number CLs: %zd \n", number_CL);
   
     // Host buffer 
     if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
@@ -487,8 +485,8 @@ int  main(int argc, char** argv){
 	}
     number_CL = number_CL_buckets * (4096/16);
     */
-	printf("Number CL buckets: %zd \n", number_CL_buckets);
-    printf("Number CLs: %zd \n", number_CL);
+//	printf("Number CL buckets: %zd \n", number_CL_buckets);
+//  printf("Number CLs: %zd \n", number_CL);
   
     // Host buffer 
     if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
