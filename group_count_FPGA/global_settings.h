@@ -25,7 +25,8 @@
 
 // define byte-size, which defines the amount of data that is load within one clock cycle
 // Note: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
-    constexpr int byteSize = 128; 
+// Note: At the moment, please use ONLY 64, 128 OR 256 byte!! NOT 192!
+    constexpr int byteSize = 64; 
 
 // DON'T CHANGE!
     const int loops = (dataSize / (byteSize/sizeof(Type)));
