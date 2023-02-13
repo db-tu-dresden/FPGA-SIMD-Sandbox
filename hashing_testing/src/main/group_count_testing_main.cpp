@@ -114,22 +114,25 @@ int main(int argc, char** argv){
     // }
 
     //generating data for validation so that we only need to calculate it once per data
-    ps_type *table_value;
-    ps_type *table_count;
+
     std::cout << "Prepare Validation data\n";
-    size_t validation_size = createCountValidationTable(&table_value, &table_count, data, data_size, HSIZE);
+
+    Scalar_group_count<ps_type> *validation_baseline = nullptr;
+    validation_baseline = new Scalar_group_count<ps_type>(distinct_value_count * 2, &id_mod);
+    validation_baseline->create_hash_table(data, data_size);
+
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
 
     // Run test with the given configuaration
-    run_test<ps_type>(new Scalar_group_count<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
-    run_test<ps_type>(new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
+    run_test<ps_type>(new Scalar_group_count<ps_type>(HSIZE, function), data, data_size, validation_baseline, distinct_value_count * 2, true, true);
+    run_test<ps_type>(new AVX512_group_count_SoA_v1<ps_type>(HSIZE, function), data, data_size, validation_baseline, distinct_value_count * 2, true, true);
+    run_test<ps_type>(new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function), data, data_size, validation_baseline, distinct_value_count * 2, true, true);
+    run_test<ps_type>(new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function), data, data_size, validation_baseline, distinct_value_count * 2, true, true);
+    run_test<ps_type>(new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function), data, data_size, validation_baseline, distinct_value_count * 2, true, true);
 
     std::cout << "Collision!\n";
 
-    run_test<ps_type>(new AVX512_group_count_SoA_collision_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
+    run_test<ps_type>(new AVX512_group_count_SoA_collision_v1<ps_type>(HSIZE, function), data, data_size, validation_baseline, distinct_value_count * 2, true, true);
 
 //*/
 
