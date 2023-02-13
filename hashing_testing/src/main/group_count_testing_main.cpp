@@ -126,6 +126,11 @@ int main(int argc, char** argv){
     run_test<ps_type>(new AVX512_group_count_SoA_v2<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoA_v3<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
     run_test<ps_type>(new AVX512_group_count_SoAoV_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
+
+    std::cout << "Collision!\n";
+
+    run_test<ps_type>(new AVX512_group_count_SoA_collision_v1<ps_type>(HSIZE, function), data, data_size, table_value, table_count, validation_size);
+
 //*/
 
     return 0;
