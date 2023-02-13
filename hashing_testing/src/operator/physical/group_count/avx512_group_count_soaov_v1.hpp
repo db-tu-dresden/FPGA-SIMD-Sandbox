@@ -28,6 +28,8 @@ class AVX512_group_count_SoAoV_v1 : public Scalar_group_count<T>{
         size_t get_HSIZE(){
             return m_HSIZE_v * m_elements_per_vector;
         }
+
+        T get(T value);
 };
 
 

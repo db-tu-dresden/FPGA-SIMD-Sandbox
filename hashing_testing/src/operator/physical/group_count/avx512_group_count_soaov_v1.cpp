@@ -116,6 +116,49 @@ void print512i(__m512i a, bool newline){
 
 }
 
+template <typename T>
+T AVX512_group_count_SoAoV_v1<T>::get(T input){
+    size_t rounds = 0;
+    size_t HSIZE = this->m_HSIZE;
+    
+    T hash_key = this->m_hash_function(input, HSIZE);
+
+    while(rounds <= 1){
+        T value = this->m_hash_vec[hash_key];
+        
+        if(value == input){
+            return this->m_count_vec[hash_key];
+        }else if(value == EMPTY_SPOT){
+            return 0;
+        }else{
+            hash_key = (hash_key + 1) % HSIZE;
+            rounds += (hash_key == 0);
+        }
+    }
+    return 0;
+}
+
+template <>
+uint32_t AVX512_group_count_SoAoV_v1<uint32_t>::get(uint32_t input){
+    size_t rounds = 0;
+    size_t HSIZE = this->m_HSIZE_v * this->m_elements_per_vector;
+
+    uint32_t hash_key = this->m_hash_function(input, this->m_HSIZE_v) * this->m_elements_per_vector;
+
+    while(rounds <= 1){
+        uint32_t value = this->m_hash_vec[hash_key];
+        
+        if(value == input){
+            return this->m_count_vec[hash_key];
+        }else if(value == EMPTY_SPOT){
+            return 0;
+        }else{
+            hash_key = (hash_key + 1) % HSIZE;
+            rounds += (hash_key == 0);
+        }
+    }
+    return 0;
+}
 
 template class AVX512_group_count_SoAoV_v1<uint32_t>;
 // template class AVX512_group_count_SoAoV_v1<uint64_t>;

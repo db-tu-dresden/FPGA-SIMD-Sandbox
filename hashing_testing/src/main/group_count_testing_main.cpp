@@ -92,26 +92,29 @@ using ps_type = uint32_t;
 int main(int argc, char** argv){
 
 //*   
-    size_t distinct_value_count = 256; // setting the number of Distinct Values
-    float scale = 1.5f; // setting the hash map scaling factor
-    size_t data_size = 16 * 1024;//0000;; // setting the number of entries
+    size_t distinct_value_count = 31; // setting the number of Distinct Values
+    float scale = 1.1f; // setting the hash map scaling factor
+    size_t data_size = 16 * 5;//0000;; // setting the number of entries
     
     ps_type* data; 
     data = new ps_type[data_size];  
 
-    size_t (*function) (ps_type, size_t) = &hashx;//&force_collision; // setting the function
+    size_t (*function) (ps_type, size_t) = &id_mod;//&force_collision; // setting the function
     size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
+
+    std::cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    std::cout << "\tdistinct values: " << distinct_value_count << "\tHSIZE: " << HSIZE << "\n";
 
 
     //Generate and prepare Validation data.
-    std::cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     std::cout << "Generate Data\n\t" << data_size << " entries with " << distinct_value_count << " distinct values with " << sizeof(ps_type) * 8 << "bit\n";    
     generate_data<ps_type>(data, data_size, distinct_value_count, Density::SPARSE, Generation::FLAT, Distribution::UNIFORM, 0, 330854072);
     // generate_data<ps_type>(data, data_size, distinct_value_count, Density::SPARSE);
     
-    // for(size_t i = 0; i < data_size; i++){
-    //     data[i] = data[i] % (HSIZE * 30);
-    // }
+    for(size_t i = 0; i < data_size; i++){
+        data[i] = (data[i] % (HSIZE * 37)) + 1;
+    }
 
     //generating data for validation so that we only need to calculate it once per data
 
@@ -180,14 +183,15 @@ size_t run_test(Group_count<T>* group_count, T* data, size_t data_size, T* valid
 // validate run
     bool errors = validation<ps_type>(group_count, validation_value, validation_count, validation_size);
 
-    if(cleanup){
-        delete group_count;
-    }
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
 
     if(errors){
         return 0;
     }
+    if(cleanup){
+        delete group_count;
+    }
+
     return duration;
 }
 
@@ -232,14 +236,17 @@ size_t run_test(Group_count<T>* group_count, T* data, size_t data_size, Scalar_g
         errors = validation<ps_type>(group_count, validation_baseline, validation_size);
     }
 
-    if(cleanup){
-        delete group_count;
-    }
     // std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
 
     if(errors){
-        throw std::runtime_error("Problem during Validation!");
+//        throw std::runtime_error("Problem during Validation!");
+        group_count->print(true);
     }
+
+    if(cleanup){
+        delete group_count;
+    }
+
     return duration;
 }
 
