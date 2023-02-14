@@ -88,7 +88,7 @@ void AVX512_group_count_SoA_collision_v1<uint32_t>::create_hash_table(uint32_t* 
     while(p + 16 <= data_size){
 
         // load the to aggregate data
-        __m512i input_value = _mm512_maskz_loadu_epi32(all_mask, &input[p]);
+        __m512i input_value = _mm512_load_epi32(&input[p]);
         // how much the given count should be increased for the given input.
         __m512i input_add = _mm512_set1_epi32(1);
 
@@ -115,9 +115,9 @@ void AVX512_group_count_SoA_collision_v1<uint32_t>::create_hash_table(uint32_t* 
         // for this we can store the input_value hash it and load it
         // OR we use the input and hash it save it in to buffer and than make a maskz load for the hashed data
         // OR we have a simdifyed Hash Algorithm! For the most cases we would need an avx... mod. 
-        _mm512_store_epi32(buffer, input_value);
+        // _mm512_store_epi32(buffer, input_value);
         for(size_t i = 0; i < 16; i++){
-            buffer[i] = this->m_hash_function(buffer[i], HSIZE);
+            buffer[i] = this->m_hash_function(input[p + i], HSIZE);
         }
         __m512i hash_map_position = _mm512_maskz_load_epi32(no_conflicts_mask, buffer); // these are the hash values
 
