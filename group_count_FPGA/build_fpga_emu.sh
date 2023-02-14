@@ -16,5 +16,6 @@ export PATH=/glob/intel-python/python2/bin:$PATH
 
 cd ~/FPGA-SIMD-Sandbox/group_count_FPGA
 
-
 make emu
+
+# error_check
