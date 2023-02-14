@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#include "helper_kernel.hpp"
+
 using namespace std;
 
 // simple multiplicative hashing function

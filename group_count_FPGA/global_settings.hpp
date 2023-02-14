@@ -1,6 +1,10 @@
 #ifndef GLOBAL_SETTINGS_H_
 #define GLOBAL_SETTINGS_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //// Define global parameters (on host) for data generation
@@ -13,11 +17,11 @@
  * @param regSize define register-size (in byte), which defines the amount of data that is load within one clock cycle :: (64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;)
  */
 
-    //uint64_t distinctValues = 8000;
-    uint64_t distinctValues = 128;
-    uint64_t dataSize = 16*10000000;
-    float scale = 1.4;
-    uint64_t HSIZE = distinctValues*scale;
+    //static uint64_t distinctValues = 8000;
+    static uint64_t distinctValues = 128;
+    static uint64_t dataSize = 16*10000000;
+    static float scale = 1.4;
+    static uint64_t HSIZE = distinctValues*scale;
 
 // define datatype which is used within all registers
     using Type = uint32_t;     

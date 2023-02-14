@@ -39,10 +39,10 @@
 // Sleep
 #include <unistd.h>
 
+#include "global_settings.hpp"
 #include "kernel.hpp"
-#include "kernel.cpp"
-#include "helper_main.cpp"
-#include "global_settings.h"
+#include "helper_main.hpp"
+
 
 using namespace sycl;
 using namespace std::chrono;
@@ -50,7 +50,7 @@ using namespace std::chrono;
 ////////////////////////////////////////////////////////////////////////////////
 //// Board globals. Can be changed from command line.
 // default to values in pac_s10_usm BSP
-/*                          
+                         
 #ifndef DDR_CHANNELS
 #define DDR_CHANNELS 4
 #endif
@@ -63,17 +63,17 @@ using namespace std::chrono;
 #define PCIE_WIDTH 64 // bytes (512 bits)
 #endif
 
-constexpr size_t kDDRChannels = DDR_CHANNELS;
-constexpr size_t kDDRWidth = DDR_WIDTH;
-// note: definition of kDDRInterleavedChunkSize is done before in kernel.cpp
-constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
-constexpr size_t kPCIeWidth = PCIE_WIDTH;
-*/
-
 #ifndef DDR_INTERLEAVED_CHUNK_SIZE
 #define DDR_INTERLEAVED_CHUNK_SIZE 4096 // bytes
 #endif
 
+//// parameter is currently not used
+// constexpr size_t kDDRChannels = DDR_CHANNELS;
+//// parameter is currently not used
+// constexpr size_t kDDRWidth = DDR_WIDTH;
+constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
+//// parameter is currently not used
+// constexpr size_t kPCIeWidth = PCIE_WIDTH;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

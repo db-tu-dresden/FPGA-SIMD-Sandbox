@@ -1,52 +1,32 @@
 
 ########################################################################
-#      Date:           Sat 04 Feb 2023 10:07:59 AM PST
-#    Job ID:           2169364.v-qsvr-1.aidevcloud
+#      Date:           Tue 14 Feb 2023 07:23:51 AM PST
+#    Job ID:           2194030.v-qsvr-1.aidevcloud
 #      User:           u177951
 # Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=00:10:00
 ########################################################################
 
 sourcing /opt/intel/inteloneapi/setvars.sh
  
-:: initializing oneAPI environment ...
-   2169364.v-qsvr-1.aidevcloud.SC: BASH_VERSION = 5.0.17(1)-release
-   args: Using "$@" for setvars.sh arguments: -t S10OAPI
-:: advisor -- latest
-:: ccl -- latest
-:: clck -- latest
-:: compiler -- latest
-:: dal -- latest
-:: debugger -- latest
-:: dev-utilities -- latest
-:: dnnl -- latest
-:: dpcpp-ct -- latest
-:: dpl -- latest
-:: embree -- latest
-:: inspector -- latest
-:: intelpython -- latest
-:: ipp -- latest
-:: ippcp -- latest
-:: ipp -- latest
-:: ispc -- latest
-:: itac -- latest
-:: mkl -- latest
-:: modelzoo -- latest
-:: modin -- latest
-:: mpi -- latest
-:: neural-compressor -- latest
-:: oidn -- latest
-:: openvkl -- latest
-:: ospray -- latest
-:: ospray_studio -- latest
-:: pytorch -- latest
-:: rkcommon -- latest
-:: rkutil -- latest
-:: tbb -- latest
-:: tensorflow -- latest
-:: vpl -- latest
-:: vtune -- latest
-:: oneAPI environment initialized ::
- 
+:: WARNING: setvars.sh has already been run. Skipping re-execution.
+   To force a re-execution of setvars.sh, use the '--force' option.
+   Using '--force' can result in excessive use of your environment variables.
+  
+usage: source setvars.sh [--force] [--config=file] [--help] [...]
+  --force        Force setvars.sh to re-run, doing so may overload environment.
+  --config=file  Customize env vars using a setvars.sh configuration file.
+  --help         Display this help message and exit.
+  ...            Additional args are passed to individual env/vars.sh scripts
+                 and should follow this script's arguments.
+  
+  Some POSIX shells do not accept command-line options. In that case, you can pass
+  command-line options via the SETVARS_ARGS environment variable. For example:
+  
+  $ SETVARS_ARGS="ia32 --config=config.txt" ; export SETVARS_ARGS
+  $ . path/to/setvars.sh
+  
+  The SETVARS_ARGS environment variable is cleared on exiting setvars.sh.
+  
 fpga_crossgen -v -fPIC lib/lib_sycl.cpp --source sycl --target sycl -o lib/lib_sycl.o
 Creating SYCL Library object from lib/lib_sycl.cpp for lib/lib_sycl.o
 fpga_libtool -v lib/lib_sycl.o --target sycl --create lib/lib_sycl.a
@@ -61,7 +41,7 @@ Creating Emulation model from lib/lib_rtl_spec_add.xml and packaging it into Ope
 fpga_libtool -v lib/lib_rtl.o lib/lib_rtl_add.o --target sycl --create lib/lib_rtl.a
 
 ########################################################################
-# End of output for job 2169364.v-qsvr-1.aidevcloud
-# Date: Sat 04 Feb 2023 10:08:18 AM PST
+# End of output for job 2194030.v-qsvr-1.aidevcloud
+# Date: Tue 14 Feb 2023 07:24:14 AM PST
 ########################################################################
 

@@ -2,7 +2,7 @@
 #define PRIMITIVES_HPP
 
 #include <array>
-#include "global_settings.h"
+#include "global_settings.hpp"
 
 /**
  * This file contains the scalar primitves of the Intel Intrinsics, which are used 

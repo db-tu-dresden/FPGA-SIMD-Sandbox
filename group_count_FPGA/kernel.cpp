@@ -15,10 +15,10 @@
 
 #include <sycl/ext/intel/fpga_extensions.hpp>
 
-#include "primitives.hpp"
 #include "kernel.hpp"
-#include "helper_kernel.cpp"
-#include "global_settings.h"
+#include "global_settings.hpp"
+#include "helper_kernel.hpp"
+#include "primitives.hpp"
 
 #include "lib/lib.hpp"
 
