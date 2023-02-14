@@ -10,7 +10,7 @@
  * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  * @param Type define datatype which is used within all registers
- * @param byteSize define byte-size, which defines the amount of data that is load within one clock cycle :: (64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;)
+ * @param regSize define register-size (in byte), which defines the amount of data that is load within one clock cycle :: (64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;)
  */
 
     //uint64_t distinctValues = 8000;
@@ -23,15 +23,15 @@
     using Type = uint32_t;     
     
 
-// define byte-size, which defines the amount of data that is load within one clock cycle
+// define register-size (in byte), which defines the amount of data that is load within one clock cycle
 // Note: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
 // Note: At the moment, please use ONLY 64, 128 OR 256 byte!! NOT 192!
-    constexpr int byteSize = 64; 
+    constexpr int regSize = 64; 
 
 // DON'T CHANGE!
-    const int loops = (dataSize / (byteSize/sizeof(Type)));
-    const int elementCount = (byteSize/sizeof(Type));
-    // @ TODO : check, if Type & byteSize match regarding max 2048 bit for FPGA with 4x DDR4 memory controller
+    const int loops = (dataSize / (regSize/sizeof(Type)));
+    const int elementCount = (regSize/sizeof(Type));
+    // @ TODO : check, if Type & regSize match regarding max 2048 bit for FPGA with 4x DDR4 memory controller
  	
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

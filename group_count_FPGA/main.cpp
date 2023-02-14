@@ -136,7 +136,7 @@ int  main(int argc, char** argv){
     // print hashsize of current settings
     std::cout << "Configured HSIZE : " << HSIZE << std::endl;
     std::cout << "Configured DATATYPE within registers : " << typeid(Type).name() << std::endl;
-    std::cout << "Configured byteSize for data transfer : " << byteSize << " byte (= " << (byteSize*8) << " bit)" << std::endl;
+    std::cout << "Configured register size (regSize) for data transfer : " << regSize << " byte (= " << (regSize*8) << " bit)" << std::endl;
    
     // Define for Allocate input/output data in pinned host memory
     // Used in all three tests, for convenience
