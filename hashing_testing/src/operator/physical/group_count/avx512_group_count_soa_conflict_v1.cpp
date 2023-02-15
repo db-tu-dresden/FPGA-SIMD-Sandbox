@@ -6,31 +6,31 @@
 #include <emmintrin.h>
 #include <smmintrin.h>
 
-#include "avx512_group_count_soa_collision_v1.hpp"
+#include "avx512_group_count_soa_conflict_v1.hpp"
 #include "avx512_group_count_soaov_v1.hpp"
 
 #define EMPTY_SPOT 0
 
 template <typename T>
-AVX512_group_count_SoA_collision_v1<T>::AVX512_group_count_SoA_collision_v1(size_t HSIZE, size_t (*hash_function)(T, size_t))
+AVX512_group_count_SoA_conflict_v1<T>::AVX512_group_count_SoA_conflict_v1(size_t HSIZE, size_t (*hash_function)(T, size_t))
     : Scalar_group_count<T>(HSIZE, hash_function)
 {}
 
 template <typename T>
-AVX512_group_count_SoA_collision_v1<T>::~AVX512_group_count_SoA_collision_v1(){
+AVX512_group_count_SoA_conflict_v1<T>::~AVX512_group_count_SoA_conflict_v1(){
     free(this->m_hash_vec);
     free(this->m_count_vec);
 }
 
 
 template <typename T>
-std::string AVX512_group_count_SoA_collision_v1<T>::identify(){
-    return "AVX512 Group Count SoA Collision V1";
+std::string AVX512_group_count_SoA_conflict_v1<T>::identify(){
+    return "AVX512 Group Count SoA conflict V1";
 }
 
 
 template <typename T>
-void AVX512_group_count_SoA_collision_v1<T>::create_hash_table(T* input, size_t data_size){
+void AVX512_group_count_SoA_conflict_v1<T>::create_hash_table(T* input, size_t data_size){
     size_t p = 0;
     size_t HSIZE = this->m_HSIZE;
     // Iterate over input 
@@ -73,7 +73,7 @@ void printMask(__mmask16 mask){
 }
 
 template <>
-void AVX512_group_count_SoA_collision_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
+void AVX512_group_count_SoA_conflict_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
     size_t HSIZE = this->m_HSIZE;
     uint32_t* hashVec = this->m_hash_vec;
     uint32_t* countVec = this->m_count_vec;
@@ -141,7 +141,7 @@ void AVX512_group_count_SoA_collision_v1<uint32_t>::create_hash_table(uint32_t* 
                 no_conflicts_mask = _mm512_kandn(foundPos, no_conflicts_mask);
             }
             if(foundEmpty != 0){//B1
-                // now we have to check for collisions to prevent two different entries to write to the same position.
+                // now we have to check for conflicts to prevent two different entries to write to the same position.
                 __m512i saveConflicts = _mm512_maskz_conflict_epi32(foundEmpty, hash_map_position);
                 __m512i empty = _mm512_set1_epi32(foundEmpty);
                 saveConflicts = _mm512_and_epi32(saveConflicts, empty);
@@ -205,5 +205,5 @@ void AVX512_group_count_SoA_collision_v1<uint32_t>::create_hash_table(uint32_t* 
     // these would probably have a negative impact on  the overall performance.
 }
 
-template class AVX512_group_count_SoA_collision_v1<uint32_t>;
-template class AVX512_group_count_SoA_collision_v1<uint64_t>;
+template class AVX512_group_count_SoA_conflict_v1<uint32_t>;
+template class AVX512_group_count_SoA_conflict_v1<uint64_t>;

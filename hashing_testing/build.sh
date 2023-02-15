@@ -18,7 +18,7 @@ g++ -mavx512f -mavx512cd -O3 -fno-tree-vectorize -o collision src/main/main_coll
     src/operator/physical/group_count/avx512_group_count_soa_v2.cpp \
     src/operator/physical/group_count/avx512_group_count_soa_v3.cpp \
     src/operator/physical/group_count/avx512_group_count_soaov_v1.cpp \
-    src/operator/physical/group_count/avx512_group_count_soa_collision_v1.cpp
+    src/operator/physical/group_count/avx512_group_count_soa_conflict_v1.cpp
 
 
 # g++ -mavx512f -mavx512cd -O3 -fno-tree-vectorize -o group_count_test src/main/group_count_testing_main.cpp \

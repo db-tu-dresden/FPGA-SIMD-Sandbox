@@ -13,7 +13,7 @@
 #include "../operator/physical/group_count/avx512_group_count_soa_v2.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_v3.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soaov_v1.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soa_collision_v1.hpp"
+#include "../operator/physical/group_count/avx512_group_count_soa_conflict_v1.hpp"
 
 #include "datagen.hpp"
 
@@ -30,7 +30,7 @@ enum Algorithm{
     AVX512_GROUP_COUNT_SOA_V2, 
     AVX512_GROUP_COUNT_SOA_V3, 
     AVX512_GROUP_COUNT_SOAOV_V1, 
-    AVX512_GROUP_COUNT_SOA_COLLISION_V1
+    AVX512_GROUP_COUNT_SOA_CONFLICT_V1
 };
 
 
@@ -57,8 +57,8 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
         case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
             run = new AVX512_group_count_SoAoV_v1<T>(HSIZE, function);
             break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_COLLISION_V1:
-            run = new AVX512_group_count_SoA_collision_v1<T>(HSIZE, function);
+        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
+            run = new AVX512_group_count_SoA_conflict_v1<T>(HSIZE, function);
             break;
         default:
             throw std::runtime_error("One of the Algorithms isn't supported yet!");
@@ -202,7 +202,7 @@ int main(int argc, char** argv){
         , Algorithm::AVX512_GROUP_COUNT_SOA_V2
         , Algorithm::AVX512_GROUP_COUNT_SOA_V3
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
-        , Algorithm::AVX512_GROUP_COUNT_SOA_COLLISION_V1
+        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1
     };
     
     size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
@@ -352,14 +352,10 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     HSIZE *= elements;
 
 
-    // size_t collision_count[] = {8, 8, 128, 0, 0};
-    // size_t cluster_count[] = {0, 8, 0, 1, 128};
-    // size_t collision_size[] = {distinct_value_count/8, distinct_value_count/16, distinct_value_count/128, 0, 0};
-    // size_t cluster_size[] = {0, distinct_value_count/8, 0, distinct_value_count, distinct_value_count/128};
-    size_t collision_count[] = {0, 0};
-    size_t cluster_count[] = {1, 128};
-    size_t collision_size[] = {0, 0};
-    size_t cluster_size[] = {distinct_value_count, distinct_value_count/128};
+    size_t collision_count[] = {8, 8, 128, 0, 0};
+    size_t cluster_count[] = {0, 8, 0, 1, 128};
+    size_t collision_size[] = {distinct_value_count/8, distinct_value_count/16, distinct_value_count/128, 0, 0};
+    size_t cluster_size[] = {0, distinct_value_count/8, 0, distinct_value_count, distinct_value_count/128};
     size_t configuration_count = sizeof(collision_count) / sizeof(collision_count[0]);
 
     //verify and print configurations:
