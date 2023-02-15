@@ -2,6 +2,7 @@
 #define PRIMITIVES_HPP
 
 #include <array>
+#include "global_settings.hpp"
 
 /**
  * This file contains the scalar primitves of the Intel Intrinsics, which are used 
@@ -10,9 +11,9 @@
  * on a FPGA within the Intel DevCloud.
 */
 
-template<typename T>
+template<typename T, int B>
 struct fpvec {
-    [[intel::fpga_register]] std::array<T, 64/sizeof(T)> elements;
+    [[intel::fpga_register]] std::array<T, (B/sizeof(T))> elements;
 };
 
 /* // print a fpvec<T> result register
@@ -25,16 +26,16 @@ struct fpvec {
  * serial primitive for Intel Intrinsic:
  * _mm512_setzero_epi32
  */
-template<typename T>
-fpvec<T> setzero() {
-	auto reg = fpvec<T>{};
-	uint32_t zero = 0;
+template<typename T, int B>
+fpvec<T,B> setzero() {
+	auto reg = fpvec<T,B>{};
+	Type zero = 0;
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		reg.elements[i] = zero;
 	}
 	return reg;
-}
+} 
 
 /**	#2
  * serial primitive for Intel Intrinsic:
@@ -44,11 +45,11 @@ fpvec<T> setzero() {
  * 
  * function will (currently) only be working for arrys with 16 elements of 32bit integers!
  */
-template<typename T>
+/** Not used in current code version --> due to limitations regarding dynamic change of size and amount of elements
+template<typename T, int B>
 fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uint32_t e11, uint32_t e10, uint32_t e9,
 	uint32_t e8, uint32_t e7, uint32_t e6, uint32_t e5, uint32_t e4, uint32_t e3, uint32_t e2, uint32_t e1, uint32_t e0) {
 	auto reg = fpvec<T>{};
-#pragma unroll
 	reg.elements[0] = e0;
 	reg.elements[1] = e1;
 	reg.elements[2] = e2;
@@ -67,16 +68,17 @@ fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uin
 	reg.elements[15] = e15;
 	return reg;
 }
+*/
 
 /**	#3
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_set1_epi32 (int a)
 */
-template<typename T>
-fpvec<T> set1(T value) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> set1(T value) {
+	auto reg = fpvec<T,B>{};
 	#pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		reg.elements[i] = value;
 	}
 	return reg;
@@ -87,10 +89,10 @@ fpvec<T> set1(T value) {
 * __mmask16 _cvtu32_mask16 (unsigned int a)
 * original description: "Convert integer value a into an 16-bit mask, and store the result in k."*
 */
-template<typename T>
-fpvec<T> cvtu32_mask16(T n) {
-	auto reg = fpvec<T>{};
-	int lastElement = ((64/sizeof(T))-1);
+template<typename T, int B>
+fpvec<T,B> cvtu32_mask16(T n) {
+	auto reg = fpvec<T,B>{};
+	int lastElement = ((B/sizeof(T))-1);
 	#pragma unroll
 	while (lastElement >= 0) {
          // storing remainder in array
@@ -119,11 +121,11 @@ fpvec<T> cvtu32_mask16(T n) {
 * @param startIndex : first index-position of data from where the data should be loaded
 * @param HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
-template<typename T>
-fpvec<T> mask_loadu(fpvec<T>& writeMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
+	auto reg = fpvec<T,B>{};
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			// old reg.elements[i] = data[(startIndex+i)%HSIZE];
 			reg.elements[i] = data[startIndex+i];
@@ -141,11 +143,11 @@ fpvec<T> mask_loadu(fpvec<T>& writeMask, uint32_t* data, uint32_t startIndex, ui
 * original description: "Compare packed 32-bit integers in a and b for equality, and store the results in mask vector k 
 * using zeromask k1 (elements are zeroed out when the corresponding mask bit is not set)."
 */
-template<typename T>
-fpvec<T> mask_cmpeq_epi32_mask(fpvec<T>& zeroMask, fpvec<T>& a, fpvec<T>& b) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> mask_cmpeq_epi32_mask(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (zeroMask.elements[i] == 1) {
 			if (a.elements[i] == b.elements[i]) {
 				reg.elements[i] = 1;
@@ -167,11 +169,11 @@ fpvec<T> mask_cmpeq_epi32_mask(fpvec<T>& zeroMask, fpvec<T>& a, fpvec<T>& b) {
 * original description: "Add packed 32-bit integers in a and b, and store the results in dst using writemask k 
 * (elements are copied from src when the corresponding mask bit is not set)."
 */
-template<typename T>
-fpvec<T> mask_add_epi32(fpvec<T>& src, fpvec<T>& writeMask, fpvec<T>& a, fpvec<T>& b) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> mask_add_epi32(fpvec<T,B>& src, fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			reg.elements[i] = a.elements[i] + b.elements[i];
 		}
@@ -195,10 +197,10 @@ fpvec<T> mask_add_epi32(fpvec<T>& src, fpvec<T>& writeMask, fpvec<T>& a, fpvec<T
 * @param writeMask : if bit is set to "1" -> store related item from data into result array
 * @param data : register-array which contains the data that should be stored
 */
-template<typename T>
-void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fpvec<T>& writeMask, fpvec<T>& data) {
+template<typename T, int B>
+void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			result[(startIndex+i)%HSIZE] = data.elements[i];
 		}
@@ -213,11 +215,11 @@ void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fp
 * return 1 if at least 1 bit of mask is set;
 * return 0 if no bit of mask is set
 */
-template<typename T>
-uint32_t mask2int(fpvec<T>& mask) {
-	uint32_t res = 0;
+template<typename T, int B>
+Type mask2int(fpvec<T,B>& mask) {
+	Type res = 0;
 	#pragma unroll	
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (mask.elements[i] == 1) {
 			res = 1;
 		}
@@ -230,11 +232,11 @@ uint32_t mask2int(fpvec<T>& mask) {
 * __mmask16 _mm512_knot (__mmask16 a)
 * original description: "Compute the bitwise NOT of 16-bit mask a, and store the result in k."
 */
-template<typename T>
-fpvec<T> knot(fpvec<T>& src) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> knot(fpvec<T,B>& src) {
+	auto reg = fpvec<T,B>{};
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (src.elements[i] == 0) {
 			reg.elements[i] = 1;
 		}
@@ -253,11 +255,11 @@ fpvec<T> knot(fpvec<T>& src) {
 * Returns the number of leading 0-bits in x, starting at the most significant bit position. 
 * If x is 0, the result is undefined."
 */
-template<typename T>
-uint32_t clz_onceBultin(fpvec<T>& src) {
-	uint32_t res = 0;
+template<typename T, int B>
+Type clz_onceBultin(fpvec<T,B>& src) {
+	Type res = 0;
 	#pragma unroll
-	for (int i=((64/sizeof(T))-1); i>=0; i--) {
+	for (int i=((B/sizeof(T))-1); i>=0; i--) {
 		if (src.elements[i]==0) {
 			res = res+1;
 		} else {
@@ -274,16 +276,16 @@ uint32_t clz_onceBultin(fpvec<T>& src) {
 * mem_addr must be aligned on a 64-byte boundary or a general-protection exception may be generated."
 *
 * customized load-function:
-* @param templateMask : Register of type fpvec<uint32_t>
+* @param templateMask : Register of type fpvec<T,B>
 * @param data : array which contains the data which should be loaded
 * @param startIndex : first index-position of data from where the data should be loaded
 * @param HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
-template<typename T>
-fpvec<T> load_epi32(fpvec<T>& templateMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {		// testen - fehlt Parameter <T> ?
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> load_epi32(fpvec<T,B>& templateMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {		// testen - fehlt Parameter <T> ?
+	auto reg = fpvec<T,B>{};
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		reg.elements[i] = data[startIndex+i];
 	}
 	return reg;
@@ -294,11 +296,11 @@ fpvec<T> load_epi32(fpvec<T>& templateMask, uint32_t* data, uint32_t startIndex,
 * __mmask16 _mm512_cmpeq_epi32_mask (__m512i a, __m512i b)
 * original description: "Compare packed 32-bit integers in a and b for equality, and store the results in mask vector k."
 */
-template<typename T>
-fpvec<T> cmpeq_epi32_mask(fpvec<T>& a, fpvec<T>& b) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> cmpeq_epi32_mask(fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (a.elements[i] == b.elements[i]) {
 			reg.elements[i] = 1;
 		}
@@ -314,13 +316,13 @@ fpvec<T> cmpeq_epi32_mask(fpvec<T>& a, fpvec<T>& b) {
 * __m512i _mm512_permutexvar_epi32 (__m512i idx, __m512i a)
 * original description: "Shuffle 32-bit integers in a across lanes using the corresponding index in idx, and store the results in dst."
 */
-template<typename T>
-fpvec<T> permutexvar_epi32(fpvec<T>& idx, fpvec<T>& a) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> permutexvar_epi32(fpvec<T,B>& idx, fpvec<T,B>& a) {
+	auto reg = fpvec<T,B>{};
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
-		uint32_t id = idx.elements[i];
-		uint32_t value = a.elements[id];
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		T id = idx.elements[i];
+		T value = a.elements[id];
 		reg.elements[i] = value;
 	}
 	return reg;
@@ -333,11 +335,11 @@ fpvec<T> permutexvar_epi32(fpvec<T>& idx, fpvec<T>& a) {
 * Returns the number of trailing 0-bits in x, starting at the least significant bit position. 
 * If x is 0, the result is undefined."
 */
-template<typename T>
-uint32_t ctz_onceBultin(fpvec<T>& src) {
-	uint32_t res = 0;
+template<typename T, int B>
+Type ctz_onceBultin(fpvec<T,B>& src) {
+	Type res = 0;
 	#pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (src.elements[i]==0) {
 			res = res+1;
 		} else {
@@ -359,11 +361,11 @@ uint32_t ctz_onceBultin(fpvec<T>& src) {
 * original description: "Broadcast 32-bit integer a to all elements of dst using 
 * writemask k (elements are copied from src when the corresponding mask bit is not set)."
 */
-template<typename T>
-fpvec<T> mask_set1(fpvec<T>& src, fpvec<T>& writeMask, uint32_t value) {
-	auto reg = fpvec<T>{};
+template<typename T, int B>
+fpvec<T,B> mask_set1(fpvec<T,B>& src, fpvec<T,B>& writeMask, Type value) {
+	auto reg = fpvec<T,B>{};
 	#pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(writeMask.elements[i] == 1) {
 			reg.elements[i] = value;
 		} else {
@@ -380,16 +382,36 @@ fpvec<T> mask_set1(fpvec<T>& src, fpvec<T>& writeMask, uint32_t value) {
 * mem_addr must be aligned on a 64-byte boundary or a general-protection exception may be generated."
 *
 * customized store  - function:
-* @param result : array, in which the data is stored; function store 512-bits
+* @param result : array, in which the data is stored; function store 512, 1024, 1536 or 2048 bits
 * @param startIndex : first index - position of data from where the data should be stored
 * @param data : register-array which contains the data that should be stored
 */
-template<typename T>
-void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T>& data) {
+template<typename T, int B>
+void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& data) {
 #pragma unroll
-	for (int i=0; i<(64/sizeof(T)); i++) {
+	for (int i=0; i<(B/sizeof(T)); i++) {
 		result[(startIndex+i)] = data.elements[i];
 	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////// New functions for compile and execute on FPGA hardware //////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+/**	#18
+* Own function to load 16/32/48/64 elements (= complete CL (register)) in one clock cycle from input array
+*/
+template<typename T, int B>
+fpvec<T,B> load(T* p, int i_cnt) {
+    auto reg = fpvec<T,B> {};
+    #pragma unroll
+    for (uint idx = 0; idx < (B/sizeof(T)); idx++) {
+          reg.elements[idx] = p[idx + i_cnt * (B/sizeof(T))];
+    }
+    return reg;
 }
 
 

@@ -4,14 +4,12 @@ This directory contains the transformed code of hasbased group_count which uses 
 Execution is still serial. The code skeleton for compiling on real FPGA hardware is still missing in this folder (see: /group_count_FPGA).
 
 (1) Compile Code
-
-    (a) `cmake .` or `cmake -DCMAKE_CXX_COMPILER=... .`
-
-    (b) `make`
+-   `chmod +x build.sh`
+-   `./build.sh`
 
 (2) Execute
-`bin/main`
-
+-   `chmod +x execute.sh`
+-   `./execute.sh`
 
 
 

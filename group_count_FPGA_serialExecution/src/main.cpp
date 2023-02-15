@@ -1,7 +1,18 @@
+/*
+###############################
+## Created: 
+##          TU Dresden
+##          2023
+## 
+###############################
+
+ * This is a hashbased group count implementation using the linear probing approach.
+ * The Intel Intrinsics from the previous AVX512-based implementation were re-implemented without AVX512.
+ * This (actually serial) code is intended to be able to run it again later in parallel with the Intel OneAPI on FPGAs.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <time.h>
 #include <iostream>
 #include <chrono>
@@ -21,11 +32,10 @@
 #include <unistd.h>
 
 
-#include "kernels.hpp"
-#include "kernels.cpp"
-#include "LinearProbing_scalar.cpp"
-#include "helper_main.cpp"
-
+#include "global_settings.hpp"
+#include "kernel.hpp"
+#include "LinearProbing_scalar.hpp"
+#include "helper_main.hpp"
 
 using namespace std::chrono;
 
@@ -33,31 +43,28 @@ using namespace std::chrono;
  * Compile code with:    g++ -std=c++14 -O3 src/main.cpp -o main
 */
 
-/**
- * This is a hashbased group count implementation using the linear probing approach.
- * The Intel Intrinsics from the previous AVX512-based implementation were re-implemented without AVX512.
- * This (actually serial) code is intended to be able to run it again later in parallel with the Intel OneAPI on FPGAs.
-*/
+////////////////////////////////////////////////////////////////////////////////
+//// Forward declare functions
+struct MyException : public exception {
+   const char * what () const throw () {
+      return "C++ Exception";
+   }
+};
 
-/**
- * define global parameters for data generation
- * @param distinctValues determines the generated values between 1 and distinctValues
- * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
- * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
- * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
- */
-//int64_t distinctValues = 8000;
-uint64_t distinctValues = 128;
-uint64_t dataSize = 16*10000000;
-float scale = 1.4;
-uint64_t HSIZE = distinctValues*scale;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int  main(int argc, char** argv){
     // print global settings
-    cout << "Global configuration:"<< endl;
-    cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"============= Program Start =================="<<std::endl; 
+    std::cout <<"=============================================="<<std::endl;    
+    std::cout << "Global configuration:"<<  std::endl;
+    std::cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< std::endl;
     // print hashsize of current settings
     std::cout << "Configured HSIZE : " << HSIZE << std::endl;
+    std::cout << "Configured DATATYPE within registers : " << typeid(Type).name() << std::endl;
+    std::cout << "Configured register size (regSize) for data transfer : " << regSize << " byte (= " << (regSize*8) << " bit)" << std::endl;
 
     /**
      * allocate memory for data input array and fill with random numbers
@@ -86,57 +93,202 @@ int  main(int argc, char** argv){
         std::cout << "HashTable not allocated" << std::endl;
     }
 
-//scalar version
-    initializeHashMap(hashVec,countVec,HSIZE);
-    cout <<"=============================="<<endl;
-    cout <<"Linear Probing - scalar:"<<endl;
-    auto begin = chrono::high_resolution_clock::now();
-    LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    cout<<mis<<endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//// Forward declare LinearProbingScalar()               //scalar version
+    // track timing information, in ms
+    double pcie_time_v0=0.0;
+    try {
+        ////////////////////////////////////////////////////////////////////////////
+        std::cout <<"=============================="<<std::endl;
+        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant SCALAR:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
-//SIMD for FPGA function v1 
-    initializeHashMap(hashVec,countVec,HSIZE);
-    std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
-    begin = chrono::high_resolution_clock::now();
-    LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    std::cout<<mis<<std::endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+        // dummy run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
 
-//SIMD for FPGA function v2 
-    initializeHashMap(hashVec,countVec,HSIZE);
-    std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant 2:"<<std::endl;
-    begin = chrono::high_resolution_clock::now();
-    LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE);
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    std::cout<<mis<<std::endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+        // measured run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        auto begin_v0 = std::chrono::high_resolution_clock::now();
+        LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
+        auto end_v0 = std::chrono::high_resolution_clock::now();
+        duration<double, std::milli> diff_v0 = end_v0 - begin_v0;
 
-//SIMD for FPGA function v3 
-    initializeHashMap(hashVec,countVec,HSIZE);
-    std::cout <<"=============================="<<std::endl;
-    std::cout <<"Linear Probing for FPGA - SIMD Variant 3:"<<std::endl;
-    begin = chrono::high_resolution_clock::now();
-    LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    std::cout<<mis<<std::endl;
+        std::cout<<"Kernel runtime of function LinearProbingScalar(): "<< (diff_v0.count()) << " ms." <<std::endl;
+        std::cout <<"=============================="<<std::endl;
+        pcie_time_v0=diff_v0.count();
+        ////////////////////////////////////////////////////////////////////////////
+    } 
+    catch (std::exception const& e) {
+        std::cout << "Caught a exception: " << e.what() << "\n";
+        std::terminate();
+    }        
+    // check result for correctness
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    std::cout<< " " <<std::endl;
+
+    // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    double input_size_mb_v0 = dataSize * sizeof(Type) * 1e-6;
+	std::cout << "Input_size_mb: " << input_size_mb_v0 <<std::endl;
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v0 / (pcie_time_v0 * 1e-3)) << " MB/s\n";
+        // note: Value is not to be taken seriously in pure host execution!
+
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant SCALAR ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+//// end of LinearProbingScalar()
+////////////////////////////////////////////////////////////////////////////////    
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//// Forward declare LinearProbingFPGA_variant1()    //SIMD for FPGA function v1 
+    // track timing information, in ms
+    double pcie_time_v1=0.0;
+    try {
+        ////////////////////////////////////////////////////////////////////////////
+        std::cout <<"=============================="<<std::endl;
+        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
+
+        // dummy run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
+
+        // measured run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        auto begin_v1 = std::chrono::high_resolution_clock::now();
+        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
+        auto end_v1 = std::chrono::high_resolution_clock::now();
+        duration<double, std::milli> diff_v1 = end_v1 - begin_v1;
+
+        std::cout<<"Kernel runtime of function LinearProbingFPGA_variant1(): "<< (diff_v1.count()) << " ms." <<std::endl;
+        std::cout <<"=============================="<<std::endl;
+        pcie_time_v1=diff_v1.count();
+        ////////////////////////////////////////////////////////////////////////////
+    } 
+    catch (std::exception const& e) {
+        std::cout << "Caught a exception: " << e.what() << "\n";
+        std::terminate();
+    }        
+    // check result for correctness
+    validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    std::cout<< " " <<std::endl;
+
+    // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    double input_size_mb_v1 = dataSize * sizeof(Type) * 1e-6;
+	std::cout << "Input_size_mb: " << input_size_mb_v1 <<std::endl;
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v1 / (pcie_time_v1 * 1e-3)) << " MB/s\n";
+    // note: Value is not to be taken seriously in pure host execution!
+
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 1 ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+//// end of LinearProbingFPGA_variant1()
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//// Forward declare LinearProbingFPGA_variant2()    //SIMD for FPGA function v2 
+    // track timing information, in ms
+    double pcie_time_v2=0.0;
+    try {
+        ////////////////////////////////////////////////////////////////////////////
+        std::cout <<"=============================="<<std::endl;
+        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 2:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
+
+        // dummy run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
+
+        // measured run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        auto begin_v2 = std::chrono::high_resolution_clock::now();
+        LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE);
+        auto end_v2 = std::chrono::high_resolution_clock::now();
+        duration<double, std::milli> diff_v2 = end_v2 - begin_v2;
+
+        std::cout<<"Kernel runtime of function LinearProbingFPGA_variant2(): "<< (diff_v2.count()) << " ms." <<std::endl;
+        std::cout <<"=============================="<<std::endl;
+        pcie_time_v1=diff_v2.count();
+        ////////////////////////////////////////////////////////////////////////////
+    } 
+    catch (std::exception const& e) {
+        std::cout << "Caught a exception: " << e.what() << "\n";
+        std::terminate();
+    }        
+    // check result for correctness
+    validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    std::cout<< " " <<std::endl;
+
+    // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    double input_size_mb_v2 = dataSize * sizeof(Type) * 1e-6;
+	std::cout << "Input_size_mb: " << input_size_mb_v2 <<std::endl;
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v2 / (pcie_time_v2 * 1e-3)) << " MB/s\n";
+    // note: Value is not to be taken seriously in pure host execution!
+    
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 2 ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+//// end of LinearProbingFPGA_variant2()
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//// Forward declare LinearProbingFPGA_variant3()    //SIMD for FPGA function v3 
+    // track timing information, in ms
+    double pcie_time_v3=0.0;
+    try {
+        ////////////////////////////////////////////////////////////////////////////
+        std::cout <<"=============================="<<std::endl;
+        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 3:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
+
+        // dummy run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
+
+        // measured run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        auto begin_v3 = std::chrono::high_resolution_clock::now();
+        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
+        auto end_v3 = std::chrono::high_resolution_clock::now();
+        duration<double, std::milli> diff_v3 = end_v3 - begin_v3;
+
+        std::cout<<"Kernel runtime of function LinearProbingFPGA_variant3(): "<< (diff_v3.count()) << " ms." <<std::endl;
+        std::cout <<"=============================="<<std::endl;
+        pcie_time_v3=diff_v3.count();
+        ////////////////////////////////////////////////////////////////////////////
+    } 
+    catch (std::exception const& e) {
+        std::cout << "Caught a exception: " << e.what() << "\n";
+        std::terminate();
+    }        
+    // check result for correctness
+    validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    std::cout<< " " <<std::endl;
+
+    // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    double input_size_mb_v3 = dataSize * sizeof(Type) * 1e-6;
+	std::cout << "Input_size_mb: " << input_size_mb_v3 <<std::endl;
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v3 / (pcie_time_v3 * 1e-3)) << " MB/s\n";
+    // note: Value is not to be taken seriously in pure host execution!
+    
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 3 ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+
+//// end of LinearProbingFPGA_variant3()
+////////////////////////////////////////////////////////////////////////////////
 
     return 0;
 }

@@ -1,5 +1,20 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <time.h>
+#include <iostream>
+#include <chrono>
+#include <algorithm>
+#include <array>
+#include <iomanip>
+#include <chrono>
+#include <numeric>
+#include <vector>
+#include <time.h>
+#include <tuple>
+#include <utility>
+
+#include "helper_main.hpp"
 
 using namespace std;
 
@@ -19,16 +34,16 @@ void validate(uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t
             sum+=countVec[i];
         }
     }
-    cout << "Final result check: compare parameter dataSize against sum of all count values in countVec:"<<endl;
-    cout << dataSize <<" "<<sum<<endl;
-    cout <<" "<<endl;
+    std::cout << "Final result check: compare parameter dataSize against sum of all count values in countVec:" << std::endl;
+    std::cout << dataSize <<" " << sum << std::endl;
+    std::cout <<" " << std::endl;
 }
 
 //validates if every entry has the right number of elements and if elements are missing.
 void validate_element(uint32_t *data, uint64_t dataSize, uint32_t*hashVec, uint32_t* countVec, uint64_t HSIZE) {
     std::cout << "Element Validation\n";
     size_t errors_found = 0;
-    uint32_t lowest = 0;
+    // uint32_t lowest = 0;         // variable not used
     size_t m_id = 0;
     uint32_t *nr_list = new uint32_t[HSIZE];
     uint32_t *nr_count = new uint32_t[HSIZE];
@@ -78,24 +93,5 @@ void validate_element(uint32_t *data, uint64_t dataSize, uint32_t*hashVec, uint3
         std::cout << "Element Validation found " << errors_found << " Errors\n";
     }else{
         std::cout << "Element Validation didn't find any Errors\n";
-    }
-}
-
-/**
-  *  Generate a data array with random values between 1 and #distinctValues
-  *  The array is dynamically sized. The number of elements corresponds to the value in dataSize.
-  * @todo : change data generation function to a function with real random values
-  */
-template <typename T>
-void generateData(T* arr, uint64_t distinctValues, uint64_t dataSize) {
-    /**
-     * Create an array with #distinctValues elements which contains the count of all generated numbers
-     * This only serves for testing the code and the result of the LinearProbing algorithm.
-     */
-    int countArrayForComparison[distinctValues] = {0};
-
-    int i;    
-    for(i=0;i<dataSize;i+=1){
-        arr[i] = 1+ (rand() % distinctValues);
     }
 }
