@@ -1023,15 +1023,6 @@ size_t generate_data_p1_SoAoV(
     size_t h_pos = noise(HSIZE * distinct_values, seed + 1) % soaov_hsize;
     size_t e_pos = 0;
     
-    // for(size_t i = 0; i < soaov_hsize; i++){
-    //     std::cout << i << " -> " << all_numbers.count(i) << "\t\t";
-    //     if((i+1) % 10 == 0){
-    //         std::cout << std::endl;
-    //     }
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    // std::cout << std::endl;
 
     size_t i = 0;
     bool CREATE_CLUSTER = i < cluster_count;
@@ -1064,33 +1055,13 @@ size_t generate_data_p1_SoAoV(
         }
     }
 
-    // for(i = 0; i < numbers.size(); i++){
-    //     std::cout << hash_function(numbers[i], HSIZE) << ":" << hash_function(numbers[i], soaov_hsize) << ":" << numbers[i] << "\t";
-    //     if((i+1) % 20 == 0){
-    //         std::cout << std::endl;
-    //     }
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
 
     if(numbers.size() == 0){
         // std::cout << "NO DATA GENERATED!\n";
+        // throw std::runtime_error("no data generated");    
         return 0;
     }
     generate_benchmark_data<T>(result, data_size, &numbers, seed+3);
-
-    // testing for validitiy!
-    // std::multimap<size_t, T> numbers2;
-    // for(T x: numbers){
-    //     numbers2.insert(std::pair<size_t, T>(hash_function(x, soaov_hsize), (T)(x)));
-    // }
-    // for(size_t i = 0; i < soaov_hsize; i++){
-    //     std::cout << i << " -> " << numbers2.count(i) << "\t\t";
-    //     if((i+1) % 10 == 0){
-    //         std::cout << std::endl;
-    //     }
-    // }
-    // std::cout << std::endl;
 
     return numbers.size();
 }
@@ -1128,7 +1099,11 @@ size_t generate_data_p1(
     reserved_free += 1;
     size_t distributed_free = total_free <= reserved_free ? 1 : total_free - reserved_free ;
 
-    size_t mul = collision_size < 100? collision_size + 2 : 101;    // TODO: maybe use instead of plain 100 -> log(collision_size) * 50
+    size_t mul = (collision_size + 1) * 2;
+    if(mul > 30){
+        mul = 30;
+    }
+
     size_t number_of_values = (HSIZE + 1) * mul;
     
     size_t cluster_after_collition_length = cluster_size > collision_size ? cluster_size - collision_size : 0;
@@ -1208,7 +1183,10 @@ size_t generate_data_p0(
 
     size_t free_space = distinct_values - expected_hsize;
     
-    size_t mul = collision_size > 100? 100 : collision_size;
+    size_t mul = (collision_size + 1) * 2;
+    if(mul > 30){
+        mul = 30;
+    }
     size_t number_of_values = (distinct_values + 1) * (mul + 2);
     size_t pos = noise(distinct_values * distinct_values, seed + 1) % distinct_values;
 

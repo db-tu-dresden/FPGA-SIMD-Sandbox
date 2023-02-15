@@ -148,12 +148,39 @@ void write_to_file( std::string filename, //string
     size_t config_id
 );
 
+void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin){
+    runs_done++;
+    std::chrono::high_resolution_clock::time_point time_end;
+    
+    if((runs_done * 100) / total_runs >= percentage_done + percentage_print){
+        percentage_done += percentage_print;
+        time_end = time_now();
+        size_t meta_time = duration_time(time_begin, time_end);
+        size_t meta_time_sec = (size_t)(meta_time / 1000000000.0 + 0.5);
+        double work_done = (runs_done * 1. / total_runs);
+
+        size_t meta_time_min = (size_t)(meta_time_sec / 60.0 + 0.5);
+        size_t meta_time_left = (size_t)(meta_time_sec / work_done * (1 - work_done));
+        if(meta_time_sec < 60){
+            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_sec << " sec. Approx time left:\t" ;
+        }else{
+            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_min << " min. Approx time left:\t" ;
+        }
+        if(meta_time_left < 60){
+            std::cout << meta_time_left << " sec" << std::endl;
+        }else{
+            meta_time_left = (size_t)(meta_time_left / 60.0 + 0.5);
+            std::cout << meta_time_left << " min" << std::endl;
+        }
+    }
+}
+
 
 //---------------------------------------
 // MAIN!
 //---------------------------------------
 template <typename T> 
-int test0(size_t data_size, size_t distinct_value_count = 2048);
+int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, size_t (**all_hash_functions)(T, size_t), size_t all_hash_functions_size);
 template <typename T> 
 int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, size_t (**all_hash_functions)(T, size_t), size_t all_hash_functions_size);
 
@@ -161,7 +188,7 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 //meta benchmark info!
 using ps_type = uint32_t; 
 size_t repeats_same_data = 5;
-size_t repeats_different_data = 3;
+size_t repeats_different_data = 1;
 
 int main(int argc, char** argv){
     fill_tab_table();
@@ -174,15 +201,16 @@ int main(int argc, char** argv){
         , Algorithm::AVX512_GROUP_COUNT_SOA_V1
         , Algorithm::AVX512_GROUP_COUNT_SOA_V2
         , Algorithm::AVX512_GROUP_COUNT_SOA_V3
-        , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1
+        , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
+        , Algorithm::AVX512_GROUP_COUNT_SOA_COLLISION_V1
     };
     
-    size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod};
+    size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
     
     size_t number_algorithms_undertest = sizeof(algorithms_undertest) / sizeof(algorithms_undertest[0]);
     size_t number_hash_functions = sizeof(all_hash_functions) / sizeof(all_hash_functions[0]);
 
-    test1<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, all_hash_functions, number_hash_functions);
+    test0<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, all_hash_functions, number_hash_functions);
 }
 
 //---------------------------------------
@@ -207,8 +235,8 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     create_result_file(file_name);
 
 
-    size_t collision_count[] = {0, 0, 1, 8, 8, 128, 128};
-    size_t collision_size[] = {0, 0, distinct_value_count, distinct_value_count/8, distinct_value_count/16, distinct_value_count/128, 8};
+    size_t collision_count[] = { 8, 8, 128, 0};
+    size_t collision_size[] = {distinct_value_count/8, distinct_value_count/16, distinct_value_count/128, 0};
     size_t configuration_count = sizeof(collision_count)/sizeof(collision_count[0]);
 
     float all_scales[] = {1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f};
@@ -220,13 +248,13 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     size_t total_configs = configuration_count * all_hash_functions_size * repeats_different_data * all_scales_size * algorithms_undertest_size;
     size_t total_runs = repeats_same_data * total_configs; 
     
-    double percentage_print = 5;
-    double percentage_done = 0;
+    double percentage_print = 1;
+    double percentage_done = -percentage_print;
     size_t runs_done = 0;
 
     std::cout << "test0 has " << total_configs << " different configurations. It will run each config " 
-        << repeats_same_data << " resulting in " << total_runs << " total runs\n";
-    std::cout << "percentage done:";
+        << repeats_same_data << " times resulting in " << total_runs << " total runs\n";
+    std::cout << "percentage done:\n";
 
 
     //run variables
@@ -276,11 +304,8 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                                 conf
                             );
 
-                            runs_done++;
-                            if((runs_done * 100) / total_runs > percentage_done + percentage_print){
-                                percentage_done += percentage_print;
-                                std::cout << "\t" << percentage_done << "%";
-                            }
+                            //print some information about the progress
+                            status_output(runs_done, total_runs, percentage_done, percentage_print, time_begin);
                         }
                     }
                 }
@@ -327,10 +352,14 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     HSIZE *= elements;
 
 
-    size_t collision_count[] = {0, 0, 1, 8, 8, 128};
-    size_t cluster_count[] = {1, 128, 0, 0, 8, 0};
-    size_t collision_size[] = {0, 0, distinct_value_count, distinct_value_count/8, distinct_value_count/16, distinct_value_count/128};
-    size_t cluster_size[] = {distinct_value_count, distinct_value_count/128, 0, 0, distinct_value_count/8, 0};
+    // size_t collision_count[] = {8, 8, 128, 0, 0};
+    // size_t cluster_count[] = {0, 8, 0, 1, 128};
+    // size_t collision_size[] = {distinct_value_count/8, distinct_value_count/16, distinct_value_count/128, 0, 0};
+    // size_t cluster_size[] = {0, distinct_value_count/8, 0, distinct_value_count, distinct_value_count/128};
+    size_t collision_count[] = {0, 0};
+    size_t cluster_count[] = {1, 128};
+    size_t collision_size[] = {0, 0};
+    size_t cluster_size[] = {distinct_value_count, distinct_value_count/128};
     size_t configuration_count = sizeof(collision_count) / sizeof(collision_count[0]);
 
     //verify and print configurations:
@@ -354,13 +383,13 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     size_t total_runs = repeats_same_data * total_configs; 
 
 
-    double percentage_print = 5;
-    double percentage_done = 0;
+    double percentage_print = 2.5;
+    double percentage_done = -percentage_print;
     size_t runs_done = 0;
 
     std::cout << "test1 has " << total_configs << " different configurations. It will run each config " 
-        << repeats_same_data << " resulting in " << total_runs << " total runs\n";
-    std::cout << "percentage done:";
+        << repeats_same_data << " times resulting in " << total_runs << " total runs\n";
+    std::cout << "percentage done:\n";
 
 
     T* data = nullptr;
@@ -380,12 +409,19 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                     
                     std::string alg_identification = "";
                     size_t internal_HSIZE;
-
-                    generate_data_p1<T>( // the seed is for rdd the run id
-                        data, data_size, distinct_value_count, HSIZE, function,
-                        collision_count[conf], collision_size[conf], cluster_count[conf], cluster_size[conf],
-                        seed, test == Algorithm::AVX512_GROUP_COUNT_SOAOV_V1
-                    );
+                    size_t distinct_vals_generated;
+                    size_t data_gen_try = 0;
+                    do{
+                        distinct_vals_generated = generate_data_p1<T>( // the seed is for rdd the run id
+                            data, data_size, distinct_value_count, HSIZE, function,
+                            collision_count[conf], collision_size[conf], cluster_count[conf], cluster_size[conf],
+                            seed + data_gen_try, test == Algorithm::AVX512_GROUP_COUNT_SOAOV_V1
+                        );
+                        data_gen_try++;
+                    }while(distinct_vals_generated == 0 && data_gen_try < 5);
+                    if(distinct_vals_generated == 0){
+                        throw std::runtime_error("generate_data_p1 run into a problem with it's data generation");
+                    }
 
                     getGroupCount(alg, test, HSIZE, function);
                     internal_HSIZE = alg->get_HSIZE();
@@ -405,11 +441,7 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                             conf
                         );
 
-                        runs_done++;
-                        if((runs_done * 100) / total_runs > percentage_done + percentage_print){
-                            percentage_done += percentage_print;
-                            std::cout << "\t" << percentage_done << "%";
-                        }
+                        status_output(runs_done, total_runs, percentage_done, percentage_print, time_begin);
                     }
                 }
             }
@@ -420,6 +452,7 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
         free(data);
         data = nullptr;
     }
+
     time_end = time_now();
     size_t duration = duration_time(time_begin, time_end);
     std::cout << "\n\n\tIT TOOK\t" << duration << " ns OR\t" << (uint32_t)(duration / 1000000000.0) << " s OR\t" << (uint32_t)(duration / 60000000000.0)  << " min for " << data_size << "\n\n";

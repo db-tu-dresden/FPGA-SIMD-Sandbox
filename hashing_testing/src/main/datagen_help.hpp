@@ -75,18 +75,24 @@ void generate_random_values(
     size_t seed,
     size_t min_numbers = 2
 ){
+    size_t number_retry = 0;
     size_t retry = 0;
+    size_t wanted_values = number_of_values;
     do{
-        while(numbers.size() < number_of_values){
+        while(numbers.size() < wanted_values){
             T num;
             do{
-                num = noise(numbers.size() + retry, seed);
-                retry += num == 0;
+                num = noise(numbers.size() + number_retry, seed);
+                number_retry += num == 0;
             }while(num == 0);
             
             numbers.insert(std::pair<size_t, T>(hash_function(num, HSIZE), (T)(num)));
         }
-        number_of_values += HSIZE;
+        wanted_values += number_of_values;
+        retry++;
+        if(retry > 10 && !enough_values_per_bucket(numbers, HSIZE, 1)){    // second part tells us if every value got generated atleast once.
+            throw std::runtime_error("bad hash function!");
+        }
     }while(!enough_values_per_bucket(numbers, HSIZE, min_numbers));
 }
 
