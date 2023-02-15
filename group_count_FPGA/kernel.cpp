@@ -127,102 +127,100 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 		out[0] = 0;
 
-			// define two registers
-			fpvec<Type, regSize> dataVec;
+		// define dataVec register
+		fpvec<Type, regSize> dataVec;
 
-			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
+		// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+		#pragma nounroll
+		for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
+			// Load complete CL (register) in one clock cycle
+			dataVec = load<Type, regSize>(input, i_cnt);
+
+			/**
+			* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+			* @param p current element of input data array
+			**/ 	
+			int p = 0;
 			#pragma nounroll
-			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
-				// Load complete CL (register) in one clock cycle
-				dataVec = load<Type, regSize>(input, i_cnt);
+			while (p < elementCount) {
+				// get single value from current dataVec register at position p
+				Type inputValue = dataVec.elements[p];
+				// compute hash_key of the input value
+				uint32_t hash_key = hashx(inputValue,HSIZE);
 
-				/**
-				* iterate over input data / always step by step through the currently 16 loaded elements
-				* @param p current element of input data array
-				**/ 	
-				int p = 0;
-				#pragma nounroll
-				while (p < elementCount) {
-						// get single value from current dataVec register at position p
-						Type inputValue = dataVec.elements[p];
+				// broadcast inputValue into a SIMD register
+				fpvec<Type, regSize> broadcastCurrentValue = set1<uint32_t, regSize>(inputValue);
 
-						// compute hash_key of the input value
-						uint32_t hash_key = hashx(inputValue,HSIZE);
+				while (1) {
+					// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
+					int32_t overflow = (hash_key + elementCount) - HSIZE;
+					overflow = overflow < 0? 0: overflow;
+					uint32_t overflow_correction_mask_i = (1 << (elementCount-overflow)) - 1; 
+					fpvec<Type, regSize> overflow_correction_mask = cvtu32_mask16<Type, regSize>(overflow_correction_mask_i);
 
-						// broadcast inputValue into a SIMD register
-						fpvec<Type, regSize> broadcastCurrentValue = set1<uint32_t, regSize>(inputValue);
+					// Load 16 consecutive elements from hashVec, starting from position hash_key
+					fpvec<Type, regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key, HSIZE);
 
-						while (1) {
-							// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-							int32_t overflow = (hash_key + elementCount) - HSIZE;
-							overflow = overflow < 0? 0: overflow;
-							uint32_t overflow_correction_mask_i = (1 << (elementCount-overflow)) - 1; 
-							fpvec<Type, regSize> overflow_correction_mask = cvtu32_mask16<Type, regSize>(overflow_correction_mask_i);
+					// compare vector with broadcast value against vector with following elements for equality
+					fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
 
-							// Load 16 consecutive elements from hashVec, starting from position hash_key
-							fpvec<Type, regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key, HSIZE);
-
-							// compare vector with broadcast value against vector with following elements for equality
-							fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
-
-							/**
-							* case distinction regarding the content of the mask "compareRes"
-							* 
-							* CASE (A):
-							* inputValue does match one of the keys in nextElements (key match)
-							* just increment the associated count entry in countVec
-							**/ 
-							if ((mask2int(compareRes)) != 0) {    // !=0, because own function returns only 0 if any bit is zero
-								// load cout values from the corresponding location                
-								fpvec<Type, regSize> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
-							
-								// increment by one at the corresponding location
-								nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneMask);
-							
-								// selective store of changed value
-								mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
+					/**
+					* case distinction regarding the content of the mask "compareRes"
+					* 
+					* CASE (A):
+					* inputValue does match one of the keys in nextElements (key match)
+					* just increment the associated count entry in countVec
+					**/ 
+					if ((mask2int(compareRes)) != 0) {    // !=0, because own function returns only 0 if any bit is zero
+						// load cout values from the corresponding location                
+						fpvec<Type, regSize> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
+					
+						// increment by one at the corresponding location
+						nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneMask);
+						
+						// selective store of changed value
+						mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
 // out[0]++; only for testing
-								out[0]++;
-								p++;
-								break;
-							}   
-							else {
-								/**
-								* CASE (B): 
-								* --> inputValue does NOT match any of the keys in nextElements (no key match)
-								* --> compare "nextElements" with zero
-								* CASE (B1):   resulting mask of this comparison is not 0
-								*             --> insert inputValue into next possible slot       
-								*                 
-								* CASE (B2):  resulting mask of this comparison is 0
-								*             --> no free slot in current 16-slot array
-								*             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
-								*             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
-								**/ 
-								fpvec<Type, regSize> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask, nextElements);
-								Type innerMask = mask2int(checkForFreeSpace);
-								if(innerMask != 0) {                // CASE B1    
-									//compute position of the emtpy slot   
-									Type pos = ctz_onceBultin(checkForFreeSpace);
-
-									// use 
-									hashVec[hash_key+pos] = (uint32_t)inputValue;
-									countVec[hash_key+pos]++;
+						out[0]++;
+						p++;
+						break;
+					}   
+					else {
+						/**
+						* CASE (B): 
+						* --> inputValue does NOT match any of the keys in nextElements (no key match)
+						* --> compare "nextElements" with zero
+						* CASE (B1):   resulting mask of this comparison is not 0
+						*             --> insert inputValue into next possible slot       
+						*                 
+						* CASE (B2):  resulting mask of this comparison is 0
+						*             --> no free slot in current 16-slot array
+						*             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+						*             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+						**/ 
+						fpvec<Type, regSize> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask, nextElements);
+						Type innerMask = mask2int(checkForFreeSpace);
+						if(innerMask != 0) {                // CASE B1    
+							//compute position of the emtpy slot   
+							Type pos = ctz_onceBultin(checkForFreeSpace);
+							// use 
+							hashVec[hash_key+pos] = (uint32_t)inputValue;
+							countVec[hash_key+pos]++;
 // out[0]++; only for testing									
-									out[0]++;
-									p++;
-									break;
-								} 
-								else {         			          // CASE B2   
-									hash_key +=elementCount;
-									if(hash_key >= HSIZE){
-										hash_key = 0;
-									}
-								}
-							}
+							out[0]++;
+							p++;
+							break;
 						} 
-				}	
-			}
+						else {         			          // CASE B2   
+							hash_key +=elementCount;
+							if(hash_key >= HSIZE){
+								hash_key = 0;
+							}
+						}
+					}
+				} 
+			}	
+		}
 		});
 	}).wait();
 }   
@@ -301,17 +299,17 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 		out[0] = 0;
 
-			// define two registers
+			// define dataVec register
 			fpvec<Type, regSize> dataVec;
 
-			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
+			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				// Load complete CL (register) in one clock cycle
 				dataVec = load<Type, regSize>(input, i_cnt);
 
 				/**
-				* iterate over input data / always step by step through the currently 16 loaded elements
+				* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 				* @param p current element of input data array
 				**/ 	
 				int p = 0;
@@ -505,17 +503,17 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 		out[0] = 0;
 
-			// define two registers
+			// define dataVec register
 			fpvec<Type, regSize> dataVec;
 
-			// iterate over input data with a SIMD registers size of 512-bit (16 elements)
+			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				// Load complete CL (register) in one clock cycle
 				dataVec = load<Type, regSize>(input, i_cnt);
 
 				/**
-				* iterate over input data / always step by step through the currently 16 loaded elements
+				* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 				* @param p current element of input data array
 				**/ 	
 				int p = 0;
