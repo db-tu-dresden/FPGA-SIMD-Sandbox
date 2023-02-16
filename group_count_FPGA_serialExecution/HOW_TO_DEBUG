@@ -1,0 +1,32 @@
+
+# using GDB Debugger in Intel Devcloud
+
+
+(0) build with correct flags
+-   icpx -fsycl -g -o main src/main.cpp \
+
+(1) start debug-session
+-   gdb-oneapi main
+
+
+(2) run
+-   run cpu
+
+
+(3) set breakpoint
+-   break full/path/to/file.cpp:line
+-   e.g. break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:99
+
+(4) show breakpoints
+-   info b
+ 
+(5) delete a certain breakpoint
+-   d 3     (3 is the number of the selected breakpoint)
+
+(6) continue after breakpoint
+-   c       continue the run
+-   next    skip to next line without going inside a function
+-   step    do the next step (and go inside a called function)
+
+(7) set watchpoint for specific variable
+-   watch <variable_name>
