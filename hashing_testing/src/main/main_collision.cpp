@@ -14,6 +14,8 @@
 #include "../operator/physical/group_count/avx512_group_count_soa_v3.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soaov_v1.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_conflict_v1.hpp"
+#include "../operator/physical/group_count/avx512_group_count_soa_conflict_v2.hpp"
+
 
 #include "datagen.hpp"
 
@@ -30,7 +32,8 @@ enum Algorithm{
     AVX512_GROUP_COUNT_SOA_V2, 
     AVX512_GROUP_COUNT_SOA_V3, 
     AVX512_GROUP_COUNT_SOAOV_V1, 
-    AVX512_GROUP_COUNT_SOA_CONFLICT_V1
+    AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
+    AVX512_GROUP_COUNT_SOA_CONFLICT_V2
 };
 
 
@@ -59,6 +62,9 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
             run = new AVX512_group_count_SoA_conflict_v1<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2:
+            run = new AVX512_group_count_SoA_conflict_v2<T>(HSIZE, function);
             break;
         default:
             throw std::runtime_error("One of the Algorithms isn't supported yet!");
@@ -184,6 +190,36 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 template <typename T> 
 int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, size_t (**all_hash_functions)(T, size_t), size_t all_hash_functions_size);
 
+template <typename T> 
+int alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algorithms_undertest, size_t (*hash_function)(T, size_t)){
+    size_t noise_id = 1;
+    //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
+    srand(std::time(nullptr));
+    noise_id = std::rand();
+
+    size_t seed = noise(noise_id++, 0);
+    size_t HSIZE = distinct_value_count * 1.5;
+    //run variables
+    T* data = (T*) aligned_alloc(64, data_size * sizeof(T)); // alternative
+    Group_count<T> *alg = nullptr;
+    getGroupCount(alg, algorithms_undertest, HSIZE, hash_function);
+    Scalar_group_count<T> *val = new Scalar_group_count<T>(HSIZE, hash_function);
+
+    generate_data_p0<T>( // the seed is for rdd the run id
+        data, data_size, distinct_value_count, hash_function, 
+        2, (distinct_value_count/16)+2, seed
+    );
+    alg->create_hash_table(data, data_size);
+    std::cout << alg->identify() << std::endl;
+    val->create_hash_table(data, data_size);
+
+    validation(alg, val, HSIZE);
+
+    
+    return 0;
+}
+
+
 
 //meta benchmark info!
 using ps_type = uint32_t; 
@@ -203,6 +239,7 @@ int main(int argc, char** argv){
         , Algorithm::AVX512_GROUP_COUNT_SOA_V3
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
         , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1
+        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2
     };
     
     size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
@@ -211,6 +248,8 @@ int main(int argc, char** argv){
     size_t number_hash_functions = sizeof(all_hash_functions) / sizeof(all_hash_functions[0]);
 
     test0<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, all_hash_functions, number_hash_functions);
+    // alg_testing<ps_type>(128, 64, Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2, &id_mod);
+
 }
 
 //---------------------------------------

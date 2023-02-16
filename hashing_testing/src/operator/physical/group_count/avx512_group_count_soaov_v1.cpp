@@ -106,8 +106,8 @@ void AVX512_group_count_SoAoV_v1<uint32_t>::create_hash_table(uint32_t* input, s
 void print512i(__m512i a, bool newline){
     uint32_t *res = (uint32_t*) aligned_alloc(64, 1*sizeof(__m512i));
     _mm512_store_epi32 (res, a);
-    for(uint32_t i = 0; i < 16; i++){
-        std::cout << res[i] << "\t";
+    for(uint32_t i = 16; i > 0; i--){
+        std::cout << res[i-1] << "\t";
     }
     free(res);
     if(newline){
@@ -115,6 +115,18 @@ void print512i(__m512i a, bool newline){
     }
 
 }
+
+
+void printMask(__mmask16 mask, bool newline){
+    int32_t m = (int32_t)mask;
+    for(size_t i = 16; i > 0; i--){
+        std::cout << ((m >> (i - 1)) & 0b1) << "\t";
+    }
+    if(newline){
+        std::cout << std::endl;
+    }
+}
+
 
 template <typename T>
 T AVX512_group_count_SoAoV_v1<T>::get(T input){

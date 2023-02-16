@@ -25,7 +25,7 @@ AVX512_group_count_SoA_conflict_v1<T>::~AVX512_group_count_SoA_conflict_v1(){
 
 template <typename T>
 std::string AVX512_group_count_SoA_conflict_v1<T>::identify(){
-    return "AVX512 Group Count SoA conflict V1";
+    return "AVX512 Group Count SoA conflict Version 1";
 }
 
 
@@ -61,15 +61,6 @@ void AVX512_group_count_SoA_conflict_v1<T>::create_hash_table(T* input, size_t d
         }
         p++;
     }
-}
-
-
-void printMask(__mmask16 mask){
-    int32_t m = (int32_t)mask;
-    for(size_t i = 0; i < 16; i++){
-        std::cout << ((m >> i) & 0b1) << "\t";
-    }
-    std::cout << std::endl;
 }
 
 template <>
