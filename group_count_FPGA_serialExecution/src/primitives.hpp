@@ -406,10 +406,11 @@ void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& data) {
 */
 template<typename T, int B>
 fpvec<T,B> load(T* p, int i_cnt) {
+	const int i_localConst = i_cnt;
     auto reg = fpvec<T,B> {};
     #pragma unroll
     for (uint idx = 0; idx < (B/sizeof(T)); idx++) {
-          reg.elements[idx] = p[idx + i_cnt * (B/sizeof(T))];
+          reg.elements[idx] = p[idx + i_localConst * (B/sizeof(T))];
     }
     return reg;
 }
