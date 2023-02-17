@@ -414,5 +414,52 @@ fpvec<T,B> load(T* p, int i_cnt) {
     return reg;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////// New functions to calculate overflow -  independant of elementCount //////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+
+/**	#19
+* Own function to create the overflow_correction_mask
+*/
+template<typename T, int B>
+fpvec<T,B> createOverflowCorrectionMask(T oferflowUnsigned) {
+	auto reg = fpvec<T,B>{};
+	const int overflow = (B/sizeof(T)) - oferflowUnsigned;
+	Type one = 1;
+	Type zero = 0;
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (i<overflow) {
+			reg.elements[i] = one;
+		}
+		else {
+			reg.elements[i] = zero;
+		}		
+	}
+	return reg;
+} 
+
+/**	#20
+* Own function to create the cutlow_mask
+*/
+template<typename T, int B>
+fpvec<T,B> createCutlowMask(T cutlowUnsigned) {
+	auto reg = fpvec<T,B>{};
+	const int cutlow_const = (B/sizeof(T)) - cutlowUnsigned;
+	Type one = 1;
+	Type zero = 0;
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (i<cutlow_const) {
+			reg.elements[i] = zero;
+		}
+		else {
+			reg.elements[i] = one;
+		}		
+	}
+	return reg;
+} 
 
 #endif // PRIMITIVES_HPP
