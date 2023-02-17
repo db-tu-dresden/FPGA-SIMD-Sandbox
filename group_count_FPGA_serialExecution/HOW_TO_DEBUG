@@ -39,7 +39,7 @@ for v1
     - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:140
 
 for v2
-    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:241
-    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:261  xx
-    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:277
-    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:309
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:205
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:233
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:322
+

@@ -69,47 +69,106 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
 	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
-
-		// Load complete CL (register) in one clock cycle
+/*std::cout<<"content of hashVec | countVec: "<<std::endl;
+for (int i=0; i<HSIZE; i++) {
+	std::cout << hashVec[i] << "  |  " << countVec[i]<<std::endl;
+} 	
+std::cout<<" "<<std::endl;
+		
+std::cout<<"================================================"<<std::endl;
+std::cout<<"===ATTENTION for-loop for iterations: i_cnt "<<i_cnt<<std::endl;		
+*/		// Load complete CL (register) in one clock cycle
 		dataVec = load<Type, regSize>(input, i_cnt);
-
+/*
+std::cout<<"dataVec_Register: "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << dataVec.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;
+*/
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 		* @param p current element of input data array
 		**/ 	
 		int p = 0;
 		while (p < elementCount) {
-	
+//std::cout<<"===ATTENTION while-loop for elements of register: p "<<p<<std::endl;			
 			// get single value from current dataVec register at position p
 			Type inputValue = dataVec.elements[p];
-
+//std::cout<<"inputValue "<<inputValue<<std::endl;			
 			// compute hash_key of the input value
 			Type hash_key = hashx(inputValue,HSIZE);
-
+//std::cout<<"hash_key "<<hash_key<<std::endl;
 			// broadcast inputValue into a SIMD register
 			fpvec<Type, regSize> broadcastCurrentValue = set1<Type, regSize>(inputValue);
-
-			while (1) {
+/*
+std::cout<<"broadcastCurrentValue_Register: "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << broadcastCurrentValue.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;
+*/			while (1) {
 				// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-				TypeSigned overflow = (hash_key + elementCount) - HSIZE;		
+				int32_t overflow = (hash_key + 16) - HSIZE;
+//std::cout<<"overflow "<<overflow<<std::endl;					
 				overflow = overflow < 0? 0: overflow;
-				Type oferflowUnsigned = (Type)overflow;		
-
-				// throw exception, if calculated overflow is bigger than amount of elements within the register
-				// This case can only result from incorrectly configured global parameters.
-				if (oferflowUnsigned > elementCount) {
-					throw std::out_of_range("Value of oferflowUnsigned is bigger than value of elementCount - no valid values / range");
+//std::cout<<"overflow "<<overflow<<std::endl;					
+				uint32_t overflow_correction_mask_i = (1 << (16-overflow)) - 1; 
+//std::cout<<"overflow_correction_mask_i "<<overflow_correction_mask_i<<std::endl;				 
+			//	fpvec<Type, regSize> overflow_correction_mask = cvtu32_mask16<Type, regSize>(overflow_correction_mask_i);
+/*
+std::cout<<"overflow_correction_mask OLD: "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << overflow_correction_mask.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;
+*/
+///////////////////////////////////////////////////////////////////////
+				TypeSigned overflow_NEW = (hash_key + elementCount) - HSIZE;
+//std::cout<<"overflow_NEW "<<overflow_NEW<<std::endl;					
+				overflow_NEW = overflow_NEW < 0? 0: overflow_NEW;
+//std::cout<<"overflow_NEW "<<overflow_NEW<<std::endl;
+				Type oferflowUnsigned_NEW = (Type)overflow_NEW;		
+//std::cout<<"oferflowUnsigned_NEW "<<oferflowUnsigned_NEW<<std::endl;	
+				
+				if (oferflowUnsigned_NEW > elementCount) {
+					throw std::out_of_range("Value of oferflowUnsigned_NEW is bigger than elementCount - no valid range");
 				}
 				
-				// use function createOverflowCorrectionMask() to create overflow correction mask
-				fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
 
-				// Load #elementCount consecutive elements from hashVec, starting from position hash_key
+				fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned_NEW);
+/*
+std::cout<<"overflow_correction_mask NEW: "<<std::endl;				
+for (int i=0; i<elementCount; i++) {
+	std::cout << overflow_correction_mask_NEW.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;
+*/
+
+
+/////////////////////////////////////////////////////////////////////
+// std::cout<<" "<<std::endl;
+// std::cout<<"inputValue "<<inputValue<<std::endl;	
+// std::cout<<"hash_key "<<hash_key<<std::endl;		
+
+				// Load 16 consecutive elements from hashVec, starting from position hash_key
 				fpvec<Type, regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key, HSIZE);
-
+/*
+std::cout << "nextElements ";
+for (int i=0; i<elementCount; i++) {
+		std::cout << nextElements.elements[i] << " ";
+	} 	
+std::cout<<" "<<std::endl;
+*/
 				// compare vector with broadcast value against vector with following elements for equality
 				fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
-
+/*			
+std::cout << "compareRes ";
+for (int i=0; i<elementCount; i++) {
+		std::cout << compareRes.elements[i] << " ";
+	} 	
+	std::cout<<" "<<std::endl;
+*/
 				/**
 				* case distinction regarding the content of the mask "compareRes"
 				* 
@@ -127,6 +186,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 					// selective store of changed value
 					mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
 					p++;
+//std::cout<<"say hello1 "<<std::endl;
 					break;
 				}   
 				else {
@@ -143,6 +203,13 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 					*             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
 					**/ 
 					fpvec<Type, regSize> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_correction_mask, zeroMask, nextElements);
+/*
+std::cout << "checkForFreeSpace ";
+for (int i=0; i<elementCount; i++) {
+		std::cout << checkForFreeSpace.elements[i] << " ";
+	} 	
+std::cout<<" "<<std::endl;		
+*/			
 					Type innerMask = mask2int(checkForFreeSpace);
 					if(innerMask != 0) {                // CASE B1    
 						//compute position of the emtpy slot   
@@ -150,14 +217,21 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 						// use 
 						hashVec[hash_key+pos] = (uint32_t)inputValue;
 						countVec[hash_key+pos]++;
+// std::cout<<"hash_key "<<hash_key<<std::endl;		
+// std::cout<<"pos "<<pos<<std::endl;		
+// std::cout<<"inputValue "<<inputValue<<std::endl;		
 						p++;
+//std::cout<<"say hello2 "<<std::endl;
 						break;
 					} 
 					else {         			          // CASE B2   
-						hash_key += elementCount;			
+						hash_key += elementCount;
+// std::cout<<"B2 hash_key before "<<hash_key<<std::endl;	
+						
 						if(hash_key >= HSIZE){
 							hash_key = 0;
-						}							
+						}
+// std::cout<<"B2 hash_key after "<<hash_key<<std::endl;							
 					}
 				}
 			} 
@@ -192,36 +266,83 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
 	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
-	
+/*std::cout<<"content of hashVec | countVec: "<<std::endl;
+for (int i=0; i<HSIZE; i++) {
+	std::cout << hashVec[i] << "  |  " << countVec[i]<<std::endl;
+} 	
+std::cout<<" "<<std::endl;
+		
+std::cout<<"================================================"<<std::endl;
+std::cout<<"===ATTENTION for-loop for iterations: i_cnt "<<i_cnt<<std::endl;*/		
 		// Load complete CL (register) in one clock cycle
 		dataVec = load<Type, regSize>(input, i_cnt);
 
+/*std::cout<<"dataVec_Register: "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << dataVec.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;*/
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 		* @param p current element of input data array
 		**/ 	
 		int p = 0;
 		while (p < elementCount) {
-
+//std::cout<<"===ATTENTION while-loop for elements of register: p "<<p<<std::endl;			
 			// get single value from current dataVec register at position p
 			Type inputValue = dataVec.elements[p];
-
+//std::cout<<"inputValue "<<inputValue<<std::endl;	
 			// compute hash_key of the input value
 			Type hash_key = hashx(inputValue,HSIZE);
-
+//std::cout<<"hash_key "<<hash_key<<std::endl;
 			// compute the aligned start position within the hashMap based the hash_key
-			Type remainder = hash_key % elementCount; // should be equal to (hash_key/elementCount)*elementCount;
-			Type aligned_start = hash_key - remainder;
+
+/*			
+			Type aligned_start = (hash_key/16)*16;
+			Type remainder = hash_key - aligned_start; // should be equal to hash_key % elementCount
+std::cout<<"aligned_start "<<aligned_start<<std::endl;
+std::cout<<"remainder "<<remainder<<std::endl;	
+*/
+////// NEW //////
+Type remainder = hash_key % elementCount; // should be equal to (hash_key/elementCount)*elementCount;
+Type aligned_start = hash_key - remainder;
+//std::cout<<"aligned_start_new  "<<aligned_start_new <<std::endl;
+//std::cout<<"remainder_new  "<<remainder_new <<std::endl;
+////////////////
+
 
 			/**
 			* broadcast element p of input[] to vector of type fpvec<uint32_t>
 			* broadcastCurrentValue contains sixteen times value of input[i]
 			**/
 			fpvec<Type, regSize> broadcastCurrentValue = set1<Type, regSize>(inputValue);
+/*std::cout<<"broadcastCurrentValue_Register: "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << broadcastCurrentValue.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;	
+*/			while(1) {
 
-			while(1) {
+////// OLD //////////////////////	
+/*
+				// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
+				int32_t overflow = (aligned_start + 16) - HSIZE;
+std::cout<<"overflow "<<overflow<<std::endl;						
+				overflow = overflow < 0? 0: overflow;
+std::cout<<"overflow "<<overflow<<std::endl;						
+				Type overflow_correction_mask_i = (1 << (16-overflow)) - 1; 
+std::cout<<"overflow_correction_mask_i "<<overflow_correction_mask_i<<std::endl;					
+				fpvec<Type, regSize> overflow_correction_mask = cvtu32_mask16<Type, regSize>(overflow_correction_mask_i);
+std::cout<<"overflow_correction_mask Register: "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << overflow_correction_mask.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;	*/
+////////////////////////////////////////////
+////// NEW //////
 				// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
 				TypeSigned overflow = (aligned_start + elementCount) - HSIZE;
+//std::cout<<"overflow_new "<<overflow_new<<std::endl;				
 				overflow = overflow < 0 ? 0 : overflow;
 				Type oferflowUnsigned = (Type)overflow;
 
@@ -233,21 +354,81 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
 				// use function createOverflowCorrectionMask() to create overflow correction mask
 				fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
+/*std::cout<<"overflow_new "<<overflow_new<<std::endl;	
+std::cout<<"oferflowUnsigned_new "<<oferflowUnsigned_new<<std::endl;		
+std::cout<<"Register overflow_correction_mask_new : "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << overflow_correction_mask_new.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;
+std::cout<<" "<<std::endl;	
+std::cout<<" "<<std::endl;					
+////////////////
+std::cout << "============= used variables 2nd party =========" << std::endl;
+std::cout<<"inputValue "<<inputValue<<std::endl;	
+std::cout<<"hash_key "<<hash_key<<std::endl;	
+std::cout<<"aligned_start "<<aligned_start<<std::endl;
+std::cout<<"remainder "<<remainder<<std::endl;	
+std::cout << "============= BEGIN 2nd party =========" << std::endl;*/
 
-				// Calculating a cutlow correction mask and a overflow_and_cutlow_mask 
-				TypeSigned cutlow = elementCount - remainder; // should be in a range from 1 to elementCount
-				Type cutlowUnsigned = (Type)cutlow;
-				fpvec<Type, regSize> cutlow_mask = createCutlowMask<Type, regSize>(cutlowUnsigned);
-				
-				fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
-	
+////// OLD //////////////////////
+/*
+				int32_t cutlow = 16 - remainder; // should be in a range from 1-(regSize/sizeof(Type))
+std::cout<<"cutlow "<<cutlow<<std::endl;					
+				Type cutlow_mask_i = (1 << cutlow) -1;
+std::cout<<"cutlow_mask_i "<<cutlow_mask_i<<std::endl;					
+				cutlow_mask_i <<= remainder;
+std::cout<<"cutlow_mask_i after <<= remainder  "<<cutlow_mask_i<<std::endl;					
+
+				Type combined_mask_i = cutlow_mask_i & overflow_correction_mask_i;
+std::cout<<"combined_mask_i "<<combined_mask_i<<std::endl;				
+				fpvec<Type, regSize> overflow_and_cutlow_mask = cvtu32_mask16<Type, regSize>(combined_mask_i);
+std::cout<<"overflow_and_cutlow_mask Register: "<<std::endl;
+for (int i=0; i<elementCount; i++) {
+	std::cout << overflow_and_cutlow_mask.elements[i] << " ";
+} 	
+std::cout<<" "<<std::endl;	*/
+////////////////////////////////////////////
+////// NEW //////////////////////
+
+TypeSigned cutlow = elementCount - remainder; // should be in a range from 1 to elementCount
+//std::cout << "cutlow NEW " << cutlow_NEW << std::endl;
+Type cutlowUnsigned = (Type)cutlow;
+//std::cout << "cutlowUnsigned NEW " << cutlowUnsigned_NEW<< std::endl;
+
+fpvec<Type, regSize> cutlow_mask = createCutlowMask<Type, regSize>(cutlowUnsigned);
+/*std::cout << "cutlow_mask_NEW ";
+for (int i = 0; i < elementCount; i++) {
+	std::cout << cutlow_mask_NEW.elements[i] << " ";
+}
+std::cout << " " << std::endl;
+*/
+fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
+/*std::cout << "overflow_and_cutlow_mask_NEW NEW ";
+for (int i = 0; i < elementCount; i++) {
+	std::cout << overflow_and_cutlow_mask_NEW.elements[i] << " ";
+}
+std::cout << " " << std::endl;
+*/
+
+////////////////////////////////
+////////////////////////////////
+
 				// Load 16 consecutive elements from hashVec, starting from position hash_key
 				fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
-
-				// compare vector with broadcast value against vector with following elements for equality
+/*std::cout << "nextElements ";
+for (int i=0; i<elementCount; i++) {
+		std::cout << nextElements.elements[i] << " ";
+	} 	
+std::cout<<" "<<std::endl;
+*/				// compare vector with broadcast value against vector with following elements for equality
 				fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
-
-				/**
+/*std::cout << "compareRes ";
+for (int i=0; i<elementCount; i++) {
+		std::cout << compareRes.elements[i] << " ";
+	} 	
+	std::cout<<" "<<std::endl;			
+*/				/**
 				* case distinction regarding the content of the mask "compareRes"
 				* 
 				* CASE (A):
@@ -271,11 +452,12 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 					Type matchPos = ctz_onceBultin(compareRes);
 					//uint32_t matchPos = ((64/sizeof(uint32_t))-clz_onceBultin(compareRes)); // old variant
 
-					// WE COULD DO THIS LIKE VARIANT ONE.
-					// This would mean we wouldn't calculate the match pos since it is clear already.
+		// WE COULD DO THIS LIKE VARIANT ONE.
+		// This would mean we wouldn't calculate the match pos since it is clear already.
 					// increase the counter in countVec
 					countVec[aligned_start+matchPos]++;
-					p++;		
+					p++;
+//std::cout<<"say hello1 "<<std::endl;					
 					break;
 				}   
 				else {
@@ -293,6 +475,13 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 					**/ 
 					// checkForFreeSpace. A free space is indicated by 1.
 					fpvec<Type, regSize> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_and_cutlow_mask, zeroMask,nextElements);
+/*
+std::cout << "checkForFreeSpace ";
+for (int i=0; i<elementCount; i++) {
+		std::cout << checkForFreeSpace.elements[i] << " ";
+	} 	
+std::cout<<" "<<std::endl;		
+*/
 					Type innerMask = mask2int(checkForFreeSpace);
 					if(innerMask != 0) {                // CASE B1    
 						//this does not calculate the correct position. we should rather look at trailing zeros.
@@ -300,18 +489,24 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
 						hashVec[aligned_start+pos] = (uint32_t)inputValue;
 						countVec[aligned_start+pos]++;
+//std::cout<<"hash_key "<<hash_key<<std::endl;		
+//std::cout<<"pos "<<pos<<std::endl;		
+//std::cout<<"inputValue "<<inputValue<<std::endl;		
 						p++;
+//std::cout<<"say hello2 "<<std::endl;
 						break;
 					}
 					else {                   // CASE B2 
 					//aligned_start = (aligned_start+16) % HSIZE;
-					// since we now use the overflow mask we can do this to change our position
-					// we ALSO need to set the remainder to 0.  
+	// since we now use the overflow mask we can do this to change our position
+	// we ALSO need to set the remainder to 0.  
 						remainder = 0;
-						aligned_start += elementCount;			
+						aligned_start += elementCount;
+//std::cout<<"B2 hash_key before "<<hash_key<<std::endl;						
 						if(aligned_start >= HSIZE){
 							aligned_start = 0;
-						}							
+						}
+//std::cout<<"B2 hash_key after "<<hash_key<<std::endl;							
 					} 
 				}  
 			}
@@ -374,30 +569,21 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 				Type hash_key = hashx(inputValue,HSIZE);
 
 				// compute the aligned start position within the hashMap based the hash_key
-				Type remainder = hash_key % elementCount; // should be equal to (hash_key/elementCount)*elementCount;
-				Type aligned_start = hash_key - remainder;
+				Type aligned_start = (hash_key/elementCount)*elementCount;
+				Type remainder = hash_key - aligned_start; // should be equal to hash_key % 16
 			
 				while (1) {
-					// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-					TypeSigned overflow = (aligned_start + elementCount) - HSIZE;
-					overflow = overflow < 0 ? 0 : overflow;
-					Type oferflowUnsigned = (Type)overflow;
+					Type overflow = (aligned_start + elementCount) - HSIZE;
+					overflow = overflow < 0? 0: overflow;
+					Type overflow_correction_mask_i = (1 << ((Type)(elementCount-overflow))) - 1; 
+					fpvec<Type, regSize> overflow_correction_mask = cvtu32_mask16<Type, regSize>(overflow_correction_mask_i);
 
-					// throw exception, if calculated overflow is bigger than amount of elements within the register
-					// This case can only result from incorrectly configured global parameters.
-					if (oferflowUnsigned > elementCount) {
-						throw std::out_of_range("Value of oferflowUnsigned is bigger than value of elementCount - no valid values / range");
-					}
+					Type cutlow = elementCount - remainder; // should be in a range from 1 - (regSize/sizeof(Type))
+					Type cutlow_mask_i = (1 << cutlow) -1;
+					cutlow_mask_i <<= remainder;
 
-					// use function createOverflowCorrectionMask() to create overflow correction mask
-					fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
-
-					// Calculating a cutlow correction mask and a overflow_and_cutlow_mask 
-					TypeSigned cutlow = elementCount - remainder; // should be in a range from 1 to elementCount
-					Type cutlowUnsigned = (Type)cutlow;
-					fpvec<Type, regSize> cutlow_mask = createCutlowMask<Type, regSize>(cutlowUnsigned);
-					
-					fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
+					Type combined_mask_i = cutlow_mask_i & overflow_correction_mask_i;
+					fpvec<Type, regSize> overflow_and_cutlow_mask = cvtu32_mask16<Type, regSize>(combined_mask_i);
 
 					// Load 16 consecutive elements from hashVec, starting from position hash_key
 					fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
@@ -415,13 +601,13 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 					if (mask2int(compareRes) != 0) {
 						// compute the matching position indicated by a one within the compareRes mask
 						// the position can be calculated two ways.
-						// example: 00010000 is our matching mask
-						// we could count the leading zeros and get the position like 7 - leadingzeros
-						// we calculate the trailing zeros and get the position implicitly 
+	// example: 00010000 is our matching mask
+	// we could count the leading zeros and get the position like 7 - leadingzeros
+	// we calculate the trailing zeros and get the position implicitly 
 						Type matchPos = ctz_onceBultin(compareRes);
 						
-						//WE COULD DO THIS LIKE VARIANT ONE.
-						//  This would mean we wouldn't calculate the match pos since it is clear already.                
+	//WE COULD DO THIS LIKE VARIANT ONE.
+	//  This would mean we wouldn't calculate the match pos since it is clear already.                
 						// increase the counter in countVec
 						countVec[aligned_start+matchPos]++;
 						i++;
@@ -455,8 +641,8 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 						}   
 						else {    			               // CASE B2                    
 							//aligned_start = (aligned_start+16) % HSIZE;
-							// since we now use the overflow mask we can do this to change our position
-							// we ALSO need to set the remainder to 0.
+	// since we now use the overflow mask we can do this to change our position
+	// we ALSO need to set the remainder to 0.
 							remainder = 0;
 							aligned_start += elementCount;
 							if(aligned_start >= HSIZE){
