@@ -30,3 +30,16 @@
 
 (7) set watchpoint for specific variable
 -   watch <variable_name>
+
+
+Used breakpoints:
+for v1
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:86
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:107
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:140
+
+for v2
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:241
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:261  xx
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:277
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:309

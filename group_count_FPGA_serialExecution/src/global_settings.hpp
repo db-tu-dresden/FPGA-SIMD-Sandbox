@@ -30,11 +30,11 @@
 // define register-size (in byte), which defines the amount of data that is load within one clock cycle
 // Note: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
 // Note: At the moment, please use ONLY 64, 128 OR 256 byte!! NOT 192!
-    constexpr int regSize = 64; 
+    constexpr Type regSize = 256; 
 
 // DON'T CHANGE!
-    const int loops = (dataSize / (regSize/sizeof(Type)));
-    const int elementCount = (regSize/sizeof(Type));
+    const Type loops = (dataSize / (regSize/sizeof(Type)));
+    const Type elementCount = (regSize/sizeof(Type));
     // @ TODO : check, if Type & regSize match regarding max 2048 bit for FPGA with 4x DDR4 memory controller
  	
 ////////////////////////////////////////////////////////////////////////////////
