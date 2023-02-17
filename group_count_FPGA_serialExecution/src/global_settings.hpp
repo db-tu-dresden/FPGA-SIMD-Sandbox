@@ -25,7 +25,7 @@
 
 // define datatype which is used within all registers
     using Type = uint32_t;     
-    
+    using TypeSigned = int32_t;
 
 // define register-size (in byte), which defines the amount of data that is load within one clock cycle
 // Note: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
