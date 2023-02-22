@@ -110,7 +110,7 @@ int main(int argc, char** argv){
     size_t data_size = 2048;
     uint32_t *data = new uint32_t[data_size];
 
-    size_t distinct = 2048;
+    size_t distinct = 256;
     double s = 1.1;
     size_t HSIZE = distinct * s;
     double spielraum = 0.00;
@@ -122,7 +122,8 @@ int main(int argc, char** argv){
 
 
     size_t ok;
-    ok = generate_data_p1(data, data_size, distinct, HSIZE, &mod, 128, distinct/128, 0, 0, 1, true);
+    //ok = generate_data_p1(data, data_size, distinct, HSIZE, &mod, 128, distinct/128, 0, 0, 1, true);
+    ok = generate_data_p0<uint32_t>(data, data_size, distinct, &mod, 1, distinct, 0);
 
     // for(size_t col_group = 0; col_group <= p1_max_col_group && p1_parameter_gen_hsize(col_group) <= HSIZE; col_group++){
 
@@ -178,4 +179,13 @@ int main(int argc, char** argv){
     // }
     delete []data;
 
+
+
+
+    size_t prime = ((uint64_t)(1) << 31) - 1;
+    size_t prime2 = ((uint64_t)(1) << 61) - 1;
+    size_t res1 = prime * prime2;
+    size_t res2 = (prime * prime2) >> 63;
+    std::cout << res1 << "\t" << res2 << std::endl;
+    std::cout << prime << std::endl;
 }

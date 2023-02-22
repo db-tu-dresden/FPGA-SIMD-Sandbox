@@ -1189,11 +1189,15 @@ size_t generate_data_p0(
     }
     size_t number_of_values = (distinct_values + 1) * (mul + 2);
     size_t pos = noise(distinct_values * distinct_values, seed + 1) % distinct_values;
+    size_t goal = collision_size / 2;
+    if(goal <= 1){
+        goal = 2;
+    }
 
     std::multimap<size_t, T> all_numbers;
     std::vector<T> numbers;
 
-    generate_random_values(all_numbers, hash_function, number_of_values, distinct_values, seed);
+    generate_random_values(all_numbers, hash_function, number_of_values, distinct_values, seed, goal);
 
     // for(size_t i = 0; i < distinct_values; i++){
     //     std::cout << i << " -> " << all_numbers.count(i) << "\t\t";
@@ -1215,13 +1219,14 @@ size_t generate_data_p0(
     generate_cluster<T>(&numbers, &all_numbers, distinct_values, pos, free_space);
     pos = (pos + free_space) % distinct_values;
 
-    // for(i = 0; i < numbers.size(); i++){
-    //     std::cout << hash_function(numbers[i], distinct_values) << ":" << numbers[i] << "\t";
-    //     if((i+1) % 20 == 0){
-    //         std::cout << std::endl;
-    //     }
-    // }
-    // std::cout << std::endl << std::endl;
+    for(i = 0; i < numbers.size(); i++){
+        // std::cout << hash_function(numbers[i], distinct_values) << ":" << numbers[i] << "\t";
+        // if((i+1) % 20 == 0){
+        //     std::cout << std::endl;
+        // }
+        std::cout << numbers[i] << std::endl;
+    }
+    std::cout << std::endl << std::endl;
 
     if(numbers.size() == 0 || numbers.size() > distinct_values){
         return 0;
