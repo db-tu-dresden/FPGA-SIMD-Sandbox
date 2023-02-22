@@ -12,6 +12,13 @@ Execution is still serial. The code skeleton for compiling on real FPGA hardware
 -   `./execute.sh`
 
 
+## overview about functions in kernel.cpp
+-   LinearProbingFPGA_variant1() == SoA_v1 -- without aligned_start; version descbribed in paper
+-   LinearProbingFPGA_variant2() == SoA_v1 -- first optimization: using aligned_start
+-   LinearProbingFPGA_variant3() == SoA_v1 -- with aligned start and approach of using permutexvar_epi32
+-   LinearProbingFPGA_variant4() == SoAoV_v1
+-   LinearProbingFPGA_variant5() == SoA_conflict_v1
+
 
 ## List of all needed Intel intrinsics
 - Analysis based on own AVX512 implementation (Link: https://github.com/db-tu-dresden/FPGA-SIMD-Sandbox/tree/main/group_count_AVX512)
@@ -45,3 +52,4 @@ Execution is still serial. The code skeleton for compiling on real FPGA hardware
 | 16 | int | __builtin_ctz() | (unsigned int x) | v1, v2, v3 | #15 ctz_onceBultin() |
 
 --> _mm512_maskz_loadu_epi32() and _mm512_mask_loadu_epi32() are combined in only one function: #5 mask_loadu() 
+--> Currently used intrinsics have been continuously expanded, see functional description in primitives.hppo

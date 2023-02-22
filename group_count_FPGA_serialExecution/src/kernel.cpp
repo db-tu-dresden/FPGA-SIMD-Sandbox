@@ -19,6 +19,32 @@
 #include "global_settings.hpp"
 #include "helper_kernel.hpp"
 #include "primitives.hpp"
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//// Board globals. Can be changed from command line.
+// default to values in pac_s10_usm BSP
+#ifndef DDR_CHANNELS
+#define DDR_CHANNELS 4
+#endif
+
+#ifndef DDR_WIDTH
+#define DDR_WIDTH 64 // bytes (512 bits)
+#endif
+
+#ifndef PCIE_WIDTH
+#define PCIE_WIDTH 64 // bytes (512 bits)
+#endif
+
+#ifndef DDR_INTERLEAVED_CHUNK_SIZE
+#define DDR_INTERLEAVED_CHUNK_SIZE 4096 // bytes
+#endif
+
+constexpr size_t kDDRChannels = DDR_CHANNELS;		
+constexpr size_t kDDRWidth = DDR_WIDTH;				
+constexpr size_t kPCIeWidth = PCIE_WIDTH;
+////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //// declaration of the classes
@@ -53,12 +79,24 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	 * testReg = cvtu32_mask16(n);
 	 **/
 ////////////////////////////////////////////////////////////////////////////////
-//// Check global parameters & calculate iterations parameter
+//// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
+
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
+
+	const size_t iterations = loops;
+
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
+
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
-	assert((regSize == 64) || (regSize == 128) || (regSize == 256));
-	size_t iterations =  loops;
-	assert(dataSize % elementCount == 0);
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,8 +108,11 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
-		// Load complete CL (register) in one clock cycle
-		dataVec = load<Type, regSize>(input, i_cnt);
+		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
+		// dataVec = load<Type, regSize>(input, i_cnt);	
+
+		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
 
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -79,7 +120,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 		**/ 	
 		int p = 0;
 		while (p < elementCount) {
-	
+		
 			// get single value from current dataVec register at position p
 			Type inputValue = dataVec.elements[p];
 
@@ -100,7 +141,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 				if (oferflowUnsigned > elementCount) {
 					throw std::out_of_range("Value of oferflowUnsigned is bigger than value of elementCount - no valid values / range");
 				}
-				
+					
 				// use function createOverflowCorrectionMask() to create overflow correction mask
 				fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
 
@@ -123,7 +164,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 					
 					// increment by one at the corresponding location
 					nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneMask);
-						
+							
 					// selective store of changed value
 					mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
 					p++;
@@ -179,12 +220,24 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
  */
 void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE) {
 ////////////////////////////////////////////////////////////////////////////////
-//// Check global parameters & calculate iterations parameter
+//// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
+
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
+
+	const size_t iterations = loops;
+
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
+
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
-	assert((regSize == 64) || (regSize == 128) || (regSize == 256));
-	size_t iterations =  loops;
-	assert(dataSize % elementCount == 0);
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
 ////////////////////////////////////////////////////////////////////////////////
 
 	// define dataVec register
@@ -193,8 +246,11 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 	
-		// Load complete CL (register) in one clock cycle
-		dataVec = load<Type, regSize>(input, i_cnt);
+		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
+		// dataVec = load<Type, regSize>(input, i_cnt);	
+
+		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
 
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -333,12 +389,24 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
  */
 void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
 ////////////////////////////////////////////////////////////////////////////////
-//// Check global parameters & calculate iterations parameter
+//// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
+
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
+
+	const size_t iterations = loops;
+
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
+
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
-	assert((regSize == 64) || (regSize == 128) || (regSize == 256));
-	size_t iterations =  loops;
-	assert(dataSize % elementCount == 0);
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -349,8 +417,12 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 
 	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
-		// Load complete CL (register) in one clock cycle
-		dataVec = load<Type, regSize>(input, i_cnt);
+		
+		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
+		// dataVec = load<Type, regSize>(input, i_cnt);	
+
+		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
 
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
