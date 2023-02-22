@@ -118,9 +118,12 @@ void write_to_file( std::string filename, //string
 void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin){
     runs_done++;
     std::chrono::high_resolution_clock::time_point time_end;
-    
-    if((runs_done * 100) / total_runs >= percentage_done + percentage_print){
-        percentage_done += percentage_print;
+    uint32_t current_percentage = (runs_done * 100) / total_runs;
+    if(current_percentage >= percentage_done + percentage_print){
+        while(current_percentage > percentage_done + percentage_print){
+            percentage_done += percentage_print;
+        }
+
         time_end = time_now();
         size_t meta_time = duration_time(time_begin, time_end);
         size_t meta_time_sec = (size_t)(meta_time / 1000000000.0 + 0.5);
