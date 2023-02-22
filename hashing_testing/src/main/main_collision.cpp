@@ -15,14 +15,14 @@
 #include "../operator/physical/group_count/avx512_group_count_soa_conflict_v1.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_conflict_v2.hpp"
 
-
 #include "datagen.hpp"
 #include "hash_function.hpp"
 
 // TODO
 // p2 data generaiton
-// more hashing functions (in arbeit)
-// collisions with 16 x 32bit elements or 8 x 64bit
+// TVL integration!
+// rethink how different collisions could be passed to the given test. ATM: hard coded in the testX functions.
+// documentation
 
 enum Algorithm{
     SCALAR_GROUP_COUNT, 
@@ -34,80 +34,104 @@ enum Algorithm{
     AVX512_GROUP_COUNT_SOA_CONFLICT_V2
 };
 
-
+/// @brief creates a new instance of Group_count.
+/// @tparam T the data type for the execution
+/// @param run the instance of the Group_count. If not nullptr then it gets deleted
+/// @param test the algorithm that shall be created
+/// @param HSIZE the hash table size for the algorithm
+/// @param function the hash function that shall be used
 template <typename T>
-void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (*function)(T, size_t)){
-    if(run != nullptr){
-        delete run;
-        run = nullptr;
-    }
+void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (*function)(T, size_t));
 
-    switch(test){
-        case Algorithm::SCALAR_GROUP_COUNT:
-            run = new Scalar_group_count<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
-            run = new AVX512_group_count_SoA_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_V2:
-            run = new AVX512_group_count_SoA_v2<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_V3:
-            run = new AVX512_group_count_SoA_v3<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
-            run = new AVX512_group_count_SoAoV_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
-            run = new AVX512_group_count_SoA_conflict_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2:
-            run = new AVX512_group_count_SoA_conflict_v2<T>(HSIZE, function);
-            break;
-        default:
-            throw std::runtime_error("One of the Algorithms isn't supported yet!");
-    }
-}
+//--------------------------------------------
+//validation function
+//--------------------------------------------
 
-//---------------------------------------
-//validation functions
-//---------------------------------------
-
+/// @brief Checks the given execution of the algorithm against a baseline
+/// @tparam T the data type on which the algorithm was executed
+/// @param grouping the algorithm in question
+/// @param validation_baseline the baseline execution
+/// @param validation_size the size of the hash table of the validation_baseline
+/// @return 
 template <typename T> 
 bool validation(Group_count<T>* grouping, Scalar_group_count<T>* validation_baseline, size_t validation_size);
 
-//---------------------------------------
-// benchmark functions
-//---------------------------------------
+//--------------------------------------------
+// Time and Run functions for one Benchmark
+//--------------------------------------------
 
+/// @brief Executes the hash function and collecting performance data and checks if the given algorithm has the same result as the Scalar Group Count algorithm 
+/// @tparam T the data type on which the algorithm shall be executed
+/// @param group_count The algorithm (group_count operation) that shall be executed.
+/// @param data The data on which the operation shall be evaluated
+/// @param data_size 
+/// @param validation_baseline the Scalar Group Count execution. It must have been executed on the same data before hand.
+/// @param validation_size the hash table size of the validation
+/// @param validate if the given execution shall be checked for errors
+/// @param cleanup true if group_count should be delete when the benchmark is finished. 
+/// @param reset true if the hash table and count table shall be cleared again
+/// @return the time the execution took in nano seconds
 template <typename T>
-size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, Scalar_group_count<T>*& validation_baseline, size_t validation_size, bool validate = true, bool cleanup = true);
-template <typename T>
-size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cleanup = false, bool reset = true); // without validation
+size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, Scalar_group_count<T>*& validation_baseline, size_t validation_size, bool validate = true, bool cleanup = false, bool reset = true);
 
+/// @brief Executes the hash function and collecting performance data. 
+/// @tparam T the data type on which the algorithm shall be executed
+/// @param group_count The algorithm (group_count operation) that shall be executed.
+/// @param data The data on which the operation shall be evaluated
+/// @param data_size 
+/// @param cleanup true if group_count should be delete when the benchmark is finished. 
+/// @param reset true if the hash table and count table shall be cleared again
+/// @return the time the execution took in nano seconds
+template <typename T>
+size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cleanup = false, bool reset = true);
+
+/// @brief creates a time point now
+/// @return current time point
 std::chrono::high_resolution_clock::time_point time_now();
 
+/// @brief calculates the time differeance between two time points
+/// @param begin starting time point
+/// @param end end time point
+/// @return time between the given time points in nano seconds
 uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end);
 
-//---------------------------------------
+//--------------------------------------------
 // output functions
-//---------------------------------------
+//--------------------------------------------
 
+/// @brief creates a new empty file with the given namen. important an already existing file might be overwritten
+/// @param filename the name of the file that shall be created
 void create_result_file(std::string filename);
 
-void write_to_file( std::string filename, //string
-    std::string alg_identification, //string
-    // benchmark time
-    uint64_t time, //size_t or uint64_t
-    // config
-    size_t data_size,   // size_t 
+/// @brief Writes all the necessary information about one benchmark run into a file
+/// @param filename the name of the file
+/// @param alg_identification the name of the algorithm ( can be optained using identify() )
+/// @param time how long the execution took in ns
+/// @param data_size how much data was processed
+/// @param bytes how many bytes the base data type had
+/// @param distinct_value_count how many distinct values were used during the computation
+/// @param scale the scaleing factor for the hash table
+/// @param HSIZE the real hash table size
+/// @param hash_function_enum the enum for the hash function
+/// @param seed which datageneration seed was used
+/// @param rsd the run id with the same configuration
+/// @param config_collision_count how many collision groups where plant
+/// @param config_collition_size how big these collisions were
+/// @param conig_cluster_count how many cluster were plant
+/// @param config_cluster_size how big theses cluster were
+/// @param config_id a general id that combines all 4 values with loss
+void write_to_file( 
+    std::string filename, 
+    std::string alg_identification, 
+    uint64_t time, 
+    size_t data_size,
     size_t bytes,
-    size_t distinct_value_count, // size_t 
-    float scale, // Scaleing factor for Hash Table double/float
-    size_t HSIZE, // HASH Table Size size_t 
-    HashFunction hash_function_enum, // hash function index size_t 
-    size_t seed, // Datageneration seed COULD BE REPLACED BY ANNOTHER ID BUT!  size_t 
-    size_t rsd, // run id (same config with same runs) size_t 
+    size_t distinct_value_count, 
+    float scale, 
+    size_t HSIZE, 
+    HashFunction hash_function_enum, 
+    size_t seed, 
+    size_t rsd, 
     size_t config_collision_count,
     size_t config_collition_size,
     size_t conig_cluster_count,
@@ -115,75 +139,53 @@ void write_to_file( std::string filename, //string
     size_t config_id
 );
 
-void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin){
-    runs_done++;
-    std::chrono::high_resolution_clock::time_point time_end;
-    uint32_t current_percentage = (runs_done * 100) / total_runs;
-    if(current_percentage >= percentage_done + percentage_print){
-        while(current_percentage > percentage_done + percentage_print){
-            percentage_done += percentage_print;
-        }
+/// @brief Prints to the console how long the benchmark already runs, and gives an estimation on how long it will keep on running
+/// @param runs_done how many iterations are done already (will be changed by this function!)
+/// @param total_runs how many iterations there are in total 
+/// @param percentage_done how many percent of the benchmark are already done (will be changed by this function!)
+/// @param percentage_print at what percentage intervals the msg should be displayed
+/// @param time_begin the starting time of the benchmark
+void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin);
 
-        time_end = time_now();
-        size_t meta_time = duration_time(time_begin, time_end);
-        size_t meta_time_sec = (size_t)(meta_time / 1000000000.0 + 0.5);
-        double work_done = (runs_done * 1. / total_runs);
+//--------------------------------------------
+// Benchmark Execution and Testing Functions
+//--------------------------------------------
 
-        size_t meta_time_min = (size_t)(meta_time_sec / 60.0 + 0.5);
-        size_t meta_time_left = (size_t)(meta_time_sec / work_done * (1 - work_done));
-        if(meta_time_sec < 60){
-            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_sec << " sec. Approx time left:\t" ;
-        }else{
-            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_min << " min. Approx time left:\t" ;
-        }
-        if(meta_time_left < 60){
-            std::cout << meta_time_left << " sec" << std::endl;
-        }else{
-            meta_time_left = (size_t)(meta_time_left / 60.0 + 0.5);
-            std::cout << meta_time_left << " min" << std::endl;
-        }
-    }
-}
-
-
-//---------------------------------------
-// MAIN!
-//---------------------------------------
+/// @brief Executes a the given algorithms with the given functions a number of times. Uses generate_data_p0 to generate the data and uses different scaleing factors
+/// @tparam T  the datatype with which the test shall be executed
+/// @param data_size how large the table that gets agregated shall be
+/// @param distinct_value_count of how many distinct values the table should be composed of
+/// @param algorithms_undertest the different algorithms that shall be benchmarked
+/// @param algorithms_undertest_size 
+/// @param functions_to_test the different hash functions that shall be used during the benchmark
+/// @param all_hash_functions_size 
+/// @return 0
 template <typename T> 
 int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size);
+/// @brief Executes a the given algorithms with the given functions a number of times. Uses generate_data_p1 to generate the data
+/// @tparam T the datatype with which the test shall be executed
+/// @param data_size how large the table that gets agregated shall be
+/// @param distinct_value_count of how many distinct values the table should be composed of
+/// @param algorithms_undertest the different algorithms that shall be benchmarked
+/// @param algorithms_undertest_size 
+/// @param functions_to_test the different hash functions that shall be used during the benchmark
+/// @param all_hash_functions_size 
+/// @return -1 if one of the given configuration can't be used. 0 otherwise
 template <typename T> 
 int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size);
-
+/// @brief Test if the given Algorithm with the given HashFunction works correctly
+/// @tparam T type for the execution
+/// @param data_size how much data should be used to test the given Algorithm
+/// @param distinct_value_count how many distinct values should be used
+/// @param algorithms_undertest Algorithm to be tested
+/// @param hash_function_enum HashFunction that shall be used
 template <typename T> 
-int alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algorithms_undertest, size_t (*hash_function)(T, size_t)){
-    size_t noise_id = 1;
-    //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
-    srand(std::time(nullptr));
-    noise_id = std::rand();
-
-    size_t seed = noise(noise_id++, 0);
-    size_t HSIZE = distinct_value_count * 1.5;
-    //run variables
-    T* data = (T*) aligned_alloc(64, data_size * sizeof(T)); // alternative
-    Group_count<T> *alg = nullptr;
-    getGroupCount(alg, algorithms_undertest, HSIZE, hash_function);
-    Scalar_group_count<T> *val = new Scalar_group_count<T>(HSIZE, hash_function);
-
-    generate_data_p0<T>( // the seed is for rdd the run id
-        data, data_size, distinct_value_count, hash_function, 
-        2, (distinct_value_count/16)+2, seed
-    );
-    alg->create_hash_table(data, data_size);
-    std::cout << alg->identify() << std::endl;
-    val->create_hash_table(data, data_size);
-
-    validation(alg, val, HSIZE);
-
-    
-    return 0;
-}
+void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algorithms_undertest, HashFunction hash_function_enum = HashFunction::MULITPLY_SHIFT);
 
 
+//--------------------------------------------
+// MAIN!
+//--------------------------------------------
 
 //meta benchmark info!
 using ps_type = uint32_t; 
@@ -223,11 +225,10 @@ int main(int argc, char** argv){
 
 }
 
-//---------------------------------------
-// benchmark functions
-//---------------------------------------
+//--------------------------------------------
+// Benchmark Execution and Testing Functions
+//--------------------------------------------
 
-//should use p0 for data gen since we just place the data into memory. important note is that cluster is not a meaningfull metric for that placement since p0 generates for distinct data.
 template <typename T> 
 int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size){
     size_t noise_id = 1;
@@ -339,7 +340,6 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 }
 
 
-//test different "perfect" layouts against each other. "SHORT TEST"
 template <typename T> 
 int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size){
     size_t noise_id = 1;
@@ -361,7 +361,6 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     HSIZE = (HSIZE + elements - 1);
     HSIZE /= elements;
     HSIZE *= elements;
-
 
     size_t collision_count[] = {8, 8, 128, 0, 0};
     size_t cluster_count[] = {0, 8, 0, 1, 128};
@@ -385,10 +384,8 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
         return -1;
     }
     
-
     size_t total_configs = configuration_count * all_hash_functions_size * repeats_different_data * algorithms_undertest_size;
     size_t total_runs = repeats_same_data * total_configs; 
-
 
     double percentage_print = 2.5;
     double percentage_done = -percentage_print;
@@ -469,14 +466,41 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 }
 
 
-/// @brief Executes the hash function and collecting performance Data. 
-/// @tparam T 
-/// @param group_count The group_count operation that shall be executed.
-/// @param data The data on which the operation shall be evaluated
-/// @param data_size 
-/// @param validation_baseline annother run of the scalar algorithm to compare the results.
-/// @param validation_size the hash table size of the validation_baseline
-/// @param cleanup true if group_count should be delete when the benchmark is finished. 
+template <typename T> 
+void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algorithms_undertest, HashFunction hash_function_enum){
+
+    size_t noise_id = 1;
+    //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
+    srand(std::time(nullptr));
+    noise_id = std::rand();
+
+    size_t seed = noise(noise_id++, 0);
+    size_t HSIZE = distinct_value_count * 1.5;
+    //run variables
+    T* data = (T*) aligned_alloc(64, data_size * sizeof(T)); // alternative
+    Group_count<T> *alg = nullptr;
+
+    hash_fptr<T> hash_function = get_hash_function<T>(hash_function_enum);
+    
+    getGroupCount(alg, algorithms_undertest, HSIZE, hash_function);
+    Scalar_group_count<T> *val = new Scalar_group_count<T>(HSIZE, hash_function);
+
+    generate_data_p0<T>( // the seed is for rdd the run id
+        data, data_size, distinct_value_count, hash_function, 
+        2, (distinct_value_count/16)+2, seed
+    );
+    alg->create_hash_table(data, data_size);
+    std::cout << alg->identify() << std::endl;
+    val->create_hash_table(data, data_size);
+
+    validation(alg, val, HSIZE);
+}
+
+//--------------------------------------------
+// Time and Run functions for one Benchmark
+//--------------------------------------------
+
+
 template <typename T>
 size_t run_test(Group_count<T>*& group_count, T*& data, size_t data_size, Scalar_group_count<T>* validation_baseline, size_t validation_size, bool validate, bool cleanup, bool reset){
     uint64_t duration = run_test(group_count, data, data_size, false, false); 
@@ -493,12 +517,6 @@ size_t run_test(Group_count<T>*& group_count, T*& data, size_t data_size, Scalar
     return duration;
 }
 
-/// @brief Executes the hash function and collecting performance Data. 
-/// @tparam T 
-/// @param group_count The group_count operation that shall be executed.
-/// @param data The data on which the operation shall be evaluated
-/// @param data_size 
-/// @param cleanup true if group_count should be delete when the benchmark is finished. 
 template <typename T>
 size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cleanup, bool reset){
     std::chrono::high_resolution_clock::time_point time_begin, time_end;
@@ -520,19 +538,18 @@ size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cl
     return duration;
 }
 
-/*
-    creates a time point
-*/
 std::chrono::high_resolution_clock::time_point time_now(){
     return std::chrono::high_resolution_clock::now();
 }
 
-/*
-    gives the time between begin and end in nanoseconds
-*/
 uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end){
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
 }
+
+
+//--------------------------------------------
+//validation function
+//--------------------------------------------
 
 template <typename T> 
 bool validation(Group_count<T>* grouping, Scalar_group_count<T> *validation_baseline, size_t validation_size){
@@ -565,9 +582,9 @@ bool validation(Group_count<T>* grouping, Scalar_group_count<T> *validation_base
     return nr_of_errors != 0;
 }
 
-//---------------------------------------
+//--------------------------------------------
 // output functions
-//---------------------------------------
+//--------------------------------------------
 
 void create_result_file(std::string filename){
     std::ofstream myfile;
@@ -614,5 +631,73 @@ void write_to_file( std::string filename, //string
         myfile.close();
     } else {
         throw std::runtime_error("Could not open file to write results!");
+    }
+}
+
+void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin){
+    runs_done++;
+    std::chrono::high_resolution_clock::time_point time_end;
+    uint32_t current_percentage = (runs_done * 100) / total_runs;
+    if(current_percentage >= percentage_done + percentage_print){
+        while(current_percentage > percentage_done + percentage_print){
+            percentage_done += percentage_print;
+        }
+
+        time_end = time_now();
+        size_t meta_time = duration_time(time_begin, time_end);
+        size_t meta_time_sec = (size_t)(meta_time / 1000000000.0 + 0.5);
+        double work_done = (runs_done * 1. / total_runs);
+
+        size_t meta_time_min = (size_t)(meta_time_sec / 60.0 + 0.5);
+        size_t meta_time_left = (size_t)(meta_time_sec / work_done * (1 - work_done));
+        if(meta_time_sec < 60){
+            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_sec << " sec. Approx time left:\t" ;
+        }else{
+            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_min << " min. Approx time left:\t" ;
+        }
+        if(meta_time_left < 60){
+            std::cout << meta_time_left << " sec" << std::endl;
+        }else{
+            meta_time_left = (size_t)(meta_time_left / 60.0 + 0.5);
+            std::cout << meta_time_left << " min" << std::endl;
+        }
+    }
+}
+
+//--------------------------------------------
+// other functions
+//--------------------------------------------
+
+template <typename T>
+void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (*function)(T, size_t)){
+    if(run != nullptr){
+        delete run;
+        run = nullptr;
+    }
+
+    switch(test){
+        case Algorithm::SCALAR_GROUP_COUNT:
+            run = new Scalar_group_count<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
+            run = new AVX512_group_count_SoA_v1<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_SOA_V2:
+            run = new AVX512_group_count_SoA_v2<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_SOA_V3:
+            run = new AVX512_group_count_SoA_v3<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
+            run = new AVX512_group_count_SoAoV_v1<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
+            run = new AVX512_group_count_SoA_conflict_v1<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2:
+            run = new AVX512_group_count_SoA_conflict_v2<T>(HSIZE, function);
+            break;
+        default:
+            throw std::runtime_error("One of the Algorithms isn't supported yet!");
     }
 }
