@@ -402,6 +402,7 @@ void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& data) {
 ////////////////////////////////////////////////////////////////////////////
 
 /**	#18
+* Old function - Functionality not compatible with parallel utilization of all 4 memory controllers!
 * Own function to load 16/32/48/64 elements (= complete CL (register)) in one clock cycle from input array
 */
 template<typename T, int B>
@@ -414,13 +415,37 @@ fpvec<T,B> load(T* p, int i_cnt) {
     return reg;
 }
 
+/**	#19
+* Own function to load 4*512bit (2048bit, 256 byte) (= complete CL (register)) in one clock cycle from input array
+* Load complete CL (register) in one clock cycle (same for PCIe and DDR4) 
+* Function is based on the approach of parallel load with all 4 memory controller 
+*/
+template<typename T, int B>
+fpvec<T,B> maxLoad_per_clock_cycle(T* input, int i_cnt, size_t kNumLSUs, size_t kValuesPerLSU, const Type elementCount) {
+	auto reg = fpvec<T,B> {};
+	const int i_cnt_const = i_cnt;
+	#pragma unroll
+	for (size_t l = 0; l < kNumLSUs; l++) {
+		#pragma unroll
+		for (size_t k = 0; k < kValuesPerLSU; k++) {
+					
+			const int idx = (i_cnt_const*elementCount)
+							+ (l*kValuesPerLSU)
+							+ k;
+
+			reg.elements[l*kValuesPerLSU+k] = input[idx];
+		}
+	}	
+    return reg;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////// New functions to calculate overflow -  independant of elementCount //////////
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-/**	#19
+/**	#20
 * Own function to create the overflow_correction_mask
 */
 template<typename T, int B>
@@ -441,7 +466,7 @@ fpvec<T,B> createOverflowCorrectionMask(T oferflowUnsigned) {
 	return reg;
 } 
 
-/**	#20
+/**	#21
 * Own function to create the cutlow_mask
 */
 template<typename T, int B>

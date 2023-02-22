@@ -131,8 +131,11 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		#pragma nounroll
 		for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
-			// Load complete CL (register) in one clock cycle
-			dataVec = load<Type, regSize>(input, i_cnt);
+			// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
+			// dataVec = load<Type, regSize>(input, i_cnt);	
+
+			// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+			dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
 
 			/**
 			* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -289,8 +292,12 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
-				// Load complete CL (register) in one clock cycle
-				dataVec = load<Type, regSize>(input, i_cnt);
+				
+				// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
+				// dataVec = load<Type, regSize>(input, i_cnt);	
+
+				// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+				dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
 
 				/**
 				* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -477,8 +484,12 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
-				// Load complete CL (register) in one clock cycle
-				dataVec = load<Type, regSize>(input, i_cnt);
+				
+				// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
+				// dataVec = load<Type, regSize>(input, i_cnt);	
+
+				// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+				dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
 
 				/**
 				* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -488,7 +499,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				#pragma nounroll
 				while (p < elementCount) {
 
-					// load (regSize/sizeof(Type)) input values --> use the 16 elements of dataVec	/// !! change compared to the serial implementation !!
+					// load #elementCount input values --> use the #elementCount elements of dataVec	/// !! change compared to the serial implementation !!
 					fpvec<Type, regSize> iValues = dataVec;
 
 					//iterate over the input values
