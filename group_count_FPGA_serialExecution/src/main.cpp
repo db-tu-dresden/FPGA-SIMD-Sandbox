@@ -150,7 +150,7 @@ int  main(int argc, char** argv){
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
-        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA Variant v1:"<<std::endl;
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
@@ -199,7 +199,7 @@ int  main(int argc, char** argv){
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
-        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 2:"<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA Variant v2:"<<std::endl;
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
@@ -248,7 +248,7 @@ int  main(int argc, char** argv){
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
-        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 3:"<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA Variant v3:"<<std::endl;
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
