@@ -22,7 +22,16 @@
 #include "primitives.hpp"
 
 #include "lib/lib.hpp"
-
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//	OVERVIEW about functions in kernel.cpp
+//
+//	LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA function v1 -  without aligned_start; version descbribed in paper
+// 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
+//	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
+//	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - 
+// 	LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5 - 
+// 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -45,10 +54,9 @@
 #define DDR_INTERLEAVED_CHUNK_SIZE 4096 // bytes
 #endif
 
-constexpr size_t kDDRChannels = DDR_CHANNELS;
-constexpr size_t kDDRWidth = DDR_WIDTH;
-constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
-// constexpr size_t kPCIeWidth = PCIE_WIDTH;
+constexpr size_t kDDRChannels = DDR_CHANNELS;		
+constexpr size_t kDDRWidth = DDR_WIDTH;				
+// constexpr size_t kPCIeWidth = PCIE_WIDTH;	// currently not used
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,46 +75,37 @@ class kernelV3;
  * @param arr_d the input data array
  * @param hashVec_d store value of k at position hashx(k)
  * @param countVec_d store the count of occurence of k at position hashx(k)
- * @param out_d
  * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
- * @param size 
  */
-void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, long *out_d, uint64_t dataSize, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(int) == 0);
-	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
 
-	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(int);
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(int);
-	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
-
-	constexpr size_t kNumLSUs = kDDRChannels;
-	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
 	
-	// ensure size is nice
-	assert(size % kValuesPerInterleavedChunk == 0);
-	assert(size % kNumLSUs == 0);
+	// recalculate iterations, because we must ierate through all data lines of input array
+	// the input array contains dataSize lines 
+	// per cycle we can load #(regSize/sizeof(Type)) elements
+	// !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	const size_t iterations =  loops;
 
-	size_t total_chunks = size / kValuesPerInterleavedChunk;
-	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	size_t iterations = chunks_per_lsu * kIterationsPerChunk; 
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
 
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
-	assert((regSize == 64) || (regSize == 128) || (regSize == 256));
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
-
-// recalculate iterations, because we must ierate through all data lines of input array.
-// the input array contains dataSize lines 
-// per cycle we can load #(regSize/sizeof(Type)) elements
-// !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
-	iterations =  loops;
-	assert(dataSize % elementCount == 0);
 
 	q.submit([&](handler& h) {
 		h.single_task<kernelV1>([=]() [[intel::kernel_args_restrict]] {
@@ -114,7 +113,6 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		device_ptr<Type> input(arr_d);
 		device_ptr<Type> hashVec(hashVec_d);
 		device_ptr<Type> countVec(countVec_d);
-		device_ptr<long> out(out_d);
 
 		////////////////////////////////////////////////////////////////////////////////
 		//// declare some basic masks and arrays
@@ -125,8 +123,6 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		fpvec<Type, regSize> zeroMask = set1<Type, regSize>(zero);
 		////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////
-
-		out[0] = 0;
 
 		// define dataVec register
 		fpvec<Type, regSize> dataVec;
@@ -239,48 +235,37 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
  * @param arr_d the input data array
  * @param hashVec_d store value of k at position hashx(k)
  * @param countVec_d store the count of occurence of k at position hashx(k)
- * @param out_d
  * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
- * @param size 
  */
-void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, long *out_d, uint64_t dataSize, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(int) == 0);
-	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
 
-	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(int);
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(int);
-	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
-
-	constexpr size_t kNumLSUs = kDDRChannels;
-	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
 	
-	// ensure size is nice
-	assert(size % kValuesPerInterleavedChunk == 0);
-	assert(size % kNumLSUs == 0);
+	// recalculate iterations, because we must ierate through all data lines of input array
+	// the input array contains dataSize lines 
+	// per cycle we can load #(regSize/sizeof(Type)) elements
+	// !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	const size_t iterations =  loops;
 
-	size_t total_chunks = size / kValuesPerInterleavedChunk;
-	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	size_t iterations = chunks_per_lsu * kIterationsPerChunk; 
-	
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
+
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
-	assert((regSize == 64) || (regSize == 128) || (regSize == 256));
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
-
-// recalculate iterations, because we must ierate through all data lines of input array.
-// the input array contains dataSize lines 
-// per cycle we can load #(regSize/sizeof(Type)) elements
-// !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
-	iterations =  loops;
-	assert(dataSize % elementCount == 0);
 
 	q.submit([&](handler& h) {
 		h.single_task<kernelV2>([=]() [[intel::kernel_args_restrict]] {
@@ -288,7 +273,6 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			device_ptr<Type> input(arr_d);
 			device_ptr<Type> hashVec(hashVec_d);
 			device_ptr<Type> countVec(countVec_d);
-			device_ptr<long> out(out_d);
 
 			////////////////////////////////////////////////////////////////////////////////
 			//// declare some basic masks and arrays
@@ -298,8 +282,6 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<Type, regSize> zeroMask = set1<Type, regSize>(zero);
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
-
-		out[0] = 0;
 
 			// define dataVec register
 			fpvec<Type, regSize> dataVec;
@@ -441,48 +423,37 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
  * @param arr_d the input data array
  * @param hashVec_d store value of k at position hashx(k)
  * @param countVec_d store the count of occurence of k at position hashx(k)
- * @param out_d
  * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
- * @param size 
  */
-void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, long *out_d, uint64_t dataSize, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(int) == 0);
-	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
 
-	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(int);
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(int);
-	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
-
-	constexpr size_t kNumLSUs = kDDRChannels;
-	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
 	
-	// ensure size is nice
-	assert(size % kValuesPerInterleavedChunk == 0);
-	assert(size % kNumLSUs == 0);
+	// recalculate iterations, because we must ierate through all data lines of input array
+	// the input array contains dataSize lines 
+	// per cycle we can load #(regSize/sizeof(Type)) elements
+	// !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	const size_t iterations =  loops;
 
-	size_t total_chunks = size / kValuesPerInterleavedChunk;
-	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	size_t iterations = chunks_per_lsu * kIterationsPerChunk; 
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
 
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
-	assert((regSize == 64) || (regSize == 128) || (regSize == 256));
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
-
-// recalculate iterations, because we must ierate through all data lines of input array.
-// the input array contains dataSize lines 
-// per cycle we can load #(regSize/sizeof(Type)) elements
-// !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
-	iterations =  loops;
-	assert(dataSize % elementCount == 0);
 
 	q.submit([&](handler& h) {
 		h.single_task<kernelV3>([=]() [[intel::kernel_args_restrict]] {
@@ -490,7 +461,6 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			device_ptr<Type> input(arr_d);
 			device_ptr<Type> hashVec(hashVec_d);
 			device_ptr<Type> countVec(countVec_d);
-			device_ptr<long> out(out_d);
 
 			////////////////////////////////////////////////////////////////////////////////
 			//// declare some basic masks and arrays
@@ -500,8 +470,6 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<Type, regSize> zeroMask = set1<Type, regSize>(zero);
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
-
-		out[0] = 0;
 
 			// define dataVec register
 			fpvec<Type, regSize> dataVec;

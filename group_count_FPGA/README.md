@@ -93,6 +93,13 @@ FIX FOR ENV-ERROR WHILE COMPILING "Error: Failed to open quartus_sh_compile.log"
 (b) `./main.fpga`
 
 
+## overview about functions in kernel.cpp
+-	LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA function v1 -  without aligned_start; version descbribed in paper
+- 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
+-	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
+-	LinearProbingFPGA_variant4() == SoAoV_v1
+- 	LinearProbingFPGA_variant5() == SoA_conflict_v1
+
 
 
 ## List of all needed Intel intrinsics
@@ -127,3 +134,4 @@ FIX FOR ENV-ERROR WHILE COMPILING "Error: Failed to open quartus_sh_compile.log"
 | 16 | int | __builtin_ctz() | (unsigned int x) | v1, v2, v3 | #15 ctz_onceBultin() |
 
 --> _mm512_maskz_loadu_epi32() and _mm512_mask_loadu_epi32() are combined in only one function: #5 mask_loadu() 
+--> Currently used intrinsics have been continuously expanded, see functional description in primitives.hppo

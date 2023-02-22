@@ -67,13 +67,7 @@ using namespace std::chrono;
 #define DDR_INTERLEAVED_CHUNK_SIZE 4096 // bytes
 #endif
 
-//// parameter is currently not used
-// constexpr size_t kDDRChannels = DDR_CHANNELS;
-//// parameter is currently not used
-// constexpr size_t kDDRWidth = DDR_WIDTH;
 constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
-//// parameter is currently not used
-// constexpr size_t kPCIeWidth = PCIE_WIDTH;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,14 +119,13 @@ int  main(int argc, char** argv){
 	} else {
 		size = atoi(argv[1]);
 	}
-//  printf("Vector length: %zd \n", size);
 
     // print global settings
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"============= Program Start =================="<<std::endl; 
     std::cout <<"=============================================="<<std::endl;    
-     std::cout << "Global configuration:"<<  std::endl;
-     std::cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< std::endl;
+    std::cout << "Global configuration:"<<  std::endl;
+    std::cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< std::endl;
     // print hashsize of current settings
     std::cout << "Configured HSIZE : " << HSIZE << std::endl;
     std::cout << "Configured DATATYPE within registers : " << typeid(Type).name() << std::endl;
@@ -143,7 +136,6 @@ int  main(int argc, char** argv){
     Type *arr_h, *arr_d; 
     Type *hashVec_h, *hashVec_d;
     Type *countVec_h, *countVec_d;
-    long *out_h, *out_d;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,27 +143,10 @@ int  main(int argc, char** argv){
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
 	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 1 ### \n\n");
-	size_t number_CL_buckets = 0;
-    size_t number_CL = 0;
-	
-	if(size % (4096) == 0) {
-		number_CL_buckets = size / (4096);
-	} else {
-		number_CL_buckets = size / (4096) + 1;
-	}
-	
-    number_CL = number_CL_buckets * (4096/16);
-    
-//	printf("Number CL buckets: %zd \n", number_CL_buckets);
-//  printf("Number CLs: %zd \n", number_CL);
 
     // Host buffer 
     if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
-        std::terminate();
-    }
-    if ((out_h = malloc_host<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_h'\n";
         std::terminate();
     }
     if ((hashVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -186,10 +161,6 @@ int  main(int argc, char** argv){
     // Device buffer  
     if ((arr_d = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
-        std::terminate();
-    }
-    if ((out_d = malloc_device<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_d'\n";
         std::terminate();
     }
     if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -237,11 +208,11 @@ int  main(int argc, char** argv){
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
-        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 1:"<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA Variant v1:"<<std::endl;
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE);
 
         // Re-Initialize HashMap after dummy run
         initializeHashMap(hashVec_h,countVec_h,HSIZE);
@@ -252,7 +223,7 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v1 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant1(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE);
         auto end_v1 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v1 = end_v1 - begin_v1;
 
@@ -267,8 +238,6 @@ int  main(int argc, char** argv){
     }   
 
     // Copy output device buffer to output host buffer 
-    q.memcpy(out_h, out_d, 8);
-    q.wait();  
     q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(uint32_t));
     q.wait();  
     q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(uint32_t));
@@ -276,7 +245,6 @@ int  main(int argc, char** argv){
     
 
     std::cout << "Value in variable dataSize: " << dataSize << std::endl;
-    std::cout << "Result value in out_h[0]: " << out_h[0] << std::endl;
     std::cout<< " " <<std::endl;
 
     // check result for correctness
@@ -288,12 +256,10 @@ int  main(int argc, char** argv){
     sycl::free(arr_h, q);
     sycl::free(hashVec_h, q);
     sycl::free(countVec_h, q);
-    sycl::free(out_h, q);
     
     sycl::free(arr_d, q);
     sycl::free(hashVec_d, q);
     sycl::free(countVec_d, q);
-    sycl::free(out_d, q);
     
 
     // print result
@@ -314,25 +280,10 @@ int  main(int argc, char** argv){
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
 	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 2 ### \n\n");
-
-    /**                 unused - @TODO : adjust and use  
-	if(size % (4096) == 0) {
-		number_CL_buckets = size / (4096);
-	} else {
-		number_CL_buckets = size / (4096) + 1;
-	}
-    number_CL = number_CL_buckets * (4096/16);
-    */
-//	printf("Number CL buckets: %zd \n", number_CL_buckets);
-//  printf("Number CLs: %zd \n", number_CL);
-  
+ 
     // Host buffer 
     if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
-        std::terminate();
-    }
-    if ((out_h = malloc_host<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_h'\n";
         std::terminate();
     }
     if ((hashVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -347,10 +298,6 @@ int  main(int argc, char** argv){
     // Device buffer  
     if ((arr_d = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
-        std::terminate();
-    }
-    if ((out_d = malloc_device<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_d'\n";
         std::terminate();
     }
     if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -398,11 +345,11 @@ int  main(int argc, char** argv){
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
-        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 2:"<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA Variant v2:"<<std::endl;
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant2(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant2(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE);
     	
         // Re-Initialize HashMap after dummy run
         initializeHashMap(hashVec_h,countVec_h,HSIZE);
@@ -413,7 +360,7 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v2 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant2(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant2(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE);
         auto end_v2 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v2 = end_v2 - begin_v2;
 
@@ -427,9 +374,7 @@ int  main(int argc, char** argv){
         std::terminate();
     }   
 
-    // Copy output device buffer to output host buffer 
-    q.memcpy(out_h, out_d, 8);
-    q.wait();  
+    // Copy output device buffer to output host buffer  
     q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(uint32_t));
     q.wait();  
     q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(uint32_t));
@@ -437,7 +382,6 @@ int  main(int argc, char** argv){
     
 
     std::cout << "Value in variable dataSize: " << dataSize << std::endl;
-    std::cout << "Result value in out_h[0]: " << out_h[0] << std::endl;
     std::cout<< " " <<std::endl;
 
     // check result for correctness
@@ -449,13 +393,10 @@ int  main(int argc, char** argv){
     sycl::free(arr_h, q);
     sycl::free(hashVec_h, q);
     sycl::free(countVec_h, q);
-    sycl::free(out_h, q);
     
     sycl::free(arr_d, q);
     sycl::free(hashVec_d, q);
-    sycl::free(countVec_d, q);
-    sycl::free(out_d, q);
-    
+    sycl::free(countVec_d, q);  
 
     // print result
     std::cout << "Final Evaluation of the Throughput: " <<std::endl;
@@ -477,24 +418,9 @@ int  main(int argc, char** argv){
     std::cout <<"=============================================="<<std::endl;
 	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 3 ### \n\n");
 
-    /**                 unused - @TODO : adjust and use  
-	if(size % (4096) == 0) {
-		number_CL_buckets = size / (4096);
-	} else {
-		number_CL_buckets = size / (4096) + 1;
-	}
-    number_CL = number_CL_buckets * (4096/16);
-    */
-//	printf("Number CL buckets: %zd \n", number_CL_buckets);
-//  printf("Number CLs: %zd \n", number_CL);
-  
     // Host buffer 
     if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
-        std::terminate();
-    }
-    if ((out_h = malloc_host<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_h'\n";
         std::terminate();
     }
     if ((hashVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -509,10 +435,6 @@ int  main(int argc, char** argv){
     // Device buffer  
     if ((arr_d = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
-        std::terminate();
-    }
-    if ((out_d = malloc_device<long>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'out_d'\n";
         std::terminate();
     }
     if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
@@ -560,11 +482,11 @@ int  main(int argc, char** argv){
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
-        std::cout <<"Kernel-Start : Linear Probing for FPGA - SIMD Variant 3:"<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA Variant v3:"<<std::endl;
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE);
 
         // Re-Initialize HashMap after dummy run
         initializeHashMap(hashVec_h,countVec_h,HSIZE);
@@ -575,7 +497,7 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v3 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, out_d, dataSize, HSIZE, number_CL*16);
+        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE);
         auto end_v3 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v3 = end_v3 - begin_v3;
 
@@ -590,16 +512,12 @@ int  main(int argc, char** argv){
     }   
 
     // Copy output device buffer to output host buffer 
-    q.memcpy(out_h, out_d, 8);
-    q.wait();  
     q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(uint32_t));
     q.wait();  
     q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(uint32_t));
     q.wait();  
     
-
     std::cout << "Value in variable dataSize: " << dataSize << std::endl;
-    std::cout << "Result value in out_h[0]: " << out_h[0] << std::endl;
     std::cout<< " " <<std::endl;
 
     // check result for correctness
@@ -611,13 +529,10 @@ int  main(int argc, char** argv){
     sycl::free(arr_h, q);
     sycl::free(hashVec_h, q);
     sycl::free(countVec_h, q);
-    sycl::free(out_h, q);
     
     sycl::free(arr_d, q);
     sycl::free(hashVec_d, q);
-    sycl::free(countVec_d, q);
-    sycl::free(out_d, q);
-    
+    sycl::free(countVec_d, q);   
 
     // print result
     std::cout << "Final Evaluation of the Throughput: " <<std::endl;
