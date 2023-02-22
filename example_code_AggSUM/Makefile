@@ -79,7 +79,7 @@ hw: $(SRC) Makefile
 ## ## ## ## ##
 
 hw_a: $(SRC) Makefile
-	icpx -fsycl $(ALL_CXXFLAGS) -v -fPIC -fintelfpga -fsycl-link=image -Xshardware -fsycl-device-code-split=off -Xsprofile -reuse-exe=$(TARGET_KERNEL) -Xsboard=$(BOARD) kernel.cpp lib/lib_sycl.a lib/lib_rtl.a -o $(TARGET_KERNEL) $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L) -Wl,--unresolved-symbols=ignore-all
+	icpx -fsycl $(ALL_CXXFLAGS) -v -fPIC -fintelfpga -fsycl-link=image -Xshardware -fsycl-device-code-split=off -Xsprofile -reuse-exe=$(TARGET_KERNEL) -Xsboard=$(BOARD) kernels.cpp lib/lib_sycl.a lib/lib_rtl.a -o $(TARGET_KERNEL) $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L) -Wl,--unresolved-symbols=ignore-all
 
 
 
