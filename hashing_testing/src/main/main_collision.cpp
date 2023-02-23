@@ -255,8 +255,8 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     create_result_file(file_name);
 
 
-    size_t collision_count[] = {1, 8, 16, distinct_value_count/16, 0};
-    size_t collision_size[] = {distinct_value_count, distinct_value_count/8, distinct_value_count/64, 16, 0};
+    size_t collision_count[] = {1,                    8,                      16,                      distinct_value_count/16, 0};
+    size_t collision_size[] =  {distinct_value_count, distinct_value_count/8, distinct_value_count/64, 16,                      0};
     size_t configuration_count = sizeof(collision_count)/sizeof(collision_count[0]);
 
     float all_scales[] = {1.0f ,1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f};
@@ -268,7 +268,7 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     size_t total_configs = configuration_count * all_hash_functions_size * repeats_different_data * all_scales_size * algorithms_undertest_size;
     size_t total_runs = repeats_same_data * total_configs; 
     
-    double percentage_print = 1;
+    double percentage_print = 0.5;
     double percentage_done = -percentage_print;
     size_t runs_done = 0;
 
@@ -371,10 +371,10 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     HSIZE /= elements;
     HSIZE *= elements;
 
-    size_t collision_count[] = {8, 8, 128, 0, 0};
-    size_t cluster_count[] = {0, 8, 0, 1, 128};
-    size_t collision_size[] = {distinct_value_count/8, distinct_value_count/16, distinct_value_count/128, 0, 0};
-    size_t cluster_size[] = {0, distinct_value_count/8, 0, distinct_value_count, distinct_value_count/128};
+    size_t collision_count[] =  {1,                    8,                      16,                      distinct_value_count/16, 0,                    0};
+    size_t collision_size[] =   {distinct_value_count, distinct_value_count/8, distinct_value_count/64, 16,                      0,                    0};
+    size_t cluster_count[] =    {0,                    0,                      16,                      0,                       1,                    128};
+    size_t cluster_size[] =     {0,                    0,                      distinct_value_count/16, 0,                       distinct_value_count, distinct_value_count/128};
     size_t configuration_count = sizeof(collision_count) / sizeof(collision_count[0]);
 
     //verify and print configurations:
@@ -396,7 +396,7 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     size_t total_configs = configuration_count * all_hash_functions_size * repeats_different_data * algorithms_undertest_size;
     size_t total_runs = repeats_same_data * total_configs; 
 
-    double percentage_print = 2.5;
+    double percentage_print = 1;
     double percentage_done = -percentage_print;
     size_t runs_done = 0;
 
