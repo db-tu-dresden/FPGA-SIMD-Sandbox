@@ -16,7 +16,7 @@ Execution is still serial. The code skeleton for compiling on real FPGA hardware
 -	LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA function v1 -  without aligned_start; version descbribed in paper
 - 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
 -	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
--	LinearProbingFPGA_variant4() == SoAoV_v1
+-	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - use a vector with elements of type <fpvec<Type, regSize> as hash_map structure "around" the registers
 - 	LinearProbingFPGA_variant5() == SoA_conflict_v1
 
 
