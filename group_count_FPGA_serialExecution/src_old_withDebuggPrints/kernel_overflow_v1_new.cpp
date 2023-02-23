@@ -659,3 +659,256 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 //// end of LinearProbingFPGA_variant3()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Variant 4 of a AVX512-based group_count implementation.
+ * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
+ * @param input the input data array
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
+ * @param hashVec store value of k at position hashx(k)
+ * @param countVec store the count of occurence of k at position hashx(k)
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ */
+void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+////////////////////////////////////////////////////////////////////////////////
+//// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
+
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
+
+	const size_t iterations = loops;
+
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
+
+	// ensure global defined regSize is nice
+    // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//// starting point of the logic of the algorithm
+
+    fpvec<Type, 64> oneMask_TMP = set1<Type, 64>(one);
+    fpvec<Type, 64> zeroMask_TMP = set1<Type, 64>(zero);
+/*
+std::cout<<"input"<<std::endl;
+	for(size_t i=0; i<dataSize; i++) {
+		std::cout<<input[i] << "  |  "<<input[i]<<std::endl;
+	}
+*/
+	
+	//// declare the basic hash- and count-map structure for this approach an some function intern variables
+    fpvec<Type, 64>* hash_map;
+    fpvec<Type, 64>* count_map;
+
+	const size_t m_elements_per_vector = (64) / sizeof(Type);					/////// CHANGE TO = elementCount !!
+std::cout<< "result m_elements_per_vector: "<<m_elements_per_vector<<std::endl;
+	const size_t m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;
+std::cout<< "result m_HSIZE_v: "<<m_HSIZE_v<<std::endl;
+	const size_t m_HSIZE = HSIZE;
+ 
+
+    // use a vector with elements of type <fpvec<uint32_t> as structure "around" the registers
+    hash_map = new fpvec<Type, 64>[m_HSIZE_v];
+    count_map = new fpvec<Type, 64>[m_HSIZE_v];
+
+    // loading data. On the first exec this should result in only 0 vals.   
+    for(size_t i = 0; i < m_HSIZE_v; i++){
+        size_t h = i * m_elements_per_vector;
+
+       	hash_map[i] = load_epi32(oneMask_TMP, hashVec, h, m_HSIZE);
+    	count_map[i] = load_epi32(oneMask_TMP, countVec, h, m_HSIZE);
+	}
+
+	/**
+	 * calculate overflow in last register of hash_map and count_map, to prevent errors from storing elements in hash_map[m_HSIZE_v-1] which position within end-result is >HSIZE 
+	 *	
+	 * due to this approach, the hash_map and count_map can have overall more slots than the value of HSIZE
+	 * set value of positions of the last register that "overflows" to a value that is bigger than distinctValues
+	 * These values can't be part of input data array (because positions bigger than HSIZE will not be stored), but will be will be handled as "no match, but position already filled" within the algorithm.
+	 * Since only HSIZE values are stored at the end (back to hashVec and countVec), these values are simply dropped at the end.
+	 */
+	// define variables and register for overflow calculation
+	fpvec<Type, 64> overflow_correction_mask;
+	Type value_bigger_distinctValues;
+	fpvec<Type, 64> value_bigger_distinctValues_mask;
+
+	// caculate overflow and mark positions in last register that will be overflow the value of HSIZE
+	Type oferflowUnsigned = (m_HSIZE_v * m_elements_per_vector) - HSIZE;
+	if (oferflowUnsigned > 0) {
+		overflow_correction_mask = createOverflowCorrectionMask<Type, 64>(oferflowUnsigned);
+		value_bigger_distinctValues = (Type)(distinctValues+7); 	
+		value_bigger_distinctValues_mask = set1<Type, 64>(value_bigger_distinctValues);
+
+		hash_map[m_HSIZE_v-1] = mask_set1(value_bigger_distinctValues_mask, overflow_correction_mask, zero);
+		count_map[m_HSIZE_v-1] = set1<Type, 64>(zero);
+	}
+std::cout<< "oferflowUnsigned: "<<oferflowUnsigned<<std::endl;
+std::cout<< "overflow_correction_mask: "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << overflow_correction_mask.elements[i] << " ";
+}  std::cout<<std::endl;		
+std::cout<< "value_bigger_distinctValues: "<<value_bigger_distinctValues<<std::endl;
+std::cout<< "value_bigger_distinctValues_mask: "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << value_bigger_distinctValues_mask.elements[i] << " ";
+}  std::cout<<std::endl;	
+
+std::cout<< "hash_map[m_HSIZE_v-1]: "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << hash_map[m_HSIZE_v-1].elements[i] << " ";
+}  std::cout<<std::endl;	
+
+
+    // creating writing masks
+	/** CREATING WRITING MASKS
+	 * 
+	 * Following line isn't needed anymore. Instead of zero_cvtu32_mask, please use zeroMask as mask with all 0 and elementCount elements!
+	 * fpvec<uint32_t> zero_cvtu32_mask = cvtu32_mask16((uint32_t)0);	
+	 *
+	 *	old code for creating writing masks:
+     *	std::array<fpvec<uint32_t>, 16> masks {};
+     *	for(uint32_t i = 1; i <= 16; i++){
+     *		masks[i-1] = cvtu32_mask16((uint32_t)(1 << (i-1)));
+	 *	}
+	 *
+	 * new solution is working with (variable) regSize and elementCount per register (e.g. 256 byte and 64 elements per register)
+	 * It generates a matrix of the required size according to the parameters used.  
+	*/
+    std::array<fpvec<Type, 64>, 16> masks {};
+	masks = cvtu32_create_writeMask_Matrix<Type, 64>();
+
+///    
+// ! ATTENTION - changed indizes (compared to the first AVX512 implementation) !
+// mask with only 0 => zero_cvtu32_mask
+// masks = array of 16 masks respectively fpvec<uint32_t> with one 1 at unique positions 
+///	
+
+    int p = 0;
+    while (p < dataSize) {
+        Type inputValue = input[p];
+		Type hash_key = hashx(inputValue,m_HSIZE_v);
+
+        fpvec<Type, 64> broadcastCurrentValue = set1<Type, 64>(inputValue);
+/*
+std::cout<< "=============== NEW ROUND : p = "<<p<<std::endl;		
+std::cout<< "inputValue "<<inputValue<<std::endl;	
+std::cout<< "hash_key "<<hash_key<<std::endl;	
+
+std::cout<< "broadcastCurrentValue register: "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << broadcastCurrentValue.elements[i] << " ";
+}  std::cout<<std::endl;
+*/
+        while(1) {
+/*
+std::cout<< "hash_map[hash_key] - BEFORE:"<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << hash_map[hash_key].elements[i] << " ";
+}  std::cout<<std::endl;	
+std::cout<< "count_map[hash_key] - BEFORE:"<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << count_map[hash_key].elements[i] << " ";
+}  std::cout<<std::endl;		
+*/
+            // compare vector with broadcast value against vector with following elements for equality
+            fpvec<Type, 64> compareRes = cmpeq_epi32_mask(broadcastCurrentValue, hash_map[hash_key]);
+/*
+std::cout<< "compareRes register: "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << compareRes.elements[i] << " ";
+}  std::cout<<std::endl;
+*/
+            // found match
+            if (mask2int(compareRes) != 0) {
+// std::cout<< "found match ! "<<std::endl;				
+                count_map[hash_key] = mask_add_epi32(count_map[hash_key], compareRes, count_map[hash_key], oneMask_TMP);
+
+                p++;
+                break;
+            } else { // no match found
+// std::cout<< "no match found "<<std::endl;					
+                // deterime free position within register
+                fpvec<Type, 64> checkForFreeSpace = cmpeq_epi32_mask(zeroMask_TMP, hash_map[hash_key]);
+/*std::cout<< "checkForFreeSpace register: "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << checkForFreeSpace.elements[i] << " ";
+}  std::cout<<std::endl;	*/			
+                if(mask2int(checkForFreeSpace) != 0) {                // CASE B1   
+//std::cout<< "IF-ZWEIG mask2int(checkForFreeSpace) "<< mask2int(checkForFreeSpace) <<std::endl;				
+
+// old : uint32_t pos = __builtin_ctz(checkForFreeSpace) + 1;
+// --> omit +1, because masks with only 0 at every position is outsourced to zero_cvtu32_mask --> zeroMask is used instead                
+                    Type pos = ctz_onceBultin(checkForFreeSpace);
+// std::cout<< "pos "<< pos <<std::endl;	
+                    //store key
+                    hash_map[hash_key] = mask_set1<Type, 64>(hash_map[hash_key], masks[pos], inputValue);
+                    //set count to one
+                    count_map[hash_key] = mask_set1<Type, 64>(count_map[hash_key], masks[pos], (Type)1);
+/*
+std::cout<< "hash_map[hash_key] "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << hash_map[hash_key].elements[i] << " ";
+}  std::cout<<std::endl;	
+std::cout<< "count_map[hash_key] "<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << count_map[hash_key].elements[i] << " ";
+}  std::cout<<std::endl;						
+*/
+                    p++;
+                    break;
+                }   else    { // CASE B2
+// std::cout<< "ELSE-ZWEIG mask2int(checkForFreeSpace) "<< mask2int(checkForFreeSpace) <<std::endl;				
+                    hash_key = (hash_key + 1) % m_HSIZE_v;
+                }
+            }
+        }
+    }
+/*
+std::cout<< "hash_map[11] - BEFORE:"<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << hash_map[11].elements[i] << " ";
+}  std::cout<<std::endl;	
+std::cout<< "count_map[11] - BEFORE:"<<std::endl;
+for (int i=0; i<(64/sizeof(Type)); i++) {
+		std::cout << count_map[11].elements[i] << " ";
+}  std::cout<<std::endl;	
+*/
+ std::cout<<"============================================================="<<std::endl;	
+ std::cout<<"============== BEFORE STORE ================================="<<std::endl;	
+
+for (int i=0; i<m_HSIZE_v; i++) {
+	std::cout<<"Current line - hash_key = "<<i<<std::endl;	
+	std::cout<< "hash_map["<<i<<"]: ";
+	for (int j=0; j<(64/sizeof(Type)); j++) {
+		std::cout << hash_map[i].elements[j] << " ";
+	}  std::cout<<std::endl;	
+	std::cout<< "count_map["<<i<<"]: ";
+	for (int j=0; j<(64/sizeof(Type)); j++) {
+		std::cout << count_map[i].elements[j] << " ";
+	}  std::cout<<std::endl;	
+}
+
+    //store data
+    for(size_t i = 0; i < m_HSIZE_v; i++){
+		size_t h = i * m_elements_per_vector;
+				
+        store_epi32(hashVec, h, hash_map[i]);
+        store_epi32(countVec, h, count_map[i]);
+    }
+
+/*	std::cout<<"hashVec  |  countVec"<<std::endl;
+	for(size_t i=0; i<HSIZE; i++) {
+		std::cout<<hashVec[i] << "  |  "<<countVec[i]<<std::endl;
+	}
+*/
+}
+//// end of LinearProbingFPGA_variant4()
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////

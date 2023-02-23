@@ -43,3 +43,8 @@ for v2
     - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:233
     - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:322
 
+for v4 
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:666
+    - condition 1 inputValue == 66                                                          // if line 666 is breakpoint 1
+
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:656

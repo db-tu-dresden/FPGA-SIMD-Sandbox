@@ -23,14 +23,18 @@
     static float scale = 1.4;
     static uint64_t HSIZE = distinctValues*scale;
 
-// define datatype which is used within all registers
+    // define datatype which is used within all registers
     using Type = uint32_t;     
     using TypeSigned = int32_t;
 
-// define register-size (in byte), which defines the amount of data that is load within one clock cycle
-// Note: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
-// Note: At the moment, please use ONLY 64, 128 OR 256 byte!! NOT 192!
-    constexpr Type regSize = 256; 
+    /**
+    * define register-size (in byte), which defines the amount of data that is load within one clock cycle
+    * NOTE: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
+    * NOTE: At the moment, please use ONLY 256 byte !
+    * NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+    *           every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+    */
+    constexpr int regSize = 256; 
 
 // DON'T CHANGE!
     const Type loops = (dataSize / (regSize/sizeof(Type)));

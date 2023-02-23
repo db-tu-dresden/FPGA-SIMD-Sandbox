@@ -26,7 +26,7 @@
 //	LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA function v1 -  without aligned_start; version descbribed in paper
 // 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
 //	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
-//	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - 
+//	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - use a vector with elements of type <fpvec<Type, regSize> as hash_map structure "around" the registers
 // 	LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5 - 
 // 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,6 +249,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
 	assert(regSize == 256);
 ////////////////////////////////////////////////////////////////////////////////
+//// starting point of the logic of the algorithm
 
 	// define dataVec register
 	fpvec<Type, regSize> dataVec;
@@ -553,5 +554,184 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	}	
 }
 //// end of LinearProbingFPGA_variant3()
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Variant 4 of a AVX512-based group_count implementation.
+ * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
+ * @param input the input data array
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
+ * @param hashVec store value of k at position hashx(k)
+ * @param countVec store the count of occurence of k at position hashx(k)
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ */
+void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+////////////////////////////////////////////////////////////////////////////////
+//// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
+
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
+
+	const size_t iterations = loops;
+
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
+
+	// ensure global defined regSize is nice
+    // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//// starting point of the logic of the algorithm
+
+	//// declare the basic hash- and count-map structure for this approach an some function intern variables
+    fpvec<Type, regSize>* hash_map;
+    fpvec<Type, regSize>* count_map;
+
+	const size_t m_elements_per_vector = elementCount; 			// should be equivalent to (regSize)/sizeof(Type);		
+	const size_t m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;
+	const size_t m_HSIZE = HSIZE;
+ 
+
+    // use a vector with elements of type <fpvec<uint32_t> as structure "around" the registers
+    hash_map = new fpvec<Type, regSize>[m_HSIZE_v];
+    count_map = new fpvec<Type, regSize>[m_HSIZE_v];
+
+    // loading data. On the first exec this should result in only 0 vals.   
+    for(size_t i = 0; i < m_HSIZE_v; i++){
+        size_t h = i * m_elements_per_vector;
+
+       	hash_map[i] = load_epi32(oneMask, hashVec, h, m_HSIZE);
+    	count_map[i] = load_epi32(oneMask, countVec, h, m_HSIZE);
+	}
+
+	/**
+	 * calculate overflow in last register of hash_map and count_map, to prevent errors from storing elements in hash_map[m_HSIZE_v-1] in positions that are >HSIZE 
+	 *	
+	 * due to this approach, the hash_map and count_map can have overall more slots than the value of HSIZE
+	 * set value of positions of the last register that "overflows" to a value that is bigger than distinctValues
+	 * These values can't be part of input data array (because inpute only have values between 1 and distinctValues), 
+	 * but these slots will be handled as "no match, but position already filled" within the algorithm.
+	 * Since only HSIZE values are stored at the end (back to hashVec and countVec), these slots/values are simply dropped at the end.
+	 * This procedure avoids the error that the algorithm stores real values in positions that are not written back later. As a result, values were lost and the end result became incorrect.
+	 */
+	// define variables and register for overflow calculation
+	fpvec<Type, regSize> overflow_correction_mask;
+	Type value_bigger_distinctValues;
+	fpvec<Type, regSize> value_bigger_distinctValues_mask;
+
+	// caculate overflow and mark positions in last register that will be overflow the value of HSIZE
+	Type oferflowUnsigned = (m_HSIZE_v * m_elements_per_vector) - HSIZE;
+	if (oferflowUnsigned > 0) {
+		overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
+		value_bigger_distinctValues = (Type)(distinctValues+7); 	
+		value_bigger_distinctValues_mask = set1<Type, regSize>(value_bigger_distinctValues);
+
+		hash_map[m_HSIZE_v-1] = mask_set1(value_bigger_distinctValues_mask, overflow_correction_mask, zero);
+		count_map[m_HSIZE_v-1] = set1<Type, regSize>(zero);
+	}
+
+    // creating writing masks
+	/** CREATING WRITING MASKS
+	 * 
+	 * Following line isn't needed anymore. Instead of zero_cvtu32_mask, please use zeroMask as mask with all 0 and elementCount elements!
+	 * fpvec<uint32_t> zero_cvtu32_mask = cvtu32_mask16((uint32_t)0);	
+	 *
+	 *	old code for creating writing masks:
+     *	std::array<fpvec<uint32_t>, 16> masks {};
+     *	for(uint32_t i = 1; i <= 16; i++){
+     *		masks[i-1] = cvtu32_mask16((uint32_t)(1 << (i-1)));
+	 *	}
+	 *
+	 * new solution is working with (variable) regSize and elementCount per register (e.g. 256 byte and 64 elements per register)
+	 * It generates a matrix of the required size according to the parameters used.  
+	*/
+    std::array<fpvec<Type, regSize>, (regSize/sizeof(Type))> masks {};
+	masks = cvtu32_create_writeMask_Matrix<Type, regSize>();
+
+	/**
+	* ! ATTENTION - changed indizes (compared to the first AVX512 implementation) !
+	* mask with only 0 => zero_cvtu32_mask
+	* masks = array of 16 masks respectively fpvec<uint32_t> with one 1 at unique positions 
+	*
+	* calculation of free position is reworked
+	* old approach: uint32_t pos = __builtin_ctz(checkForFreeSpace) + 1;
+	* -> omit +1, because masks with only 0 at every position is outsourced to zero_cvtu32_mask --> zeroMask is used instead                
+	*/
+
+	// #########################################
+	// #### START OF FPGA parallelized part ####
+	// #########################################
+	// define dataVec register
+	fpvec<Type, regSize> dataVec;
+
+	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
+
+		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
+		// dataVec = load<Type, regSize>(input, i_cnt);	
+
+		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
+
+		/**
+		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+		* @param p current element of input data array
+		**/ 	
+    	int p = 0;
+		while (p < elementCount) {
+			Type inputValue = dataVec.elements[p];
+			Type hash_key = hashx(inputValue,m_HSIZE_v);
+			fpvec<Type, regSize> broadcastCurrentValue = set1<Type, regSize>(inputValue);
+
+			while(1) {
+
+				// compare vector with broadcast value against vector with following elements for equality
+				fpvec<Type, regSize> compareRes = cmpeq_epi32_mask(broadcastCurrentValue, hash_map[hash_key]);
+
+				// found match
+				if (mask2int(compareRes) != 0) {
+					count_map[hash_key] = mask_add_epi32(count_map[hash_key], compareRes, count_map[hash_key], oneMask);
+					p++;
+					break;
+				} else { // no match found
+					// deterime free position within register
+					fpvec<Type, regSize> checkForFreeSpace = cmpeq_epi32_mask(zeroMask, hash_map[hash_key]);
+
+					if(mask2int(checkForFreeSpace) != 0) {                // CASE B1   
+						Type pos = ctz_onceBultin(checkForFreeSpace);
+						//store key
+						hash_map[hash_key] = mask_set1<Type, regSize>(hash_map[hash_key], masks[pos], inputValue);
+						//set count to one
+						count_map[hash_key] = mask_set1<Type, regSize>(count_map[hash_key], masks[pos], (Type)1);
+						p++;
+						break;
+					}   else    { // CASE B2
+						hash_key = (hash_key + 1) % m_HSIZE_v;
+					}
+				}
+			}
+		}
+	}
+	// #######################################
+	// #### END OF FPGA parallelized part ####
+	// #######################################
+
+    //store data from hash_ma
+    for(size_t i = 0; i < m_HSIZE_v; i++){
+		size_t h = i * m_elements_per_vector;
+				
+        store_epi32(hashVec, h, hash_map[i]);
+        store_epi32(countVec, h, count_map[i]);
+    }
+}
+//// end of LinearProbingFPGA_variant4()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
