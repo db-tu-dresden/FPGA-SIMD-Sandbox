@@ -102,6 +102,36 @@ fpvec<T,B> cvtu32_mask16(T n) {
 	return reg;
 }
 
+/**	#4.1
+* serial primitive adaption of Intel Intrinsic:
+* __mmask16 _cvtu32_mask16 (unsigned int a)
+* Function creates array with elements of <fpvec<Type,B>; every element consists of a <fpvec<Type,B> register with all 0 except at position i
+* 10000000
+* 01000000
+* 00100000
+* 00010000
+* ...
+* Function automatically adjusts all sizes depending on the data type and the regSize parameter.
+*/
+template<typename T, int B>
+std::array<fpvec<T, B>, (B/sizeof(T))> cvtu32_create_writeMask_Matrix() {
+	Type zero = 0;
+	Type one = 1;
+	std::array<fpvec<Type, B>, (B/sizeof(T))> result {};
+
+	#pragma unroll
+	for(Type i = 0; i < (B/sizeof(T)); i++){
+		auto tmp = fpvec<T,B>{};
+		#pragma unroll
+		for (int j=0; j<(B/sizeof(T)); j++) {
+			tmp.elements[j] = zero;
+		}
+		tmp.elements[i] = one;
+		result[i] = tmp;
+	}
+	return result;
+}
+
 /**	#5
 * serial primitive for two Intel Intrinsics:
 * __m512i _mm512_maskz_loadu_epi32 (__mmask16 k, void const* mem_addr)

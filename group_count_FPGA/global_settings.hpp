@@ -18,10 +18,10 @@
  */
 
     //static uint64_t distinctValues = 8000;
-    static uint64_t distinctValues = 128;
-    static uint64_t dataSize = 16*10000000;
-    static float scale = 1.4;
-    static uint64_t HSIZE = distinctValues*scale;
+    static const uint64_t distinctValues = 128;
+    static const uint64_t dataSize = 16*10000000;
+    static const float scale = 1.4;
+    static const uint64_t HSIZE = distinctValues*scale;
 
     // define datatype which is used within all registers
     using Type = uint32_t;     
