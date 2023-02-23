@@ -11,7 +11,7 @@ class Group_count{
     protected:
         size_t (* m_hash_function) (T, size_t);
         size_t m_HSIZE;
-        Group_count(size_t HSIZE, size_t (*hash_function)(T, size_t)):m_HSIZE{HSIZE},m_hash_function{hash_function}{}
+        Group_count(size_t HSIZE, size_t (*hash_function)(T, size_t), int32_t bonus_scale):m_HSIZE{HSIZE * bonus_scale},m_hash_function{hash_function}{}
 
 
 void printBits(size_t const size, void const * const ptr) {

@@ -23,6 +23,7 @@
 // TVL integration!
 // rethink how different collisions could be passed to the given test. ATM: hard coded in the testX functions.
 // documentation
+// und hsize * 16
 
 enum Algorithm{
     SCALAR_GROUP_COUNT, 

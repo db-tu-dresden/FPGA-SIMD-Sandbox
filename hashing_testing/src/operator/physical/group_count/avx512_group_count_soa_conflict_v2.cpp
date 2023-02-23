@@ -7,7 +7,6 @@
 #include <smmintrin.h>
 
 #include "avx512_group_count_soa_conflict_v2.hpp"
-#include "avx512_group_count_soaov_v1.hpp"
 
 #define EMPTY_SPOT 0
 
