@@ -197,8 +197,8 @@ size_t repeats_different_data = 1;
 int main(int argc, char** argv){
     fill_tab_table();
 
-    size_t distinct_value_count = 2048;
-    size_t all_data_sizes = 32 * 1024 * 1024;// 1024*1024*1024;
+    size_t distinct_value_count = 1024;
+    size_t all_data_sizes = 1 * 1024 * 1024;// 1024*1024*1024;
 
     float scale_boost = 1.0f;
 
@@ -254,11 +254,11 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     create_result_file(file_name);
 
 
-    size_t collision_count[] = {1, 8, 8, 128, 0};
-    size_t collision_size[] = {distinct_value_count, distinct_value_count/8, distinct_value_count/16, distinct_value_count/128, 0};
+    size_t collision_count[] = {1, 8, 16, distinct_value_count/16, 0};
+    size_t collision_size[] = {distinct_value_count, distinct_value_count/8, distinct_value_count/64, 16, 0};
     size_t configuration_count = sizeof(collision_count)/sizeof(collision_count[0]);
 
-    float all_scales[] = {1f ,1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f};
+    float all_scales[] = {1.0f ,1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f};
     size_t all_scales_size = sizeof(all_scales)/sizeof(all_scales[0]);
 
     const size_t elements = (512 / 8) / sizeof(T);
