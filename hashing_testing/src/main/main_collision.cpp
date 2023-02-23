@@ -197,8 +197,8 @@ size_t repeats_different_data = 1;
 int main(int argc, char** argv){
     fill_tab_table();
 
-    size_t distinct_value_count = 1024;
-    size_t all_data_sizes = 1 * 1024 * 1024;// 1024*1024*1024;
+    size_t distinct_value_count = 2048;
+    size_t all_data_sizes = 32 * 1024 * 1024;// 1024*1024*1024;
 
     float scale_boost = 1.0f;
 
@@ -215,6 +215,7 @@ int main(int argc, char** argv){
     
     // size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
     HashFunction functions_to_test[] = {
+        HashFunction::MULTIPLY_PRIME,
         HashFunction::MULITPLY_SHIFT, 
         HashFunction::MULTIPLY_ADD_SHIFT, 
         HashFunction::MODULO, 
@@ -294,9 +295,9 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                 );
 
                 for(size_t ass = 0; ass < all_scales_size && data != nullptr; ass++){
-                    float scale = all_scales[ass];
+                    float scale = all_scales[ass] * scale_boost;
 
-                    size_t HSIZE = (size_t)(scale * scale_boost * distinct_value_count + 0.5f);
+                    size_t HSIZE = (size_t)(scale * distinct_value_count + 0.5f);
                     HSIZE = (HSIZE + elements - 1);
                     HSIZE /= elements;
                     HSIZE *= elements;
@@ -645,7 +646,7 @@ void write_to_file( std::string filename, //string
 void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin){
     runs_done++;
     std::chrono::high_resolution_clock::time_point time_end;
-    uint32_t current_percentage = (runs_done * 100) / total_runs;
+    double current_percentage = (runs_done * 100.) / total_runs;
     if(current_percentage >= percentage_done + percentage_print){
         while(current_percentage > percentage_done + percentage_print){
             percentage_done += percentage_print;

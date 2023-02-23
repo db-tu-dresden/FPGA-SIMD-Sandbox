@@ -1219,14 +1219,14 @@ size_t generate_data_p0(
     generate_cluster<T>(&numbers, &all_numbers, distinct_values, pos, free_space);
     pos = (pos + free_space) % distinct_values;
 
-    for(i = 0; i < numbers.size(); i++){
-        // std::cout << hash_function(numbers[i], distinct_values) << ":" << numbers[i] << "\t";
-        // if((i+1) % 20 == 0){
-        //     std::cout << std::endl;
-        // }
-        std::cout << numbers[i] << std::endl;
-    }
-    std::cout << std::endl << std::endl;
+    // for(i = 0; i < numbers.size(); i++){
+    //     // std::cout << hash_function(numbers[i], distinct_values) << ":" << numbers[i] << "\t";
+    //     // if((i+1) % 20 == 0){
+    //     //     std::cout << std::endl;
+    //     // }
+    //     std::cout << numbers[i] << std::endl;
+    // }
+    // std::cout << std::endl << std::endl;
 
     if(numbers.size() == 0 || numbers.size() > distinct_values){
         return 0;
