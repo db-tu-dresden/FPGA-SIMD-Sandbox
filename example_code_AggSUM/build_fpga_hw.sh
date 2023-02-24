@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # # run this by
-# qsub -l nodes=1:fpga_compile:ppn=2 -d . build_fpga_hw.sh -l walltime=23:00:00
+# qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_fpga_hw.sh -l walltime=23:00:00
 # # monitor job via
 # watch -n 1 qstat -n -1
 

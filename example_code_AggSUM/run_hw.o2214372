@@ -1,0 +1,56 @@
+
+########################################################################
+#      Date:           Fri Feb 24 12:27:53 PST 2023
+#    Job ID:           2214372.v-qsvr-1.aidevcloud
+#      User:           u177951
+# Resources:           cput=75:00:00,neednodes=1:fpga_runtime:stratix10:ppn=2,nodes=1:fpga_runtime:stratix10:ppn=2,walltime=00:05:00
+########################################################################
+
+sourcing /opt/intel/inteloneapi/setvars.sh
+ 
+:: WARNING: setvars.sh has already been run. Skipping re-execution.
+   To force a re-execution of setvars.sh, use the '--force' option.
+   Using '--force' can result in excessive use of your environment variables.
+  
+usage: source setvars.sh [--force] [--config=file] [--help] [...]
+  --force        Force setvars.sh to re-run, doing so may overload environment.
+  --config=file  Customize env vars using a setvars.sh configuration file.
+  --help         Display this help message and exit.
+  ...            Additional args are passed to individual env/vars.sh scripts
+                 and should follow this script's arguments.
+  
+  Some POSIX shells do not accept command-line options. In that case, you can pass
+  command-line options via the SETVARS_ARGS environment variable. For example:
+  
+  $ SETVARS_ARGS="ia32 --config=config.txt" ; export SETVARS_ARGS
+  $ . path/to/setvars.sh
+  
+  The SETVARS_ARGS environment variable is cleared on exiting setvars.sh.
+  
+
+Running on FPGA Hardware:
+aocl initialize: Running initialize from /opt/intel/oneapi/intel_s10sx_pac/linux64/libexec
+Program succeed. 
+Vector length: 40960000 
+
+ 
+ ### aggregation ### 
+
+Number CLs: 2560000 
+Init buffers done with linear series 
+in[0],in[1],in[2] ... : 1,1,1 ... 
+ ... in[size-1] : 1 
+out[0]: 312 
+
+Running HOST-Aggregation test with an size of 40960000 numbers 
+out[0]: 40960000 	 (check with gaussian sum formula) 
+
+out: 40960000 
+input_size_mb 163.840000 
+HOST-DEVICE Throughput: 12690.5 MB/s
+
+########################################################################
+# End of output for job 2214372.v-qsvr-1.aidevcloud
+# Date: Fri Feb 24 12:28:10 PST 2023
+########################################################################
+
