@@ -74,7 +74,7 @@ FIX FOR ENV-ERROR WHILE COMPILING "Error: Failed to open quartus_sh_compile.log"
 -	after 2-4 minutes the lib/lib.a or lib/lib_rtl.a file is created
 
 (1) Build
--   `qsub -l nodes=1:fpga_compile:ppn=2 -d . build_hw -l walltime=23:59:00`
+-   `qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_hw -l walltime=23:59:00`
 -	after 3-4 hours the main.fpga file is created
 -	`cd ~/FPGA-SIMD-Sandbox/group_count_FPGA`
 
@@ -90,7 +90,10 @@ FIX FOR ENV-ERROR WHILE COMPILING "Error: Failed to open quartus_sh_compile.log"
 
 - Run
 (a) `cd ~/FPGA-SIMD-Sandbox/example_code_AggSUM`
-(b) `./main.fpga`
+(b) `source /data/intel_fpga/devcloudLoginToolSetup.sh`
+(c) `tools_setup -t S10OAPI`
+(d) `aocl initialize acl0 pac_s10_usm`
+(e) `./main.fpga 40960000` 
 
 
 ## overview about functions in kernel.cpp

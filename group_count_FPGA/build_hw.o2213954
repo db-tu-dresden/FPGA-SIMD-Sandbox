@@ -1,9 +1,9 @@
 
 ########################################################################
-#      Date:           Fri 17 Feb 2023 01:02:02 PM PST
-#    Job ID:           2200267.v-qsvr-1.aidevcloud
+#      Date:           Fri Feb 24 04:49:53 PST 2023
+#    Job ID:           2213954.v-qsvr-1.aidevcloud
 #      User:           u177951
-# Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:59:00
+# Resources:           cput=75:00:00,neednodes=1:fpga_runtime:stratix10:ppn=2,nodes=1:fpga_runtime:stratix10:ppn=2,walltime=23:59:00
 ########################################################################
 
 sourcing /opt/intel/inteloneapi/setvars.sh
@@ -30,9 +30,22 @@ usage: source setvars.sh [--force] [--config=file] [--help] [...]
 icpx -fsycl -Wall  -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xsprofile -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga helper_kernel.cpp kernel.cpp main.cpp helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a  
 warning: -reuse-exe file 'main.fpga' not found; ignored
 aoc: Compiling for FPGA. This process may take several hours to complete.  Prior to performing this compile, be sure to check the reports to ensure the design will meet your performance targets.  If the reports indicate performance targets are not being met, code edits may be required.  Please refer to the oneAPI FPGA Optimization Guide for information on performance tuning applications for FPGAs.
+Error (23035): Tcl error: 
+Error (23031): Evaluation of Tcl script compile_script.tcl unsuccessful
+Error: Quartus Prime Shell was unsuccessful. 2 errors, 0 warnings
+Error (23035): Tcl error: 
+Error (23031): Evaluation of Tcl script build/entry.tcl unsuccessful
+Error: Quartus Prime Shell was unsuccessful. 2 errors, 0 warnings
+Error: Out of memory error detected.
+This can occur if the design is too big or the machine does not meet the system
+requirements. Make sure your system meets the system requirements specified on
+the System and Software Requirements page of the Intel FPGA website
+(https://fpgasoftware.intel.com/requirements/).
+Makefile:83: recipe for target 'hw' failed
+failed
 
 ########################################################################
-# End of output for job 2200267.v-qsvr-1.aidevcloud
-# Date: Sat 18 Feb 2023 04:51:29 AM PST
+# End of output for job 2213954.v-qsvr-1.aidevcloud
+# Date: Fri Feb 24 05:29:12 PST 2023
 ########################################################################
 
