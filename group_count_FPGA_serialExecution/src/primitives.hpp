@@ -519,5 +519,284 @@ fpvec<T,B> createCutlowMask(T cutlowUnsigned) {
 	return reg;
 } 
 
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////  New functions for LinearProbing_v5 == soa_conflict_v1  ///////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+
+/**	#22
+* serial primitive for Intel Intrinsic:
+* __m512i _mm512_conflict_epi32 (__m512i a)
+* original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit. Each element's comparison forms a zero extended bit vector in dst."
+* 
+* customized conflict_epi32 - function:
+* This function check whether an element is already in the vector. 
+* Only elements with a lower index are checked. 
+* As a result, element 0 in the vector never has a conflict. The bits for each element are then set accordingly. 
+* IMPORTANT: At the point where a conflict is found, the position of the first occurrence is written! 
+* IMPORTANT: The position is specified from 1 to #elementCount (NOT 0-n-1) !!
+*
+* adjustment against original Intel Intrinsic:
+* 104 71 106 116 82 128 75 109 42 78 59 44 115 124 100 71 --> 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 
+* 104 71  71 116 82  71 75 109 42 78 59 44 115 124 100 71 --> 0 0 2 0 0 2 0 0 0 0 0 0 0 0 0 2 
+*/
+template<typename T, int B>
+fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
+	auto reg = fpvec<T,B>{};
+//	Type one = 1;
+//	Type zero = 0;
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		Type currentElement = a.elements[i];
+		for (int j=0; j<i; j++) {
+			if(a.elements[j] == currentElement) {
+				reg.elements[i] = (Type)(j+1);
+				j=i;	
+				break;			
+			}
+		}
+	}	
+	return reg;
+}
+
+/**	#23
+* serial primitive for Intel Intrinsic:
+* void _mm512_mask_compressstoreu_epi32 (void* base_addr, __mmask16 k, __m512i a)
+* original description: "Contiguously store the active 32-bit integers in a (those with their respective bit set in writemask k) to unaligned memory at base_addr."
+*
+*
+* @param buffer : 
+* @param writeMask : 
+* @param data : 
+*/
+template<typename T, int B>
+void mask_compressstoreu_epi32(Type* buffer, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
+	int buffer_position = 0;
+	#pragma nounroll								// DO NOT UNROLL, because the steps are dependent on each other ?!
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (writeMask.elements[i] == 1) {
+			buffer[buffer_position] = (Type)data.elements[i];
+			buffer_position++;
+		}
+	}
+}
+
+/**	#24
+* serial primitive for Built-in Function Provided by GCC:
+* int __builtin_popcount(int number)
+* original description: "This function is used to count the number of set bits in an unsigned integer. "
+* 
+* Adjustment: We don't hand over an integer, we handle a register directly within the function and count the "1" within this register.
+* return: count of "!=0" within this register
+*/
+template<typename T, int B>
+Type popcount_builtin(fpvec<T,B>& mask) {
+	Type count = 0;
+	#pragma unroll								
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (mask.elements[i] != 0) {
+			count++;
+		}
+	}
+	return count;
+}
+
+/**	#25
+* adaption of:
+* __m512i _mm512_set1_epi32 (int a)
+*
+* function create a fpvec<T,B> with all values zero; except at position (value-1) => 1
+*/
+template<typename T, int B>
+fpvec<T,B> setX_singleValue(T value) {
+	auto reg = fpvec<T,B>{};
+	reg.elements[value-1] = 1;
+	return reg;
+}
+
+/**	#26
+* serial primitive for Intel Intrinsic:
+* __m512i _mm512_mask_i32gather_epi32 (__m512i src, __mmask16 k, __m512i vindex, void const* base_addr, int scale)
+* original description: "Gather 32-bit integers from memory using 32-bit indices. 32-bit elements are loaded from addresses starting 
+* 	at base_addr and offset by each 32-bit element in vindex (each index is scaled by the factor in scale). Gathered elements are merged 
+*	into dst using writemask k (elements are copied from src when the corresponding mask bit is not set). scale should be 1, 2, 4 or 8."
+* 
+* @param src : register of type fpvec<T,B>
+* @param mask_k : writemask k (= register of type fpvec<T,B>)
+* @param vindex : register of type fpvec<T,B> 
+* @param data : void const* base_addr
+* @param scale : scale should be 1, 2, 4 or 8
+*/
+template<typename T, int B>
+fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, uint32_t* data, int scale) {
+	auto reg = fpvec<T,B>{};
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if(mask_k.elements[i] == (Type)1) {
+			size_t addr = 0 + vindex.elements[i];	// * scale * 8;	
+						// 0, because hashVec and countVec starting both at index 0
+						// omit *8 (because we don't need bit conversion)
+						// omit *scale, because we currently work with Type=uint32_t in all stages
+						// if we want to use another datatype, we may adjust the scale paramter within
+						// this function; now scale doesn't have an usage
+			reg.elements[i] = data[addr];													
+		} else {
+			reg.elements[i] = src.elements[i];
+		}
+	}
+	return reg;
+}
+
+/**	#27
+* serial primitive for Intel Intrinsic:
+* __m512i _mm512_maskz_add_epi32 (__mmask16 k, __m512i a, __m512i b)
+* original description: "Add packed 32-bit integers in a and b, and store the results in dst using zeromask k 
+* (elements are zeroed out when the corresponding mask bit is not set)."
+*/
+template<typename T, int B>
+fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
+	Type zero = 0;
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (writeMask.elements[i] == 1) {
+			reg.elements[i] = a.elements[i] + b.elements[i];
+		}
+		else {
+			reg.elements[i] = zero;
+		}
+	}
+	return reg;
+}
+
+/**	#28
+* serial primitive for Intel Intrinsic:
+* void _mm512_mask_i32scatter_epi32 (void* base_addr, __mmask16 k, __m512i vindex, __m512i a, int scale)
+* original description: "Scatter 32-bit integers from a into memory using 32-bit indices. 32-bit elements are stored at 
+*		addresses starting at base_addr and offset by each 32-bit element in vindex (each index is scaled by the factor in scale) 
+*		subject to mask k (elements are not stored when the corresponding mask bit is not set). scale should be 1, 2, 4 or 8."
+* 
+* @param datbaseStoragea : void const* base_addr for storage/scatter
+* @param mask_k : writemask k (= register of type fpvec<T,B>)
+* @param vindex : register of type fpvec<T,B> 
+* @param data_to_scatter : register of type fpvec<T,B>
+* @param scale : scale should be 1, 2, 4 or 8
+* @param HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets
+*/
+template<typename T, int B>
+void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter, int scale, uint64_t HSIZE) {
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if(mask_k.elements[i] == (Type)1) {
+			size_t addr = 0 + vindex.elements[i];	// * scale * 8;	
+						// 0, because hashVec and countVec starting both at index 0
+						// omit *8 (because we don't need bit conversion)
+						// omit *scale, because we currently work with Type=uint32_t in all stages
+						// if we want to use another datatype, we may adjust the scale paramter within
+						// this function; now scale doesn't have an usage
+			baseStorage[(addr % HSIZE)] = data_to_scatter.elements[i];													
+		} 
+	}
+}
+
+/**	#29
+* serial primitive for Intel Intrinsic:
+* __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
+* original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
+*
+* Note: registers a and b may only contain elements of the datatype Type (currently uint32_t)
+*/
+template<typename T, int B>
+fpvec<T,B> kandn(fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (a.elements[i] == 0) {
+			reg.elements[i] = 1;
+			if (reg.elements[i] == b.elements[i]) {
+				reg.elements[i] = 1;
+			} else {
+				reg.elements[i] = 0;
+			}
+		} else {
+			reg.elements[i] = 0;
+			if (reg.elements[i] == b.elements[i]) {
+				reg.elements[i] = 1;
+			} else {
+				reg.elements[i] = 0;
+			}
+		}
+	}
+	return reg;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**	#xx
+* serial primitive for Intel Intrinsic:
+* __m512i _mm512_maskz_conflict_epi32 (__mmask16 k, __m512i a)
+* original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit using zeromask k 
+* 			(elements are zeroed out when the corresponding mask bit is not set). Each element's comparison forms a zero extended bit vector in dst."
+* 
+* customized mask_compressstoreu_epi32  - function:
+* This function check whether an element is already in the vector. 
+* Only elements with a lower index are checked. 
+* As a result, element 0 in the vector never has a conflict. The bits for each element are then set accordingly. 
+* IMPORTANT: At the point where a conflict is found, the position of the first occurrence is written! 
+* IMPORTANT: The position is specified from 1 to #elementCount (NOT 0-n-1) !!
+*
+* adjustment against original Intel Intrinsic:
+* 104 71 106 116 82 128 75 109 42 78 59 44 115 124 100 71 --> 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 
+* 104 71  71 116 82  71 75 109 42 78 59 44 115 124 100 71 --> 0 0 2 0 0 2 0 0 0 0 0 0 0 0 0 2 
+
+template<typename T, int B>
+fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& a) {
+	auto reg = fpvec<T,B>{};
+//	Type one = 1;
+//	Type zero = 0;
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		Type currentElement = a.elements[i];
+		for (int j=0; j<i; j++) {
+			if(a.elements[j] == currentElement) {
+				reg.elements[i] = (Type)(j+1);
+				j=i;	
+				break;			
+			}
+		}
+	}	
+	return reg;
+}
+*/
+
+
+
+
+
 #endif // PRIMITIVES_HPP
 
