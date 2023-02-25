@@ -705,7 +705,7 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 * __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
 * original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
 *
-* Note: registers a and b may only contain elements of the datatype Type (currently uint32_t)
+* Note: registers a and b may only contain elements of the datatype Type (currently uint32_t) with values ONLY 1 or 0 !!
 */
 template<typename T, int B>
 fpvec<T,B> kandn(fpvec<T,B>& a, fpvec<T,B>& b) {
@@ -731,39 +731,13 @@ fpvec<T,B> kandn(fpvec<T,B>& a, fpvec<T,B>& b) {
 	return reg;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**	#xx
+/**	#30
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_maskz_conflict_epi32 (__mmask16 k, __m512i a)
 * original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit using zeromask k 
 * 			(elements are zeroed out when the corresponding mask bit is not set). Each element's comparison forms a zero extended bit vector in dst."
 * 
-* customized mask_compressstoreu_epi32  - function:
+* customized maskz_conflict_epi32 - function:
 * This function check whether an element is already in the vector. 
 * Only elements with a lower index are checked. 
 * As a result, element 0 in the vector never has a conflict. The bits for each element are then set accordingly. 
@@ -773,30 +747,79 @@ fpvec<T,B> kandn(fpvec<T,B>& a, fpvec<T,B>& b) {
 * adjustment against original Intel Intrinsic:
 * 104 71 106 116 82 128 75 109 42 78 59 44 115 124 100 71 --> 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 
 * 104 71  71 116 82  71 75 109 42 78 59 44 115 124 100 71 --> 0 0 2 0 0 2 0 0 0 0 0 0 0 0 0 2 
-
+*
+* Difference against conflict_epi32:	additional fpvec<T,B>& mask_k : if mask_k[i]==0 --> result[0]=0 ; else do conflict_epi32 algorithm
+*/
 template<typename T, int B>
-fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& a) {
+fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
 	auto reg = fpvec<T,B>{};
-//	Type one = 1;
-//	Type zero = 0;
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
-		Type currentElement = a.elements[i];
-		for (int j=0; j<i; j++) {
-			if(a.elements[j] == currentElement) {
-				reg.elements[i] = (Type)(j+1);
-				j=i;	
-				break;			
+		if(mask_k.elements[i] == 1) {
+			Type currentElement = a.elements[i];
+			for (int j=0; j<i; j++) {
+				if(a.elements[j] == currentElement) {
+					reg.elements[i] = (Type)(j+1);
+					j=i;	
+					break;			
+				}
 			}
-		}
+		} else {
+			reg.elements[i] = (Type)(0);
+		}	
 	}	
 	return reg;
 }
+
+/**	#32
+* serial primitive for Intel Intrinsic:
+* __m512i _mm512_and_epi32 (__m512i a, __m512i b)
+* original description: "Compute the bitwise AND of packed 32-bit integers in a and b, and store the results in dst."
+*
+* Note: registers a and b may only contain elements of the datatype Type (currently uint32_t) with values ONLY 1 or 0 !!
 */
+template<typename T, int B>
+fpvec<T,B> register_and_epi32(fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (a.elements[i] == b.elements[i]) {
+			reg.elements[i] = (Type)1;
+		} else {
+			reg.elements[i] = (Type)0;
+		}
+	}
+	return reg;
+}
 
-
-
-
+/**	#33
+* serial primitive for Intel Intrinsic:
+* __mmask16 _mm512_mask_cmp_epi32_mask (__mmask16 k1, __m512i a, __m512i b, _MM_CMPINT_ENUM imm8)
+* original description: "Compare packed signed 32-bit integers in a and b based on the comparison operand specified by imm8,
+* 	and store the results in mask vector k using zeromask k1 (elements are zeroed out when the corresponding mask bit is not set)."
+*
+* NOTE: adjust function to handle ONLY the _MM_CMPINT_NLT (Not less than) comparison, due to the fact that this is the only scenario,
+*		which is used in LinearProbing_v5 (SoA_conflict_v1); Thereby an additional parameter for the cmp type isn't necessary anymore.
+*/
+template<typename T, int B>
+fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (zeroMask.elements[i] == 1) {
+			if (a.elements[i] < b.elements[i]) {
+				reg.elements[i] = 0;
+			}	
+			else {
+				reg.elements[i] = 1;
+			}
+		}	
+		else {
+			reg.elements[i] = 0;
+		}	
+	}
+	return reg;
+}
 
 #endif // PRIMITIVES_HPP
 
