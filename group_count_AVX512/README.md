@@ -8,3 +8,11 @@
 
 (2) Execute
 `bin/main`
+
+
+-   Within Intel Devcloud: DON'T execute project on login-2 node!
+-   Login interactive on a computing node:
+        (1) `source /data/intel_fpga/devcloudLoginToolSetup.sh`
+        (2) `devcloud_login`
+        (3) select option 6
+        (4) select a node of type "Nodes with no attached hardware"

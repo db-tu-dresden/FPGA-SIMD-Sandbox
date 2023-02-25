@@ -2,7 +2,9 @@
 #include<stdlib.h>
 #include<iostream>
 
-//#include "helper.cpp"
+#include "LinearProbing_scalar.hpp"
+#include "global_settings.hpp"
+#include "helper.hpp"
 
 void LinearProbingScalar(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, int HSIZE) {
 
@@ -10,7 +12,6 @@ void LinearProbingScalar(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, 
     int p = 0;
     while (p<dataSize) {
         uint32_t hash_key = hashx(input[p],HSIZE);
-        //cout <<input[p]<<" "<<hash_key<<endl;
 
         // get hash entry at the position hash_key
         uint32_t value = hashVec[hash_key];

@@ -6,36 +6,43 @@
 #include <iostream>
 #include <chrono>
 
-#include "LinearProbing_avx512.cpp"
-//#include "LinearProbing_avx512-v1.cpp"
-#include "LinearProbing_scalar.cpp"
+#include "global_settings.hpp"
+#include "LinearProbing_avx512.hpp"
+#include "LinearProbing_scalar.hpp"
+#include "helper.hpp"
+
 /*
-*   This is a proprietary AVX512 implementation of Bala Gurumurthy's LinearProbing approach. 
+*   This is a proprietary AVX512 implementation of Bala Gurumurthy's LinearProbing approach (Version 1). 
  
 *   The logical approach refers to the procedure described in the paper.
 *   Link to paper "SIMD Vectorized Hashing for Grouped Aggregation"
 *   https://wwwiti.cs.uni-magdeburg.de/iti_db/publikationen/ps/auto/Gurumurthy:ADBIS18.pdf
+*
+*   Version 2-5 are modified modified versions with different approaches of a hash-based LinearProbing algorithm.
 */
 
-/**
- * define global parameters for data generation
- * @param distinctValues determines the generated values between 1 and distinctValues
- * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
- * @param scale multiplier to determine the value of the HSIZE (note "1.6" corresponds to 60% more slots in the hashVec[] than there are distinctValues 
- * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
- */
-//uint64_t distinctValues = 32;
-uint64_t distinctValues = 8000;
-uint64_t dataSize = 16*10000000;
-float scale = 1.4;
-uint64_t HSIZE = distinctValues*scale;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//	OVERVIEW about functions in LinearProbing_avx512.cpp
+//
+//	LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA function v1 -  without aligned_start; version descbribed in paper
+// 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
+//	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
+//	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - use a vector with elements of type <fpvec<Type, regSize> as hash_map structure "around" the registers
+// 	LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5 - 
+// 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int  main(int argc, char** argv){
-    // print global settings
-    cout << "Global configuration:"<< endl;
-    cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< endl;
+   // print global settings
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"============= Program Start =================="<<std::endl; 
+    std::cout <<"=============================================="<<std::endl;    
+    std::cout << "Global configuration:"<<  std::endl;
+    std::cout << "distinctValues | scale-facor | dataSize : "<<distinctValues<<" | "<<scale<<" | "<<dataSize<< std::endl;
     // print hashsize of current settings
-    cout << "Configured HSIZE : " << HSIZE << endl;
+    std::cout << "Configured HSIZE : " << HSIZE << std::endl;
 
     /**
      * allocate memory for data input array and fill with random numbers
@@ -63,8 +70,11 @@ int  main(int argc, char** argv){
     } else {
         cout << "HashTable not allocated" << endl;
     }
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//scalar version
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// scalar version
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
     cout <<"Linear Probing - scalar:"<<endl;
@@ -73,11 +83,16 @@ int  main(int argc, char** argv){
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    cout<<mis<<endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    cout<<"Elapsed time for LinearProbing algorithm - scalar version: "<<mis<<endl;
+//    validate(dataSize, hashVec,countVec, HSIZE);
+//    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    cout <<"=============================="<<endl;
+    cout<<endl;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//SIMD AVX512 - v1
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// SIMD AVX512 - v1
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
     cout <<"Linear Probing - SIMD Variant 1:"<<endl;
@@ -86,11 +101,16 @@ int  main(int argc, char** argv){
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    cout<<mis<<endl;
+    cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 1: "<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    cout <<"=============================="<<endl;
+    cout<<endl;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//SIMD AVX512 - v2
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// SIMD AVX512 - v2
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
     cout <<"Linear Probing - SIMD Variant 2:"<<endl;
@@ -99,11 +119,16 @@ int  main(int argc, char** argv){
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    cout<<mis<<endl;
+    cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 2: "<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    cout <<"=============================="<<endl;
+    cout<<endl;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//SIMD AVX512 - v3
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// SIMD AVX512 - v3
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
     cout <<"Linear Probing - SIMD Variant 3:"<<endl;
@@ -112,23 +137,78 @@ int  main(int argc, char** argv){
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    cout<<mis<<endl;
+    cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 3: "<<mis<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
-     
-    
-    /*initializeHashMap(hashVec,countVec,HSIZE);
-     begin = chrono::high_resolution_clock::now();
-    cout <<"Linear Probing scalar"<<endl;
-    //unorderedMap(arr, dataSize, 1600);
-    SOTASIMD(arr,dataSize,hashVec,countVec,HSIZE);
-   // LinearProbingAVX512Scalar()
-     end = std::chrono::high_resolution_clock::now();
-     duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-     mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
+    cout <<"=============================="<<endl;
+    cout<<endl;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    cout <<mis<<endl;
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// SIMD AVX512 - v4 (SoAoV_v1)
+    /**
+	 * due to this approach, the hash_map and count_map can have overall more slots than the value of HSIZE
+     * especially in hash_map[m_HSIZE_v-1]; some of these elements would simply be dropped and not written back with hashVec and countVec;
+	 * to avoid this case, we simple set the HSIZE big enough and allocate more space for hashVec and countVec to prevent this error
+     *
+     * in FPGA-version of this function, we calculate an overflow correction in last register of hash_map and count_map, 
+     * to prevent errors from storing elements in hash_map[m_HSIZE_v-1] in positions that are >HSIZE 
+	 * --> see FPGA-SIMD-Sandbox/group_count_FPGA/    
+	 */
+    cout <<"=============================="<<endl;
+    cout <<"PREPARING FOR Linear Probing - SIMD Variant 4:"<<endl;
+    // calculate necessary HSIZE for v4
+    const size_t m_elements_per_vector = (512 / 8) / sizeof(uint32_t);
+    const size_t m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;
+    const size_t HSIZE_v4 = m_HSIZE_v * m_elements_per_vector;
+    // allocate big enough hashVec and countVec
+    uint32_t *hashVec_v4, *countVec_v4; 
+    hashVec_v4 = (uint32_t *) aligned_alloc(64, HSIZE_v4 * sizeof (uint32_t));
+    countVec_v4 = (uint32_t *) aligned_alloc(64, HSIZE_v4 * sizeof (uint32_t));
+    if (hashVec_v4 != NULL ||  countVec_v4 != NULL) {
+        cout << "HashTable for v4 allocated - " <<HSIZE<< " values, with modified HSZIE for v4 of: "<<HSIZE_v4<< endl;
+    } else {
+        cout << "HashTable for v4 not allocated" << endl;
+    }
+    // begin with execution of algorithm
+    initializeHashMap(hashVec,countVec,HSIZE_v4);
+    cout <<"=============================="<<endl;
+    cout <<"Linear Probing - SIMD Variant 4:"<<endl;
+    begin = chrono::high_resolution_clock::now();
+    LinearProbingAVX512Variant4(arr, dataSize, hashVec_v4, countVec_v4, HSIZE_v4);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
+    cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 4 (SoAoV_v1): "<<mis<<endl;
+    validate(dataSize, hashVec_v4,countVec_v4, HSIZE_v4);
+    validate_element(arr, dataSize, hashVec_v4, countVec_v4, HSIZE_v4);
+    cout <<"=============================="<<endl;
+    cout<<endl;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// SIMD AVX512 - v5 (SoA_conflict_v1)
+    initializeHashMap(hashVec,countVec,HSIZE);
+    cout <<"=============================="<<endl;
+    cout <<"Linear Probing - SIMD Variant 5:"<<endl;
+    begin = chrono::high_resolution_clock::now();
+    LinearProbingAVX512Variant5(arr, dataSize, hashVec, countVec, HSIZE);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+    mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
+    cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 5 (SoA_conflict_v1): "<<mis<<endl;
+    validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    cout <<"=============================="<<endl;
+    cout<<endl;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
     /*
     //__m512i a = _mm512_setzero_epi32();
     //__m512i b = _mm512_setzero_epi32();
