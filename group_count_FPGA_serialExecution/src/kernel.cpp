@@ -19,6 +19,8 @@
 #include "global_settings.hpp"
 #include "helper_kernel.hpp"
 #include "primitives.hpp"
+
+#define EMPTY_SPOT 0
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //	OVERVIEW about functions in kernel.cpp
@@ -390,7 +392,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Variant 3 of a AVX512-based group_count implementation.
+ * Variant 3 of a hasbased group_count implementation for FPGA.
  * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
  * @param input the input data array
  * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
@@ -558,7 +560,7 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Variant 4 of a AVX512-based group_count implementation.
+ * Variant 4 of a hasbased group_count implementation for FPGA.
  * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
  * @param input the input data array
  * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
@@ -591,7 +593,7 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
 ////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
 
-	//// declare the basic hash- and count-map structure for this approach an some function intern variables
+	//// declare the basic hash- and count-map structure for this approach and some function intern variables
     fpvec<Type, regSize>* hash_map;
     fpvec<Type, regSize>* count_map;
 
@@ -733,5 +735,176 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
     }
 }
 //// end of LinearProbingFPGA_variant4()
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Variant 5 of a hasbased group_count implementation for FPGA.
+ * The algorithm uses the LinearProbing approach to perform the group-count aggregation.
+ * @param input the input data array
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
+ * @param hashVec store value of k at position hashx(k)
+ * @param countVec store the count of occurence of k at position hashx(k)
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ */
+void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+////////////////////////////////////////////////////////////////////////////////
+//// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
+	static_assert(kDDRWidth % sizeof(Type) == 0);							
+
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
+	constexpr size_t kNumLSUs = kDDRChannels;         
+
+	const size_t iterations = loops;
+
+	// ensure dataSize is nice
+	assert(dataSize % elementCount == 0);
+	assert(dataSize % kValuesPerLSU == 0);
+	assert(dataSize % kNumLSUs == 0);
+
+	// ensure global defined regSize is nice
+    // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
+	// NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
+	//			every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
+	assert(regSize == 256);
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//// starting point of the logic of the algorithm
+
+// ####### REPLACE: 64 by regSize \\\\\\ 16 by elementCount
+// ####### local variables == WHEN WORKING : REPLACE with oneMask & zeroMask 
+	fpvec<Type, 64> oneMask_TMP = set1<Type, 64>(one);
+	fpvec<Type, 64> zeroMask_TMP = set1<Type, 64>(zero);
+
+	Type *buffer = reinterpret_cast< Type* >( _mm_malloc( 16 * sizeof(Type), 64 ) );
+
+	size_t p = 0;
+	while(p + elementCount < dataSize){
+		// load the to aggregate data
+		fpvec<Type, 64> input_value = load_epi32(oneMask_TMP, input, p, HSIZE);		// not used anymore
+		// how much the given count should be increased for the given input.
+		fpvec<Type, 64> input_add = set1<Type, 64>(one);
+
+		// search for conflicts
+		fpvec<Type, 64> conflicts = conflict_epi32(input_value);
+		// masked to indicate were there is a conflict in the input_values and were not.
+		fpvec<Type, 64> no_conflicts_mask = cmpeq_epi32_mask(zeroMask_TMP, conflicts);
+		fpvec<Type, 64> negativ_no_conflicts_mask = knot(no_conflicts_mask);
+
+		// we need to store the conflicts so we can interprete them as masks. and access them.
+		// we are only interested in the enties that are not zero. That means the conflict cases.
+		mask_compressstoreu_epi32(buffer, negativ_no_conflicts_mask, conflicts);
+		size_t conflict_count = popcount_builtin(negativ_no_conflicts_mask);
+		// add at all the places where the conflict masks indicates that there is an overlap
+		for(size_t i = 0; i < conflict_count; i++){
+			fpvec<Type, 64> tmp_buffer_mask = setX_singleValue<Type, 64>(buffer[i]);
+			input_add = mask_add_epi32<Type, 64>(input_add, tmp_buffer_mask, input_add, oneMask_TMP);
+		}
+
+		// we override the value and what to add with zero in the positions where we have a conflict.
+		// NOTE: This steps might not be necessary.
+		input_value = mask_set1(input_value, negativ_no_conflicts_mask, zero);
+		input_add = mask_set1(input_add, negativ_no_conflicts_mask, zero);
+
+		// now we can calculate the hashes.
+		// for this we can store the input_value hash it and load it
+		// OR we use the input and hash it save it in to buffer and than make a maskz load for the hashed data
+		// OR we have a simdifyed Hash Algorithm! For the most cases we would need an avx... mod. 
+		// _mm512_store_epi32(buffer, input_value);
+		for(size_t i = 0; i < 16; i++){
+			buffer[i] = hashx(input[p + i], HSIZE);
+		}
+		fpvec<Type, 64> hash_map_position = mask_loadu(no_conflicts_mask, buffer, (Type)0, HSIZE); // these are the hash values
+
+		do{
+			// now we can gather the data from the different positions where we have no conflicts.
+			fpvec<Type, 64> hash_map_value = mask_i32gather_epi32(zeroMask_TMP, no_conflicts_mask, hash_map_position, hashVec, 4);
+			// with these we can calculate the different possible hits. Real hits and empty positions.
+			fpvec<Type, 64> foundPos = mask_cmpeq_epi32_mask(no_conflicts_mask, input_value, hash_map_value);
+			fpvec<Type, 64> foundEmpty = mask_cmpeq_epi32_mask(no_conflicts_mask, zeroMask_TMP, hash_map_value);
+
+			if(mask2int(foundPos) != 0){		//A
+				// Now we have to gather the count. IMPORTANT! the count is a 32bit integer. 
+				// FOR NOW THIS IS CORRECT BUT MIGHT CHANGE LATER!
+				// For 64bit integers we would need to find a different solution!
+				fpvec<Type, 64> hash_map_value = mask_i32gather_epi32(zeroMask_TMP, foundPos, hash_map_position, countVec, 4);
+				// on this count we can know add the pre calculated values. and scatter it back to their positions
+				hash_map_value = maskz_add_epi32(foundPos, hash_map_value, input_add);
+				mask_i32scatter_epi32<Type, 64>(countVec, foundPos, hash_map_position, hash_map_value, 4, HSIZE);
+					
+				// finaly we remove the entries we just saved from the no_conflicts_mask such that the work to be done shrinkes.
+				no_conflicts_mask = kAndn(foundPos, no_conflicts_mask);
+			}
+
+			if(mask2int(foundEmpty) != 0){		//B1
+
+				// now we have to check for conflicts to prevent two different entries to write to the same position.
+				fpvec<Type, 64> saveConflicts = maskz_conflict_epi32(foundEmpty, hash_map_position);
+
+				fpvec<Type, 64> empty = set1<Type, 64>(mask2int(foundEmpty));
+				saveConflicts = register_and_epi32(saveConflicts, empty);
+
+				fpvec<Type, 64> to_save_data = cmpeq_epi32_mask(zeroMask_TMP, saveConflicts);
+
+				to_save_data = kAnd(to_save_data, foundEmpty);
+
+				// with the cleaned mask we can now save the data.
+				mask_i32scatter_epi32(hashVec, to_save_data, hash_map_position, input_value, 4, HSIZE);
+				mask_i32scatter_epi32(countVec, to_save_data, hash_map_position, input_add, 4, HSIZE);
+
+				//and again we need to remove the data from the todo list
+				no_conflicts_mask = kAndn(to_save_data, no_conflicts_mask);
+			}
+
+			// afterwards we add one on the current positions of the still to be handled values.
+			hash_map_position = maskz_add_epi32(no_conflicts_mask, hash_map_position, oneMask_TMP);
+
+			// Since there isn't a modulo operation we have to check if the values are bigger or equal the HSIZE AND IF we have to set them to zero
+			fpvec<Type, 64> tmp_HSIZE_mask = set1<Type, 64>(HSIZE);
+			fpvec<Type, 64> tobig = mask_cmp_epi32_mask_NLT(no_conflicts_mask, hash_map_position, tmp_HSIZE_mask);
+			hash_map_position = mask_set1(hash_map_position, tobig, (Type)0);
+
+			// we repeat this for one vector as long as their is still a value to be saved.
+		}while(mask2int(no_conflicts_mask) !=0);
+		p += 16;
+	}	
+
+	//scalar remainder
+    while(p < dataSize){
+        int error = 0;
+        // get the possible possition of the element.
+        Type hash_key = hashx(input[p], HSIZE);
+        
+        while(1){
+            // get the value of this position
+            Type value = hashVec[hash_key];
+            
+            // Check if it is the correct spot
+            if(value == input[p]){
+                countVec[hash_key]++;
+                break;
+            
+            // Check if the spot is empty
+            }else if(value == EMPTY_SPOT){
+                hashVec[hash_key] = input[p];
+                countVec[hash_key] = 1;
+                break;
+            
+            }
+            else{
+                //go to the next spot
+                hash_key = (hash_key + 1) % HSIZE;
+                //we assume that the hash_table is big enough
+            }
+        }
+        p++;
+    }	
+    // multiple improvements are possible:
+    // 1.   we could increase the performance of the worst case first write.
+    // 2.   we could absorbe the scalar remainder with overflow masks
+    // these would probably have a negative impact on  the overall performance.
+}
+//// end of LinearProbingFPGA_variant5()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

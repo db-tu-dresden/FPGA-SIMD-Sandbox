@@ -48,3 +48,17 @@ for v4
     - condition 1 inputValue == 66                                                          // if line 666 is breakpoint 1
 
     - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:656
+
+
+for v5 
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:784
+    - condition 1 p == 1                                                          // if line 666 is breakpoint 1
+
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:973
+
+
+
+AVX
+    - break FPGA-SIMD-Sandbox/group_count_AVX512/src/LinearProbing_avx512.cpp:484
+    - condition 1 p == 1     
+    - break FPGA-SIMD-Sandbox/group_count_AVX512/src/LinearProbing_avx512.cpp:638

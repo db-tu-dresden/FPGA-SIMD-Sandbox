@@ -708,7 +708,7 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 * Note: registers a and b may only contain elements of the datatype Type (currently uint32_t) with values ONLY 1 or 0 !!
 */
 template<typename T, int B>
-fpvec<T,B> kandn(fpvec<T,B>& a, fpvec<T,B>& b) {
+fpvec<T,B> kAndn(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
@@ -732,6 +732,27 @@ fpvec<T,B> kandn(fpvec<T,B>& a, fpvec<T,B>& b) {
 }
 
 /**	#30
+* serial primitive for Intel Intrinsic:
+* __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
+* original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
+*
+* Note: registers a and b may only contain elements of the datatype Type (currently uint32_t) with values ONLY 1 or 0 !!
+*/
+template<typename T, int B>
+fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
+	auto reg = fpvec<T,B>{};
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (a.elements[i] == b.elements[i]) {
+			reg.elements[i] = (Type)1;
+		} else {
+			reg.elements[i] = (Type)0;
+		}
+	}
+	return reg;
+}
+
+/**	#31
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_maskz_conflict_epi32 (__mmask16 k, __m512i a)
 * original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit using zeromask k 
@@ -822,4 +843,3 @@ fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,
 }
 
 #endif // PRIMITIVES_HPP
-

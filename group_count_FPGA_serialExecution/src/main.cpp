@@ -188,6 +188,7 @@ int  main(int argc, char** argv){
     std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 1 ### "<<std::endl;
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
+
 //// end of LinearProbingFPGA_variant1()
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -237,13 +238,14 @@ int  main(int argc, char** argv){
     std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 2 ### "<<std::endl;
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
+
 //// end of LinearProbingFPGA_variant2()
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //// Forward declare LinearProbingFPGA_variant3()    //SIMD for FPGA function v3 
-    // track timing information, in ms
+   // track timing information, in ms
     double pcie_time_v3=0.0;
     try {
         ////////////////////////////////////////////////////////////////////////////
@@ -338,6 +340,56 @@ int  main(int argc, char** argv){
     std::cout <<"=============================================="<<std::endl;
 
 //// end of LinearProbingFPGA_variant4()
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//// Forward declare LinearProbingFPGA_variant5()    //SIMD for FPGA function v4 (SoA_conflict_v1) 
+    // track timing information, in ms
+    double pcie_time_v5=0.0;
+    try {
+        ////////////////////////////////////////////////////////////////////////////
+        std::cout <<"=============================="<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
+
+        // dummy run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, HSIZE);
+
+        // measured run
+        initializeHashMap(hashVec,countVec,HSIZE);
+        auto begin_v5 = std::chrono::high_resolution_clock::now();
+        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, HSIZE);
+        auto end_v5 = std::chrono::high_resolution_clock::now();
+        duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
+
+        std::cout<<"Kernel runtime of function LinearProbingFPGA_variant5(): "<< (diff_v5.count()) << " ms." <<std::endl;
+        std::cout <<"=============================="<<std::endl;
+        pcie_time_v5=diff_v5.count();
+        ////////////////////////////////////////////////////////////////////////////
+    } 
+    catch (std::exception const& e) {
+        std::cout << "Caught a exception: " << e.what() << "\n";
+        std::terminate();
+    }        
+    // check result for correctness
+    validate(dataSize, hashVec,countVec, HSIZE);
+    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    std::cout<< " " <<std::endl;
+
+    // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    double input_size_mb_v5 = dataSize * sizeof(Type) * 1e-6;
+	std::cout << "Input_size_mb: " << input_size_mb_v5 <<std::endl;
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v5 / (pcie_time_v5 * 1e-3)) << " MB/s\n";
+    // note: Value is not to be taken seriously in pure host execution!
+    
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 5 ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+
+//// end of LinearProbingFPGA_variant5()
 ////////////////////////////////////////////////////////////////////////////////
 
     return 0;
