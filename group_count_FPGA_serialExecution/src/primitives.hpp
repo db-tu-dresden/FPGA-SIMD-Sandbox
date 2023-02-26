@@ -544,8 +544,6 @@ fpvec<T,B> createCutlowMask(T cutlowUnsigned) {
 template<typename T, int B>
 fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 	auto reg = fpvec<T,B>{};
-//	Type one = 1;
-//	Type zero = 0;
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		Type currentElement = a.elements[i];
@@ -561,6 +559,33 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 }
 
 /**	#23
+* adaption of #22 conflict_epi32
+* same functionality, but elements of input register that are zero will be ignored and set to zero within the returned register
+*/
+template<typename T, int B>
+fpvec<T,B> conflict_epi32_ignoreZero(fpvec<T,B>& a) {
+	auto reg = fpvec<T,B>{};
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		Type currentElement = a.elements[i];
+		for (int j=0; j<i; j++) {
+			if(a.elements[j] == (Type)0) {
+				reg.elements[i] = (Type)0;
+				j=i;	
+				break;
+			} else {
+				if(a.elements[j] == currentElement) {
+				reg.elements[i] = (Type)(j+1);
+				j=i;	
+				break;			
+				}
+			}
+		}
+	}	
+	return reg;
+}
+
+/**	#24
 * serial primitive for Intel Intrinsic:
 * void _mm512_mask_compressstoreu_epi32 (void* base_addr, __mmask16 k, __m512i a)
 * original description: "Contiguously store the active 32-bit integers in a (those with their respective bit set in writemask k) to unaligned memory at base_addr."
@@ -582,7 +607,7 @@ void mask_compressstoreu_epi32(Type* buffer, fpvec<T,B>& writeMask, fpvec<T,B>& 
 	}
 }
 
-/**	#24
+/**	#25
 * serial primitive for Built-in Function Provided by GCC:
 * int __builtin_popcount(int number)
 * original description: "This function is used to count the number of set bits in an unsigned integer. "
@@ -602,7 +627,7 @@ Type popcount_builtin(fpvec<T,B>& mask) {
 	return count;
 }
 
-/**	#25
+/**	#26
 * adaption of:
 * __m512i _mm512_set1_epi32 (int a)
 *
@@ -615,7 +640,7 @@ fpvec<T,B> setX_singleValue(T value) {
 	return reg;
 }
 
-/**	#26
+/**	#27
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_mask_i32gather_epi32 (__m512i src, __mmask16 k, __m512i vindex, void const* base_addr, int scale)
 * original description: "Gather 32-bit integers from memory using 32-bit indices. 32-bit elements are loaded from addresses starting 
@@ -648,7 +673,7 @@ fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>&
 	return reg;
 }
 
-/**	#27
+/**	#28
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_maskz_add_epi32 (__mmask16 k, __m512i a, __m512i b)
 * original description: "Add packed 32-bit integers in a and b, and store the results in dst using zeromask k 
@@ -670,7 +695,7 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 	return reg;
 }
 
-/**	#28
+/**	#29
 * serial primitive for Intel Intrinsic:
 * void _mm512_mask_i32scatter_epi32 (void* base_addr, __mmask16 k, __m512i vindex, __m512i a, int scale)
 * original description: "Scatter 32-bit integers from a into memory using 32-bit indices. 32-bit elements are stored at 
@@ -689,18 +714,20 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
-			size_t addr = 0 + vindex.elements[i];	// * scale * 8;	
+			Type addr = 0 + vindex.elements[i];	
 						// 0, because hashVec and countVec starting both at index 0
 						// omit *8 (because we don't need bit conversion)
 						// omit *scale, because we currently work with Type=uint32_t in all stages
 						// if we want to use another datatype, we may adjust the scale paramter within
 						// this function; now scale doesn't have an usage
-			baseStorage[(addr % HSIZE)] = data_to_scatter.elements[i];													
+//	std::cout<<"i = "<<i<<" || addr = "<<addr<<std::endl;	
+//	std::cout<<"data_to_scatter.elements[i];"<<data_to_scatter.elements[i]<<std::endl;						
+			baseStorage[(addr % HSIZE)] = (Type)data_to_scatter.elements[i];													
 		} 
 	}
 }
 
-/**	#29
+/**	#30
 * serial primitive for Intel Intrinsic:
 * __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
 * original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
@@ -731,7 +758,7 @@ fpvec<T,B> kAndn(fpvec<T,B>& a, fpvec<T,B>& b) {
 	return reg;
 }
 
-/**	#30
+/**	#31
 * serial primitive for Intel Intrinsic:
 * __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
 * original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
@@ -752,7 +779,7 @@ fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 	return reg;
 }
 
-/**	#31
+/**	#32
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_maskz_conflict_epi32 (__mmask16 k, __m512i a)
 * original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit using zeromask k 
@@ -792,7 +819,7 @@ fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
 	return reg;
 }
 
-/**	#32
+/**	#33
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_and_epi32 (__m512i a, __m512i b)
 * original description: "Compute the bitwise AND of packed 32-bit integers in a and b, and store the results in dst."
@@ -813,7 +840,7 @@ fpvec<T,B> register_and_epi32(fpvec<T,B>& a, fpvec<T,B>& b) {
 	return reg;
 }
 
-/**	#33
+/**	#34
 * serial primitive for Intel Intrinsic:
 * __mmask16 _mm512_mask_cmp_epi32_mask (__mmask16 k1, __m512i a, __m512i b, _MM_CMPINT_ENUM imm8)
 * original description: "Compare packed signed 32-bit integers in a and b based on the comparison operand specified by imm8,
