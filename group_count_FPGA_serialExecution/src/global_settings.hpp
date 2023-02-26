@@ -19,7 +19,8 @@
 
     //static uint64_t distinctValues = 8000;
     static const uint64_t distinctValues = 128;
-    static const uint64_t dataSize = 16*10000000;
+    //static const uint64_t dataSize = 16*10000000;
+    static const uint64_t dataSize = 384;
     static const float scale = 1.4;
     static const uint64_t HSIZE = distinctValues*scale;
 

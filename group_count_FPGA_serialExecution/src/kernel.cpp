@@ -772,25 +772,34 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 ////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
 
-// ####### REPLACE: 64 by regSize \\\\\\ 16 by elementCount
-// ####### local variables == WHEN WORKING : REPLACE with oneMask & zeroMask 
-	fpvec<Type, 64> oneMask_TMP = set1<Type, 64>(one);
-	fpvec<Type, 64> zeroMask_TMP = set1<Type, 64>(zero);
-
-	Type *buffer = reinterpret_cast< Type* >( _mm_malloc( 16 * sizeof(Type), 64 ) );
+	Type *buffer = reinterpret_cast< Type* >( _mm_malloc( elementCount * sizeof(Type), regSize ) );
 
 	size_t p = 0;
-	while(p + elementCount < dataSize){
+	//while(p + elementCount < dataSize){
+
+	// #########################################
+	// #### START OF FPGA parallelized part ####
+	// #########################################
+	// define dataVec register
+	fpvec<Type, regSize> input_value;
+
+	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
+
 		// load the to aggregate data
-		fpvec<Type, 64> input_value = load_epi32(oneMask_TMP, input, p, HSIZE);		// not used anymore
+		// fpvec<Type, regSize> input_value = load_epi32(oneMask, input, p, HSIZE);		// not used anymore
+
+		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+		input_value = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);	
+
 		// how much the given count should be increased for the given input.
-		fpvec<Type, 64> input_add = set1<Type, 64>(one);
+		fpvec<Type, regSize> input_add = set1<Type, regSize>(one);
 
 		// search for conflicts
-		fpvec<Type, 64> conflicts = conflict_epi32(input_value);
+		fpvec<Type, regSize> conflicts = conflict_epi32(input_value);
 		// masked to indicate were there is a conflict in the input_values and were not.
-		fpvec<Type, 64> no_conflicts_mask = cmpeq_epi32_mask(zeroMask_TMP, conflicts);
-		fpvec<Type, 64> negativ_no_conflicts_mask = knot(no_conflicts_mask);
+		fpvec<Type, regSize> no_conflicts_mask = cmpeq_epi32_mask(zeroMask, conflicts);
+		fpvec<Type, regSize> negativ_no_conflicts_mask = knot(no_conflicts_mask);
 
 		// we need to store the conflicts so we can interprete them as masks. and access them.
 		// we are only interested in the enties that are not zero. That means the conflict cases.
@@ -798,8 +807,8 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		size_t conflict_count = popcount_builtin(negativ_no_conflicts_mask);
 		// add at all the places where the conflict masks indicates that there is an overlap
 		for(size_t i = 0; i < conflict_count; i++){
-			fpvec<Type, 64> tmp_buffer_mask = setX_singleValue<Type, 64>(buffer[i]);
-			input_add = mask_add_epi32<Type, 64>(input_add, tmp_buffer_mask, input_add, oneMask_TMP);
+			fpvec<Type, regSize> tmp_buffer_mask = setX_singleValue<Type, regSize>(buffer[i]);
+			input_add = mask_add_epi32<Type, regSize>(input_add, tmp_buffer_mask, input_add, oneMask);
 		}
 
 		// we override the value and what to add with zero in the positions where we have a conflict.
@@ -812,26 +821,28 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		// OR we use the input and hash it save it in to buffer and than make a maskz load for the hashed data
 		// OR we have a simdifyed Hash Algorithm! For the most cases we would need an avx... mod. 
 		// _mm512_store_epi32(buffer, input_value);
-		for(size_t i = 0; i < 16; i++){
-			buffer[i] = hashx(input[p + i], HSIZE);
+		for(size_t i = 0; i < elementCount; i++){
+			// old : buffer[i] = hashx(input[p + i], HSIZE);
+			buffer[i] = hashx(input_value.elements[i], HSIZE);
+			
 		}
-		fpvec<Type, 64> hash_map_position = mask_loadu(no_conflicts_mask, buffer, (Type)0, HSIZE); // these are the hash values
+		fpvec<Type, regSize> hash_map_position = mask_loadu(no_conflicts_mask, buffer, (Type)0, HSIZE); // these are the hash values
 
 		do{
 			// now we can gather the data from the different positions where we have no conflicts.
-			fpvec<Type, 64> hash_map_value = mask_i32gather_epi32(zeroMask_TMP, no_conflicts_mask, hash_map_position, hashVec, 4);
+			fpvec<Type, regSize> hash_map_value = mask_i32gather_epi32(zeroMask, no_conflicts_mask, hash_map_position, hashVec, 4);
 			// with these we can calculate the different possible hits. Real hits and empty positions.
-			fpvec<Type, 64> foundPos = mask_cmpeq_epi32_mask(no_conflicts_mask, input_value, hash_map_value);
-			fpvec<Type, 64> foundEmpty = mask_cmpeq_epi32_mask(no_conflicts_mask, zeroMask_TMP, hash_map_value);
+			fpvec<Type, regSize> foundPos = mask_cmpeq_epi32_mask(no_conflicts_mask, input_value, hash_map_value);
+			fpvec<Type, regSize> foundEmpty = mask_cmpeq_epi32_mask(no_conflicts_mask, zeroMask, hash_map_value);
 
 			if(mask2int(foundPos) != 0){		//A
 				// Now we have to gather the count. IMPORTANT! the count is a 32bit integer. 
 				// FOR NOW THIS IS CORRECT BUT MIGHT CHANGE LATER!
 				// For 64bit integers we would need to find a different solution!
-				fpvec<Type, 64> hash_map_value = mask_i32gather_epi32(zeroMask_TMP, foundPos, hash_map_position, countVec, 4);
+				fpvec<Type, regSize> hash_map_value = mask_i32gather_epi32(zeroMask, foundPos, hash_map_position, countVec, 4);
 				// on this count we can know add the pre calculated values. and scatter it back to their positions
 				hash_map_value = maskz_add_epi32(foundPos, hash_map_value, input_add);
-				mask_i32scatter_epi32<Type, 64>(countVec, foundPos, hash_map_position, hash_map_value, 4, HSIZE);
+				mask_i32scatter_epi32<Type, regSize>(countVec, foundPos, hash_map_position, hash_map_value, 4, HSIZE);
 					
 				// finaly we remove the entries we just saved from the no_conflicts_mask such that the work to be done shrinkes.
 				no_conflicts_mask = kAndn(foundPos, no_conflicts_mask);
@@ -840,12 +851,12 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			if(mask2int(foundEmpty) != 0){		//B1
 
 				// now we have to check for conflicts to prevent two different entries to write to the same position.
-				fpvec<Type, 64> saveConflicts = maskz_conflict_epi32(foundEmpty, hash_map_position);
+				fpvec<Type, regSize> saveConflicts = maskz_conflict_epi32(foundEmpty, hash_map_position);
 
-				fpvec<Type, 64> empty = set1<Type, 64>(mask2int(foundEmpty));
+				fpvec<Type, regSize> empty = set1<Type, regSize>(mask2int(foundEmpty));
 				saveConflicts = register_and_epi32(saveConflicts, empty);
 
-				fpvec<Type, 64> to_save_data = cmpeq_epi32_mask(zeroMask_TMP, saveConflicts);
+				fpvec<Type, regSize> to_save_data = cmpeq_epi32_mask(zeroMask, saveConflicts);
 
 				to_save_data = kAnd(to_save_data, foundEmpty);
 
@@ -858,16 +869,16 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			}
 
 			// afterwards we add one on the current positions of the still to be handled values.
-			hash_map_position = maskz_add_epi32(no_conflicts_mask, hash_map_position, oneMask_TMP);
+			hash_map_position = maskz_add_epi32(no_conflicts_mask, hash_map_position, oneMask);
 
 			// Since there isn't a modulo operation we have to check if the values are bigger or equal the HSIZE AND IF we have to set them to zero
-			fpvec<Type, 64> tmp_HSIZE_mask = set1<Type, 64>(HSIZE);
-			fpvec<Type, 64> tobig = mask_cmp_epi32_mask_NLT(no_conflicts_mask, hash_map_position, tmp_HSIZE_mask);
+			fpvec<Type, regSize> tmp_HSIZE_mask = set1<Type, regSize>(HSIZE);
+			fpvec<Type, regSize> tobig = mask_cmp_epi32_mask_NLT(no_conflicts_mask, hash_map_position, tmp_HSIZE_mask);
 			hash_map_position = mask_set1(hash_map_position, tobig, (Type)0);
 
 			// we repeat this for one vector as long as their is still a value to be saved.
 		}while(mask2int(no_conflicts_mask) !=0);
-		p += 16;
+		p += elementCount;
 	}	
 
 	//scalar remainder

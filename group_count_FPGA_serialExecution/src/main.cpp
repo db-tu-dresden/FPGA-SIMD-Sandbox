@@ -97,7 +97,7 @@ int  main(int argc, char** argv){
 ////////////////////////////////////////////////////////////////////////////////
 //// Forward declare LinearProbingScalar()               //scalar version
     // track timing information, in ms
-    double pcie_time_v0=0.0;
+/*    double pcie_time_v0=0.0;
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
@@ -338,7 +338,7 @@ int  main(int argc, char** argv){
     std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 4 ### "<<std::endl;
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
-
+*/
 //// end of LinearProbingFPGA_variant4()
 ////////////////////////////////////////////////////////////////////////////////
 
