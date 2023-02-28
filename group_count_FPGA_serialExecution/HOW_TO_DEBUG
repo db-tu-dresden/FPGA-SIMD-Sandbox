@@ -1,4 +1,3 @@
-
 # using GDB Debugger in Intel Devcloud
 
 
@@ -45,20 +44,18 @@ for v2
 
 for v4 
     - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:666
-    - condition 1 inputValue == 66                                                          // if line 666 is breakpoint 1
-
+    - condition 1 inputValue == 66                                                      // if line 666 is breakpoint 1
     - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:656
 
 
 for v5 
-    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:784
-    - condition 1 p == 1                                                          // if line 666 is breakpoint 1
-
+    - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:788
+    - condition 1 p == 1                                                                // if line 788 is breakpoint 1
     - break FPGA-SIMD-Sandbox/group_count_FPGA_serialExecution/src/kernel.cpp:973
 
 
 
-AVX
+AVX V5
     - break FPGA-SIMD-Sandbox/group_count_AVX512/src/LinearProbing_avx512.cpp:484
-    - condition 1 p == 1     
+    - condition 1 p == 1                                                                // if line 484 is breakpoint 1
     - break FPGA-SIMD-Sandbox/group_count_AVX512/src/LinearProbing_avx512.cpp:638

@@ -16,28 +16,35 @@
  * @param Type define datatype which is used within all registers
  * @param regSize define register-size (in byte), which defines the amount of data that is load within one clock cycle :: (64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;)
  */
-
     //static uint64_t distinctValues = 8000;
     static const uint64_t distinctValues = 128;
-    //static const uint64_t dataSize = 16*10000000;
-    static const uint64_t dataSize = 384;
+    static const uint64_t dataSize = 16*10000000;
     static const float scale = 1.4;
     static const uint64_t HSIZE = distinctValues*scale;
+    
+//////// Up to this point the parameters can be adjusted.
+////////////////////////////////////////////////////////////////////////////////
+  
 
-    // define datatype which is used within all registers
+////////////////////////////////////////////////////////////////////////////////
+//////// DO NOT CHANGE THE FOLLOWING SETTINGS :
+    /**
+     * define datatype which is used within all registers
+     * NOTE: DON'T CHANGE these parameters!
+     */ 
     using Type = uint32_t;     
     using TypeSigned = int32_t;
 
     /**
     * define register-size (in byte), which defines the amount of data that is load within one clock cycle
     * NOTE: 64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;
-    * NOTE: At the moment, please use ONLY 256 byte !
+    * NOTE: DON'T CHANGE - PLEASE USE ONLY 256 byte !
     * NOTE: 	Due to current data loading approach, regSize must be 256 byte, so that
     *           every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
     */
     constexpr int regSize = 256; 
 
-// DON'T CHANGE!
+// DO NOT CHANGE!
     const Type loops = (dataSize / (regSize/sizeof(Type)));
     const Type elementCount = (regSize/sizeof(Type));
     // @ TODO : check, if Type & regSize match regarding max 2048 bit for FPGA with 4x DDR4 memory controller

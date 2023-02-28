@@ -2,13 +2,18 @@
 #define PRIMITIVES_HPP
 
 #include <array>
+#include <cmath>	//for pow() function
 #include "global_settings.hpp"
 
 /**
  * This file contains the scalar primitves of the Intel Intrinsics, which are used 
  * in the own AVX512-implementations of the hashbased group_count.
- * These functions will later be used to run the logic of the AVX512 implementations 
+ * These functions will be used to run the logic of the AVX512 implementations 
  * on a FPGA within the Intel DevCloud.
+ *
+ * Some of these functions are adapted to the peculiarities of our implementation. 
+ * This is usually due to the goal of simplified data processing. 
+ * In some cases, however, the logic of the implemented LinearProbing algorithms required a "special solution".
 */
 
 template<typename T, int B>
@@ -73,6 +78,10 @@ fpvec<T> setr_16slot(uint32_t e15, uint32_t e14, uint32_t e13, uint32_t e12, uin
 /**	#3
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_set1_epi32 (int a)
+*
+* The original Intrinsic was only for 32-bit integers.
+* This implemenation is working with uint32_t & uint64_t, etc.
+* But be careful with matching ratio of <Type, B> and related T value which is overhanded to the function!
 */
 template<typename T, int B>
 fpvec<T,B> set1(T value) {
@@ -242,8 +251,12 @@ void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fp
 * int _mm512_mask2int (__mmask16 k1)
 * original description: "Converts bit mask k1 into an integer value, storing the results in dst."
 * own (simplified implementation):
-* return 1 if at least 1 bit of mask is set;
-* return 0 if no bit of mask is set
+* 
+* IMPORTANT: 	This is an adjustet implementation of the intrinsic mentioned above. 
+				This solution is specially tailored to the logical flow of LinearProbing_v1 - v5 
+				and its functionality is reduced to its necessities.
+* @return 1 if at least 1 bit of mask is set;
+* @return 0 if no bit of mask is set
 */
 template<typename T, int B>
 Type mask2int(fpvec<T,B>& mask) {
@@ -252,6 +265,50 @@ Type mask2int(fpvec<T,B>& mask) {
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (mask.elements[i] == 1) {
 			res = 1;
+		}
+	}
+	return res;
+}
+
+/**	#9.1
+* adaption of Intel Intrinsic:
+* int _mm512_mask2int (__mmask16 k1)
+* IMPORTANT: 	This is an own adapted implementation of _mm512_mask2int, which return an uint32_t value
+*				as representation of overhanded mask.
+*				This function can handle masks up to 32 elements!
+*
+* @return uint32 value as representation of overhanded mask
+* @return 0 if no bit of mask is set
+*/
+template<typename T, int B>
+uint32_t mask2int_uint32_t(fpvec<T,B>& mask) {
+	uint32_t res = 0;
+	#pragma unroll	
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (mask.elements[i] == 1) {
+			res += pow(2,i);
+		}
+	}
+	return res;
+}
+
+/**	#9.2
+* adaption of Intel Intrinsic:
+* int _mm512_mask2int (__mmask16 k1)
+* IMPORTANT: 	This is an own adapted implementation of _mm512_mask2int, which return an uint64_t value
+*				as representation of overhanded mask.
+*				This function can handle masks up to 64 elements!
+*
+* @return uint64_t value as representation of overhanded mask
+* @return 0 if no bit of mask is set
+*/
+template<typename T, int B>
+uint64_t mask2int_uint64_t(fpvec<T,B>& mask) {
+	uint64_t res = 0;
+	#pragma unroll	
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (mask.elements[i] == 1) {
+			res += pow(2,i);
 		}
 	}
 	return res;
@@ -558,34 +615,8 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 	return reg;
 }
 
-/**	#23
-* adaption of #22 conflict_epi32
-* same functionality, but elements of input register that are zero will be ignored and set to zero within the returned register
-*/
-template<typename T, int B>
-fpvec<T,B> conflict_epi32_ignoreZero(fpvec<T,B>& a) {
-	auto reg = fpvec<T,B>{};
-#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		Type currentElement = a.elements[i];
-		for (int j=0; j<i; j++) {
-			if(a.elements[j] == (Type)0) {
-				reg.elements[i] = (Type)0;
-				j=i;	
-				break;
-			} else {
-				if(a.elements[j] == currentElement) {
-				reg.elements[i] = (Type)(j+1);
-				j=i;	
-				break;			
-				}
-			}
-		}
-	}	
-	return reg;
-}
 
-/**	#24
+/**	#23
 * serial primitive for Intel Intrinsic:
 * void _mm512_mask_compressstoreu_epi32 (void* base_addr, __mmask16 k, __m512i a)
 * original description: "Contiguously store the active 32-bit integers in a (those with their respective bit set in writemask k) to unaligned memory at base_addr."
@@ -607,7 +638,7 @@ void mask_compressstoreu_epi32(Type* buffer, fpvec<T,B>& writeMask, fpvec<T,B>& 
 	}
 }
 
-/**	#25
+/**	#24
 * serial primitive for Built-in Function Provided by GCC:
 * int __builtin_popcount(int number)
 * original description: "This function is used to count the number of set bits in an unsigned integer. "
@@ -627,7 +658,7 @@ Type popcount_builtin(fpvec<T,B>& mask) {
 	return count;
 }
 
-/**	#26
+/**	#25
 * adaption of:
 * __m512i _mm512_set1_epi32 (int a)
 *
@@ -640,7 +671,7 @@ fpvec<T,B> setX_singleValue(T value) {
 	return reg;
 }
 
-/**	#27
+/**	#26
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_mask_i32gather_epi32 (__m512i src, __mmask16 k, __m512i vindex, void const* base_addr, int scale)
 * original description: "Gather 32-bit integers from memory using 32-bit indices. 32-bit elements are loaded from addresses starting 
@@ -673,7 +704,7 @@ fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>&
 	return reg;
 }
 
-/**	#28
+/**	#27
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_maskz_add_epi32 (__mmask16 k, __m512i a, __m512i b)
 * original description: "Add packed 32-bit integers in a and b, and store the results in dst using zeromask k 
@@ -695,7 +726,7 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 	return reg;
 }
 
-/**	#29
+/**	#28
 * serial primitive for Intel Intrinsic:
 * void _mm512_mask_i32scatter_epi32 (void* base_addr, __mmask16 k, __m512i vindex, __m512i a, int scale)
 * original description: "Scatter 32-bit integers from a into memory using 32-bit indices. 32-bit elements are stored at 
@@ -727,7 +758,7 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 	}
 }
 
-/**	#30
+/**	#29
 * serial primitive for Intel Intrinsic:
 * __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
 * original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
@@ -758,7 +789,7 @@ fpvec<T,B> kAndn(fpvec<T,B>& a, fpvec<T,B>& b) {
 	return reg;
 }
 
-/**	#31
+/**	#30
 * serial primitive for Intel Intrinsic:
 * __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
 * original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
@@ -779,7 +810,7 @@ fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 	return reg;
 }
 
-/**	#32
+/**	#31
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_maskz_conflict_epi32 (__mmask16 k, __m512i a)
 * original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit using zeromask k 
@@ -797,6 +828,8 @@ fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 * 104 71  71 116 82  71 75 109 42 78 59 44 115 124 100 71 --> 0 0 2 0 0 2 0 0 0 0 0 0 0 0 0 2 
 *
 * Difference against conflict_epi32:	additional fpvec<T,B>& mask_k : if mask_k[i]==0 --> result[0]=0 ; else do conflict_epi32 algorithm
+*
+* We don't need this simplyfied maskz_conflict function anymore, we use maskz_conflict_ret_uint64_64elements() instead!
 */
 template<typename T, int B>
 fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
@@ -819,28 +852,31 @@ fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
 	return reg;
 }
 
-/**	#33
+/**	#32
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_and_epi32 (__m512i a, __m512i b)
 * original description: "Compute the bitwise AND of packed 32-bit integers in a and b, and store the results in dst."
 *
-* Note: registers a and b may only contain elements of the datatype Type (currently uint32_t) with values ONLY 1 or 0 !!
+* Note: Compute the AND (here simplified: proof of equality) of every element of two fpvec<T,B> registers.
+* @return 1, if elements at this position are equal	
+* @return 0, if elements at this position are unequal	
+* type of return-value is depending on the data type within the registers
 */
 template<typename T, int B>
-fpvec<T,B> register_and_epi32(fpvec<T,B>& a, fpvec<T,B>& b) {
+fpvec<T,B> register_and(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (a.elements[i] == b.elements[i]) {
-			reg.elements[i] = (Type)1;
+			reg.elements[i] = (T)1;
 		} else {
-			reg.elements[i] = (Type)0;
+			reg.elements[i] = (T)0;
 		}
 	}
 	return reg;
 }
 
-/**	#34
+/**	#33
 * serial primitive for Intel Intrinsic:
 * __mmask16 _mm512_mask_cmp_epi32_mask (__mmask16 k1, __m512i a, __m512i b, _MM_CMPINT_ENUM imm8)
 * original description: "Compare packed signed 32-bit integers in a and b based on the comparison operand specified by imm8,
@@ -868,5 +904,93 @@ fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,
 	}
 	return reg;
 }
+
+/////////////////////////////////////////////////////////////
+/////  heavily customized features specific to v5  //////////
+/////////////////////////////////////////////////////////////
+
+
+/**	#34
+* serial primitive for Intel Intrinsic:
+* __m512i _mm512_maskz_conflict_epi32 (__mmask16 k, __m512i a)
+* original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit using zeromask k 
+* 			(elements are zeroed out when the corresponding mask bit is not set). Each element's comparison forms a zero extended bit vector in dst."
+* 
+* customized maskz_conflict_ret_uint64_64elements - function:
+* This function check whether an element is already in the vector. 
+* Only elements with a lower index are checked. 
+* As a result, element 0 in the vector never has a conflict. The bits for each element are then set accordingly.
+* 
+* example:
+* index :							  0  1   2  3  4   5  6   7  8  9 10 11  12  13  14 15
+* input array (e.g. loaded values):	104 71 106 82 82 128 75 109 82 94 59 44 115 124 100 94 
+* result of conflict_epi32:			  0  0   0  0  8   0  0   0 24  0  0  0   0   0   0 512 
+* example input[0..15]
+* 1st conflict @ input[4] : 0 0 0 1 ..0 == 0 + 0 + 0 + 2^3 = 8
+* 2st conflict @ input[8] : 0 0 0 1 1 ..0 = 0 + 0 + 0 + 2^3 + 2^4 = 24
+* 3st conflict @ input[15]: 0 0 0 0 0 0 0 0 1 ..0 = 0 + .. + 0 + 2^9 = 512
+*
+* Difference against conflict_epi32:	additional fpvec<T,B>& mask_k : if mask_k[i]==0 --> result[0]=0 ; else do conflict_epi32 algorithm from above
+*
+* IMPORTANT: 	Adjustment of maskz_conflict_ret_uint64_64elements against: _mm512_maskz_conflict_epi32 : Due to the fact, that the input registers for this function
+*				containing up to 64 32-bit-elements in our implementation for LinearProbing_V5, we need to return a fpvec<uint64_t,512> which give us the possibility to return
+*				64-bit integers which can describe the real conflict situation for 64 positions.
+* IMPORTANT: 	This solution is a function specially adapted to LinearProbing_v5 and only works within it as long as the different input and output data formats are observed! 
+*				It is aimed to the current FPGA project, which works with 64-element data registers with 32-bit data elements (= 2048 bits per register)! 		
+* working example config:
+* @param1: fpvec<uint32_t,256>& mask_k
+* @param2: fpvec<uint32_t,256>& a
+* return: fpvec<uint64_t,512> 				
+*/
+template<typename T, int B>
+fpvec<uint64_t,512> maskz_conflict_ret_uint64_64elements(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
+	auto reg = fpvec<uint64_t,512>{};
+	#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if(mask_k.elements[i] == 1) {
+			Type currentElement = a.elements[i];
+			uint64_t conflict_calculation = 0;
+			for (int j=0; j<i; j++) {
+				if(a.elements[j] == currentElement) {
+					conflict_calculation += pow(2,j);		
+				}
+				reg.elements[i] = (uint64_t)conflict_calculation;
+			}
+		} else {
+			reg.elements[i] = (uint64_t)(0);
+		}	
+	}	
+	return reg;
+}
+
+/**	#35
+* adaption of Intel Intrinsic:
+* __mmask16 _mm512_cmpeq_epi32_mask (__m512i a, __m512i b)
+* original description: "Compare packed 32-bit integers in a and b for equality, and store the results in mask vector k."
+*
+* IMPORTANT: 	This solution is a function specially adapted to LinearProbing_v5 and only works within it as long as the different input and output data formats are observed! 
+*				It is aimed to the current FPGA project, which works with 64-element data registers with 32-bit data elements (= 2048 bits per register)! 		
+*
+* Compare every element of to registers of type fpvec<uint64_t,512> (64 64-bit elements), but return the result as fpvec<uint32_t,256> !
+* @return uint32_t 1, if elements at this position are equal	
+* @return uint32_t 0, if elements at this position are unequal	
+* @return fpvec<uint32_t,256> with 0 or 1 as representation for equality-comparison for every position
+*/
+template<typename T, int B>
+fpvec<T, B> cmpeq_epi64_reg_return_uint32_mask(fpvec<uint64_t,512>& a, fpvec<uint64_t,512>& b) {
+	fpvec<uint32_t,256> reg = fpvec<T,B>{};
+#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (a.elements[i] == b.elements[i]) {
+			reg.elements[i] = (T)1;
+		} else {
+			reg.elements[i] = (T)0;
+		}
+	}
+	return reg;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // PRIMITIVES_HPP

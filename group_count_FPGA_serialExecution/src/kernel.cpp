@@ -29,7 +29,8 @@
 // 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
 //	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
 //	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - use a vector with elements of type <fpvec<Type, regSize> as hash_map structure "around" the registers
-// 	LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5 - 
+// 	LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5 - 	search in loaded data register for conflicts and add the sum of occurences per element to countVec instead of 
+//																					process each item individually, even though it occurs multiple times in the currently loaded data		
 // 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,6 +71,7 @@ class kernelV3;
 	Type zero = 0;
 	fpvec<Type, regSize> oneMask = set1<Type, regSize>(one);
 	fpvec<Type, regSize> zeroMask = set1<Type, regSize>(zero);
+	fpvec<uint64_t,512> zeroMask_64bit_64elements = set1<uint64_t, 512>((uint64_t)0);
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -775,7 +777,10 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	Type *buffer = reinterpret_cast< Type* >( _mm_malloc( elementCount * sizeof(Type), regSize ) );
 
 	size_t p = 0;
-	//while(p + elementCount < dataSize){
+	
+	// AVX512-implementation of this LinearProbing-algorithm_v5 (SoA_conflict_v1) was actually using this while-loop.
+	// We replaced this solution through our for-loop for the loading cycles similar to the previous versions.
+	// while(p + elementCount < dataSize){
 
 	// #########################################
 	// #### START OF FPGA parallelized part ####
@@ -823,9 +828,11 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		// _mm512_store_epi32(buffer, input_value);
 		for(size_t i = 0; i < elementCount; i++){
 			// old : buffer[i] = hashx(input[p + i], HSIZE);
+			// we don't need this offset-calculation (p+i), because we iterate through our data-register (input_value), which
+			// will be loaded with new data in every data-loading-iteration. So we just have to iterate through the elements within this register. 
 			buffer[i] = hashx(input_value.elements[i], HSIZE);
-			
 		}
+
 		fpvec<Type, regSize> hash_map_position = mask_loadu(no_conflicts_mask, buffer, (Type)0, HSIZE); // these are the hash values
 
 		do{
@@ -849,20 +856,20 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			}
 
 			if(mask2int(foundEmpty) != 0){		//B1
-
 				// now we have to check for conflicts to prevent two different entries to write to the same position.
-				fpvec<Type, regSize> saveConflicts = maskz_conflict_epi32(foundEmpty, hash_map_position);
+				fpvec<uint64_t, 512> saveConflicts = maskz_conflict_ret_uint64_64elements(foundEmpty, hash_map_position);
 
-				fpvec<Type, regSize> empty = set1<Type, regSize>(mask2int(foundEmpty));
-				saveConflicts = register_and_epi32(saveConflicts, empty);
-
-				fpvec<Type, regSize> to_save_data = cmpeq_epi32_mask(zeroMask, saveConflicts);
+				// with the adjusted function maskz_conflict_ret_uint64_64elements, we don't need the procedure of register_and(saveConflicts, empty); anymore
+				// fpvec<uint64_t, 512> empty = set1<uint64_t, 512>(mask2int_uint64_t(foundEmpty));
+				// saveConflicts = register_and(saveConflicts, empty);
+				
+				fpvec<Type, regSize> to_save_data = cmpeq_epi64_reg_return_uint32_mask<Type, regSize>(zeroMask_64bit_64elements, saveConflicts);
 
 				to_save_data = kAnd(to_save_data, foundEmpty);
 
 				// with the cleaned mask we can now save the data.
-				mask_i32scatter_epi32(hashVec, to_save_data, hash_map_position, input_value, 4, HSIZE);
-				mask_i32scatter_epi32(countVec, to_save_data, hash_map_position, input_add, 4, HSIZE);
+				mask_i32scatter_epi32<Type, regSize>(hashVec, to_save_data, hash_map_position, input_value, 4, HSIZE);
+				mask_i32scatter_epi32<Type, regSize>(countVec, to_save_data, hash_map_position, input_add, 4, HSIZE);
 
 				//and again we need to remove the data from the todo list
 				no_conflicts_mask = kAndn(to_save_data, no_conflicts_mask);
@@ -880,6 +887,9 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		}while(mask2int(no_conflicts_mask) !=0);
 		p += elementCount;
 	}	
+	// #######################################
+	// #### END OF FPGA parallelized part ####
+	// #######################################
 
 	//scalar remainder
     while(p < dataSize){

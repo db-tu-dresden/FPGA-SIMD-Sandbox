@@ -44,13 +44,26 @@ using namespace std::chrono;
 */
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//	OVERVIEW about functions in kernel.cpp
+//
+//	LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA function v1 -  without aligned_start; version descbribed in paper
+// 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
+//	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
+//	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - use a vector with elements of type <fpvec<Type, regSize> as hash_map structure "around" the registers
+// 	LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5 - 	search in loaded data register for conflicts and add the sum of occurences per element to countVec instead of 
+//																					process each item individually, even though it occurs multiple times in the currently loaded data		
+// 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
 //// Forward declare functions
 struct MyException : public exception {
    const char * what () const throw () {
       return "C++ Exception";
    }
 };
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +110,7 @@ int  main(int argc, char** argv){
 ////////////////////////////////////////////////////////////////////////////////
 //// Forward declare LinearProbingScalar()               //scalar version
     // track timing information, in ms
-/*    double pcie_time_v0=0.0;
+    double pcie_time_v0=0.0;
     try {
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
@@ -338,13 +351,13 @@ int  main(int argc, char** argv){
     std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 4 ### "<<std::endl;
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
-*/
+
 //// end of LinearProbingFPGA_variant4()
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//// Forward declare LinearProbingFPGA_variant5()    //SIMD for FPGA function v4 (SoA_conflict_v1) 
+//// Forward declare LinearProbingFPGA_variant5()    //SIMD for FPGA function v5 (SoA_conflict_v1) 
     // track timing information, in ms
     double pcie_time_v5=0.0;
     try {
