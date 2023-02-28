@@ -6,9 +6,17 @@
 
 
 #include <unordered_map>
-#include "datagen.hpp"
+#include "datagenerator/datagen.hpp"
+#include "hash_function.hpp"
 
 
+std::chrono::high_resolution_clock::time_point time_now(){
+    return std::chrono::high_resolution_clock::now();
+}
+
+uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end){
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+}
 
 
 template <typename T>
@@ -92,26 +100,21 @@ void analyse2(T* data, size_t data_size){
 }
 
 
-template<typename T>
-size_t mod(T nr, size_t HSIZE){
-    return nr % HSIZE;
-}
-
-// simple multiplicative hashing function
-size_t hashx(uint32_t key, size_t HSIZE) {
-    return ((unsigned long)((unsigned int)1300000077*key)* HSIZE)>>32;
-}
-
 
 using ps_type = uint64_t;
 
 int main(int argc, char** argv){
 
-    size_t data_size = 2048;
+    size_t data_size = 2048 * 3;
     uint32_t *data = new uint32_t[data_size];
 
-    size_t distinct = 256;
-    double s = 1.1;
+    size_t distinct = 512;
+    size_t elements = 16;
+
+    float s = 1.1f;
+    float all_scales[] = {1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f};
+    size_t all_scales_size = sizeof(all_scales)/sizeof(all_scales[0]);
+
     size_t HSIZE = distinct * s;
     double spielraum = 0.00;
 
@@ -120,10 +123,92 @@ int main(int argc, char** argv){
     size_t valid_combinations = 0;
     std::unordered_map<std::string, int64_t> configuarations = {{"", 1}};
 
+    fill_tab_table();
+    HashFunction functions_to_test[] = {
+        // HashFunction::MULTIPLY_PRIME,
+        HashFunction::MULITPLY_SHIFT, 
+        HashFunction::MULTIPLY_ADD_SHIFT, 
+        HashFunction::MODULO, 
+        // HashFunction::MURMUR, 
+        // HashFunction::TABULATION,
+        HashFunction::NOISE
+    };
+    size_t number_hash_functions = sizeof(functions_to_test) / sizeof(functions_to_test[0]);
+
 
     size_t ok;
-    //ok = generate_data_p1(data, data_size, distinct, HSIZE, &mod, 128, distinct/128, 0, 0, 1, true);
-    ok = generate_data_p0<uint32_t>(data, data_size, distinct, &mod, 1, distinct, 0);
+    for(size_t a = 0; a < number_hash_functions; a++){
+        hash_fptr<uint32_t> function = get_hash_function<uint32_t>(functions_to_test[a]);
+        std::cout << "\n\n" << get_hash_function_name(functions_to_test[a]);
+
+        auto time_start = time_now();
+        size_t HSIZE = distinct * s + 0.5f;
+
+        size_t test_size = 0xFF00000;
+
+        for(size_t i = 0; i < test_size; i++){
+            function(i, HSIZE);
+        }
+
+        auto time_end = time_now();
+        std::cout<< "\tnano seconds per operation:\t" <<((duration_time(time_start, time_end)*100)/test_size)/100. << std::endl;
+
+        ok = generate_data_p0_2<uint32_t>(data, data_size, distinct, function, 8, distinct/8, 15);
+        double score = 0;
+        for(size_t b = 0; b < all_scales_size; b++){
+            s = all_scales[b];
+            float test_k = (10./9);
+            HSIZE = distinct * s * test_k + 0.5f;
+            // HSIZE = (HSIZE + elements - 1);
+            // HSIZE /= elements;
+            // HSIZE *= elements;
+
+
+            size_t control[HSIZE];
+            size_t bucket = 0;
+            for(size_t i = 0; i < HSIZE; i++){
+                control[i] = 0;
+            }
+            for(size_t i = 0; i < distinct; i++){
+                control[function(data[i], HSIZE)]++;
+            }
+            for(size_t i = 0; i < HSIZE; i++){
+                bucket += control[i] != 0;
+            }
+            score += (bucket * 1.0 / distinct);
+            std::cout <<"\tscale: "<< s << "\tHSIZE: " << HSIZE << "\tbuckets used: " << bucket << "\n";
+        }
+        score = (int32_t)(score / all_scales_size * 1000)/10.;
+        std::cout<< "\tscore: " << score << std::endl;
+    }
+    
+    size_t N = 4;
+    size_t i = 0;
+    size_t l = range_bit_based2(i, N);
+    size_t _s = 1;
+    std::cout << __builtin_clz(N) << std::endl;
+
+    // size_t max = 4294967295;
+    size_t max = N << 5;
+
+    bool end_it = false;
+    std::cout << l << "\t" << i << "\t-\t";
+    while( i <= max){
+        i++;
+        size_t l_n = range_bit_based2(i, N);
+        if(l_n != l){
+            end_it = l_n == 0;
+            l = l_n;
+            std::cout << i - 1 << "\tsize: " << _s << std::endl;
+            _s = 0;
+            if(i < max)
+                std::cout << l << "\t" << i << "\t-\t";
+        }
+        _s++;
+    }
+    std::cout << std::endl;
+
+
 
     // for(size_t col_group = 0; col_group <= p1_max_col_group && p1_parameter_gen_hsize(col_group) <= HSIZE; col_group++){
 
@@ -171,7 +256,7 @@ int main(int argc, char** argv){
     // std::cout << "results in: " << *k << std::endl;
     // delete k;
 
-    std::cout << "VALID COMBINATIONS\t" << valid_combinations << std::endl;
+    // std::cout << "VALID COMBINATIONS\t" << valid_combinations << std::endl;
 
 
     // for(size_t i = 0; i < data_size &&  i < 10; i++){
@@ -180,12 +265,4 @@ int main(int argc, char** argv){
     delete []data;
 
 
-
-
-    size_t prime = ((uint64_t)(1) << 31) - 1;
-    size_t prime2 = ((uint64_t)(1) << 61) - 1;
-    size_t res1 = prime * prime2;
-    size_t res2 = (prime * prime2) >> 63;
-    std::cout << res1 << "\t" << res2 << std::endl;
-    std::cout << prime << std::endl;
 }

@@ -16,7 +16,7 @@
 #include "../operator/physical/group_count/avx512_group_count_soa_conflict_v1.hpp"
 #include "../operator/physical/group_count/avx512_group_count_soa_conflict_v2.hpp"
 
-#include "datagen.hpp"
+#include "datagenerator/datagen.hpp"
 #include "hash_function.hpp"
 
 // TODO
@@ -606,19 +606,18 @@ void create_result_file(std::string filename){
     }
 }
 
-void write_to_file( std::string filename, //string
-    std::string alg_identification, //string
-    // benchmark time
-    uint64_t time, //size_t or uint64_t
-    // config
-    size_t data_size,   // size_t 
+void write_to_file( 
+    std::string filename,
+    std::string alg_identification,
+    uint64_t time, 
+    size_t data_size,
     size_t bytes,
-    size_t distinct_value_count, // size_t 
-    float scale, // Scaleing factor for Hash Table double/float
-    size_t HSIZE, // HASH Table Size size_t 
-    HashFunction hash_function_enum, // hash function index size_t 
-    size_t seed, // Datageneration seed COULD BE REPLACED BY ANNOTHER ID BUT!  size_t 
-    size_t rsd, // run id (same config with same runs) size_t
+    size_t distinct_value_count,
+    float scale,
+    size_t HSIZE,
+    HashFunction hash_function_enum, 
+    size_t seed,  
+    size_t rsd,
     size_t config_collision_count,
     size_t config_collition_size,
     size_t config_cluster_count,
