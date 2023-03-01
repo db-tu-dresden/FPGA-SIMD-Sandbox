@@ -80,10 +80,10 @@ report: $(SRC) Makefile
 ## ## ## ## ##
 
 hw: $(SRC) Makefile
-	icpx -fsycl $(ALL_CXXFLAGS) -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xsprofile -Xssave-temps -reuse-exe=$(TARGET).fpga -Xsoutput-report-folder=$(TARGET).prj -Xsboard=$(BOARD) -o $(TARGET).fpga $(SRC) lib/lib_sycl.a lib/lib_rtl.a $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L)
+	icpx -fsycl $(ALL_CXXFLAGS) -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=$(TARGET).fpga -Xsoutput-report-folder=$(TARGET).prj -Xsboard=$(BOARD) -o $(TARGET).fpga $(SRC) lib/lib_sycl.a lib/lib_rtl.a $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L)
 
 
-
+## delete -Xsprofile before "-reuse ..." --> profil-flag isn't necessary for FPGA-HW-Synthesis, only for analysis with VTune
 
 
 ## ## ## ## ##
@@ -91,10 +91,10 @@ hw: $(SRC) Makefile
 ## ## ## ## ##
 
 hw_a: $(SRC) Makefile
-	icpx -fsycl $(ALL_CXXFLAGS) -v -fPIC -fintelfpga -fsycl-link=image -Xshardware -fsycl-device-code-split=off -Xsprofile -reuse-exe=$(TARGET_KERNEL) -Xsboard=$(BOARD) kernel.cpp lib/lib_sycl.a lib/lib_rtl.a -o $(TARGET_KERNEL) $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L) -Wl,--unresolved-symbols=ignore-all
+	icpx -fsycl $(ALL_CXXFLAGS) -v -fPIC -fintelfpga -fsycl-link=image -Xshardware -fsycl-device-code-split=off -reuse-exe=$(TARGET_KERNEL) -Xsboard=$(BOARD) kernel.cpp lib/lib_sycl.a lib/lib_rtl.a -o $(TARGET_KERNEL) $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L) -Wl,--unresolved-symbols=ignore-all
 
 
-
+## delete -Xsprofile before "-reuse ..." --> profil-flag isn't necessary for FPGA-HW-Synthesis, only for analysis with VTune
 
 
 ## ## ## ## ##

@@ -152,7 +152,7 @@ std::array<fpvec<T, B>, (B/sizeof(T))> cvtu32_create_writeMask_Matrix() {
 * @param HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
 template<typename T, int B>
-fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {
+fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, uint32_t* data, uint32_t startIndex) {
 	auto reg = fpvec<T,B>{};
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
@@ -228,11 +228,12 @@ fpvec<T,B> mask_add_epi32(fpvec<T,B>& src, fpvec<T,B>& writeMask, fpvec<T,B>& a,
 * @param data : register-array which contains the data that should be stored
 */
 template<typename T, int B>
-void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, uint64_t HSIZE, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
+void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
-			result[(startIndex+i)%HSIZE] = data.elements[i];
+			// result[(startIndex+i)%HSIZE] = data.elements[i];
+			result[startIndex+i] = data.elements[i];
 		}
 	}
 }
@@ -312,7 +313,7 @@ Type clz_onceBultin(fpvec<T,B>& src) {
 * @param HSZIZE : HSIZE that describes the size of the arrays of the Hashvector (data array)
 */
 template<typename T, int B>
-fpvec<T,B> load_epi32(fpvec<T,B>& templateMask, uint32_t* data, uint32_t startIndex, uint64_t HSIZE) {		// testen - fehlt Parameter <T> ?
+fpvec<T,B> load_epi32(fpvec<T,B>& templateMask, uint32_t* data, uint32_t startIndex) {		// testen - fehlt Parameter <T> ?
 	auto reg = fpvec<T,B>{};
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {

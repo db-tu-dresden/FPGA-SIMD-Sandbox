@@ -128,7 +128,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		fpvec<Type, regSize> dataVec;
 
 		// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
-		#pragma nounroll
+//#pragma nounroll
 		for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
 			// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
@@ -142,7 +142,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			* @param p current element of input data array
 			**/ 	
 			int p = 0;
-			#pragma nounroll
+//#pragma nounroll
 			while (p < elementCount) {
 			
 				// get single value from current dataVec register at position p
@@ -164,7 +164,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
 
 					// Load 16 consecutive elements from hashVec, starting from position hash_key
-					fpvec<Type, regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key, HSIZE);
+					fpvec<Type, regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key);
 
 					// compare vector with broadcast value against vector with following elements for equality
 					fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -178,13 +178,13 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					**/ 
 					if ((mask2int(compareRes)) != 0) {    // !=0, because own function returns only 0 if any bit is zero
 						// load cout values from the corresponding location                
-						fpvec<Type, regSize> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
+						fpvec<Type, regSize> nextCounts = mask_loadu(oneMask, countVec, hash_key);
 					
 						// increment by one at the corresponding location
 						nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneMask);
 						
 						// selective store of changed value
-						mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
+						mask_storeu_epi32(countVec, hash_key, compareRes,nextCounts);
 						p++;
 						break;
 					}   
@@ -339,7 +339,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 
 						// Load 16 consecutive elements from hashVec, starting from position hash_key
-						fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
+						fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
 
 						// compare vector with broadcast value against vector with following elements for equality
 						fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -534,7 +534,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 							fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 
 							// Load 16 consecutive elements from hashVec, starting from position hash_key
-							fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
+							fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
 						
 							// compare vector with broadcast value against vector with following elements for equality
 							fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -678,8 +678,8 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			for(size_t i = 0; i < m_HSIZE_v; i++){
 				size_t h = i * m_elements_per_vector;
 
-				hash_map[i] = load_epi32(oneMask, hashVec, h, m_HSIZE);
-				count_map[i] = load_epi32(oneMask, countVec, h, m_HSIZE);
+				hash_map[i] = load_epi32(oneMask, hashVec, h);
+				count_map[i] = load_epi32(oneMask, countVec, h);
 			}
 
 			/**

@@ -98,7 +98,8 @@ int  main(int argc, char** argv){
     #endif
 
     // create the device queue
-    auto props = property_list{property::queue::enable_profiling()};
+    // auto props = property_list{property::queue::enable_profiling()};
+    auto props = property_list{};
     queue q(selector, exception_handler, props);
 
     // make sure the device supports USM device allocations

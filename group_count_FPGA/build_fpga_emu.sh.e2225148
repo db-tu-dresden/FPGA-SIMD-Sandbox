@@ -7,3 +7,4 @@ main.cpp:88:10: warning: variable 'size' set but not used [-Wunused-but-set-vari
     long size = kDDRInterleavedChunkSize * 4;
          ^
 1 warning generated.
+/usr/sbin/kill-illegit-procs: line 86: kill: (60220) - No such process
