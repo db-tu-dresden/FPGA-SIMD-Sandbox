@@ -15,11 +15,13 @@ enum HashFunction{
     MULTIPLY_ADD_SHIFT,
     MULTIPLY_PRIME,
     MURMUR,
-    NOISE
+    NOISE,
+    SIP_HASH
 };
 
 template<typename T>
 using hash_fptr = size_t (*)(T, size_t);
+
 
 /// @brief a necessary function for tabulation hashing (tab). This function fills the table with random values
 void fill_tab_table(){
@@ -51,9 +53,72 @@ size_t range_bit_based2(uint32_t val, size_t N){
     return (c) >> (bit);
 }
 
+template<size_t bits>
+size_t rotate_left(const size_t v){
+    const size_t left = v << bits;
+    const size_t right = v >> (64-bits);
+    return left | right;
+}
+
+void compress(size_t& v0, size_t& v1, size_t& v2, size_t& v3, const size_t rounds){
+    for(size_t i = 0; i < rounds; i++){
+        v0 += v1;
+        v2 += v3;
+        v1 = rotate_left<13>(v1);
+        v3 = rotate_left<16>(v3);
+        v1 ^= v0;
+        v3 ^= v2;
+
+        v0 = rotate_left<32>(v0);
+
+        v2 += v1;
+        v0 += v3;
+        v1 = rotate_left<17>(v1);
+        v3 = rotate_left<21>(v3);
+        v1 ^= v2;
+        v3 ^= v0;
+
+        v2 = rotate_left<32>(v2);
+    }
+}
+
 //---------------------------------------
 // hash function
 //---------------------------------------
+
+size_t _k_update_rounds = 2;
+size_t _k_finalize_rounds = 2;
+
+/// @brief based on highwayhash sip_hash. Instead of an array we use key and N and act like they were in an array
+/// @tparam T 
+/// @param key 
+/// @param N 
+/// @return [0, N)
+template<typename T>
+size_t sip_hash(T key, size_t N){
+    size_t v0 = 0x736f6d6570736575ull;
+    size_t v1 = 0x646f72616e646f6dull;
+    size_t v2 = 0x6c7967656e657261ull;
+    size_t v3 = 0x7465646279746573ull;
+
+    //packet 1 with the key
+    v3 ^= key;
+    compress(v0, v1, v2, v3, _k_update_rounds);
+    v0 ^= key;
+
+    //packet 2 with N
+    v3 ^= N;
+    compress(v0, v1, v2, v3, _k_update_rounds);    
+    v0 ^= N;
+
+    //FINALIZE (we don't really need this but to stay true to SIP HASH we do it too)
+    v2 ^= 0xFF;
+
+    compress(v0, v1, v2, v3, _k_finalize_rounds);
+
+    size_t val = (v0 ^ v1) ^ (v2 ^ v3);
+    return range_bit_based2(val, N);
+}
 
 /// @brief legcy hash function. Replaced by multiply shift
 /// @param key 
@@ -168,6 +233,7 @@ size_t multiply_add_shift(T key, size_t N){
 template<typename T>
 size_t multiply_shift(T key, size_t N){
     size_t a = 0x4D7C6D4D;
+    a ^= N;
     size_t y = a * key;
     // uint32_t z = (uint32_t)((y>>32) ^ (y));
     // return (uint64_t)(z) * (uint64_t)(N) >> 32;
@@ -218,6 +284,8 @@ hash_fptr<T> get_hash_function(HashFunction x){
             return &murmur;
         case HashFunction::NOISE:
             return &noise_hash;
+        case HashFunction::SIP_HASH:
+            return &sip_hash;
         default:
             throw std::runtime_error("Unknown Hash Function");
     }
@@ -242,6 +310,8 @@ std::string get_hash_function_name(HashFunction x){
             return "MURMUR";
         case HashFunction::NOISE:
             return "NOISE";
+        case HashFunction::SIP_HASH:
+            return "SIP_HASH";
         default:
             throw std::runtime_error("Unknown Hash Function");
     }

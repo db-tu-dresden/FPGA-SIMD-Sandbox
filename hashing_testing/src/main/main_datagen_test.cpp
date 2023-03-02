@@ -108,11 +108,11 @@ int main(int argc, char** argv){
     size_t data_size = 2048 * 3;
     uint32_t *data = new uint32_t[data_size];
 
-    size_t distinct = 512;
+    size_t distinct = 1024;
     size_t elements = 16;
 
     float s = 1.1f;
-    float all_scales[] = {1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f};
+    float all_scales[] = {1.0f, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f};
     size_t all_scales_size = sizeof(all_scales)/sizeof(all_scales[0]);
 
     size_t HSIZE = distinct * s;
@@ -125,15 +125,24 @@ int main(int argc, char** argv){
 
     fill_tab_table();
     HashFunction functions_to_test[] = {
-        // HashFunction::MULTIPLY_PRIME,
+        HashFunction::MULTIPLY_PRIME,
         HashFunction::MULITPLY_SHIFT, 
-        HashFunction::MULTIPLY_ADD_SHIFT, 
+        // HashFunction::MULTIPLY_ADD_SHIFT, 
         HashFunction::MODULO, 
         // HashFunction::MURMUR, 
         // HashFunction::TABULATION,
+        HashFunction::SIP_HASH,
         HashFunction::NOISE
     };
     size_t number_hash_functions = sizeof(functions_to_test) / sizeof(functions_to_test[0]);
+
+    size_t collision_count;
+    size_t collision_size;
+
+    // collision_count = 1;
+    collision_count = 8;
+    // collision_count = 16;
+    collision_size = distinct/collision_count;
 
 
     size_t ok;
@@ -153,14 +162,17 @@ int main(int argc, char** argv){
         auto time_end = time_now();
         std::cout<< "\tnano seconds per operation:\t" <<((duration_time(time_start, time_end)*100)/test_size)/100. << std::endl;
 
-        ok = generate_data_p0_2<uint32_t>(data, data_size, distinct, function, 8, distinct/8, 15);
+        ok = generate_data_p0_2<uint32_t>(data, data_size, distinct, function, collision_count, collision_size, 1794768573511499073);
         double score = 0;
         for(size_t b = 0; b < all_scales_size; b++){
+            size_t min = distinct;
+            size_t max = 0;
+
             s = all_scales[b];
-            float test_k = (10./9);
-            HSIZE = distinct * s * test_k + 0.5f;
-            // HSIZE = (HSIZE + elements - 1);
-            // HSIZE /= elements;
+            float bonus_scale = 1;
+            HSIZE = distinct * s * bonus_scale + 0.5f;
+            HSIZE = (HSIZE + elements - 1);
+            HSIZE /= elements;
             // HSIZE *= elements;
 
 
@@ -173,10 +185,30 @@ int main(int argc, char** argv){
                 control[function(data[i], HSIZE)]++;
             }
             for(size_t i = 0; i < HSIZE; i++){
+                if(control[i] > max){
+                    max = control[i];
+                }
+                if(control[i] < min && control[i] != 0){
+                    min = control[i];
+                }
+
                 bucket += control[i] != 0;
             }
-            score += (bucket * 1.0 / distinct);
-            std::cout <<"\tscale: "<< s << "\tHSIZE: " << HSIZE << "\tbuckets used: " << bucket << "\n";
+            score += (bucket * 1.0 / (distinct/16));
+            std::cout << "\tscale: "<< s << "\tHSIZE: " << HSIZE << "\tbuckets used: " << bucket << "  \t";
+            std::cout << "min: " << min << "  \tmax: " << max << std::endl;
+            
+            if(bucket <= 32 && bucket > 1){
+                std::cout << "\t\tbucket-info:";
+                for(size_t i = 0; i < HSIZE; i++){
+                    if(control[i] != 0){
+                        std::cout << "\t" << i << ":" << control[i];
+                    }
+                }
+                std::cout << std::endl;
+            }
+        
+        
         }
         score = (int32_t)(score / all_scales_size * 1000)/10.;
         std::cout<< "\tscore: " << score << std::endl;
