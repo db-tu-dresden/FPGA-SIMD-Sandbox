@@ -64,7 +64,8 @@ constexpr size_t kPCIeWidth = PCIE_WIDTH;
 class kernelV1;
 class kernelV2;
 class kernelV3;
-
+class kernelV4;
+class kernelV5;
 ////////////////////////////////////////////////////////////////////////////////
 //// declare some basic masks and arrays
 	Type one = 1;
@@ -160,7 +161,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 				fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
 
 				// Load #elementCount consecutive elements from hashVec, starting from position hash_key
-				fpvec<Type, regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key, HSIZE);
+				fpvec<Type, regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key);
 
 				// compare vector with broadcast value against vector with following elements for equality
 				fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -174,13 +175,13 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 				**/ 
 				if ((mask2int(compareRes)) != 0) {    // !=0, because own function returns only 0 if any bit is zero
 					// load cout values from the corresponding location                
-					fpvec<Type, regSize> nextCounts = mask_loadu(oneMask, countVec, hash_key, HSIZE);
+					fpvec<Type, regSize> nextCounts = mask_loadu(oneMask, countVec, hash_key);
 					
 					// increment by one at the corresponding location
 					nextCounts = mask_add_epi32(nextCounts, compareRes, nextCounts, oneMask);
 							
 					// selective store of changed value
-					mask_storeu_epi32(countVec, hash_key, HSIZE, compareRes,nextCounts);
+					mask_storeu_epi32(countVec, hash_key, compareRes,nextCounts);
 					p++;
 					break;
 				}   
@@ -313,7 +314,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 				fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 	
 				// Load 16 consecutive elements from hashVec, starting from position hash_key
-				fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
+				fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
 
 				// compare vector with broadcast value against vector with following elements for equality
 				fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -487,7 +488,7 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 					fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 
 					// Load 16 consecutive elements from hashVec, starting from position hash_key
-					fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start, HSIZE);
+					fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
 					
 					// compare vector with broadcast value against vector with following elements for equality
 					fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -612,8 +613,8 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
     for(size_t i = 0; i < m_HSIZE_v; i++){
         size_t h = i * m_elements_per_vector;
 
-       	hash_map[i] = load_epi32(oneMask, hashVec, h, m_HSIZE);
-    	count_map[i] = load_epi32(oneMask, countVec, h, m_HSIZE);
+       	hash_map[i] = load_epi32(oneMask, hashVec, h);
+    	count_map[i] = load_epi32(oneMask, countVec, h);
 	}
 
 	/**
@@ -833,7 +834,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			buffer[i] = hashx(input_value.elements[i], HSIZE);
 		}
 
-		fpvec<Type, regSize> hash_map_position = mask_loadu(no_conflicts_mask, buffer, (Type)0, HSIZE); // these are the hash values
+		fpvec<Type, regSize> hash_map_position = mask_loadu(no_conflicts_mask, buffer, (Type)0); // these are the hash values
 
 		do{
 			// now we can gather the data from the different positions where we have no conflicts.
