@@ -191,14 +191,14 @@ void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algori
 
 //meta benchmark info!
 using ps_type = uint32_t; 
-size_t repeats_same_data = 5;
-size_t repeats_different_data = 1;
+size_t repeats_same_data = 3;
+size_t repeats_different_data = 3;
 
 int main(int argc, char** argv){
     fill_tab_table();
 
     size_t distinct_value_count = 2048;
-    size_t all_data_sizes = 32 * 1024 * 1024;// 1024*1024*1024;
+    size_t all_data_sizes = 16 * 1024 * 1024;// 1024*1024*1024;
 
     float scale_boost = 1.0f;
 
@@ -210,17 +210,18 @@ int main(int argc, char** argv){
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V2 
         , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1
-        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2
+        // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2
     };
     
     // size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
     HashFunction functions_to_test[] = {
         HashFunction::MULTIPLY_PRIME,
-        HashFunction::MULITPLY_SHIFT, 
-        HashFunction::MULTIPLY_ADD_SHIFT, 
+        // HashFunction::MULITPLY_SHIFT, 
+        // HashFunction::MULTIPLY_ADD_SHIFT, 
         HashFunction::MODULO, 
-        HashFunction::MURMUR, 
-        HashFunction::TABULATION
+        // HashFunction::MURMUR, 
+        // HashFunction::TABULATION,        
+        HashFunction::NOISE
     };
     
     size_t number_algorithms_undertest = sizeof(algorithms_undertest) / sizeof(algorithms_undertest[0]);
@@ -283,12 +284,13 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     Group_count<T> *alg = nullptr;
 
     for(size_t conf = 0; conf < configuration_count; conf++){// iterate over all configurations of collisions and clusters
-        for(size_t hash_function_id = 0; hash_function_id < all_hash_functions_size; hash_function_id++){ // sets the hashfunction. different functions lead to different data    
-            HashFunction hash_function_enum = functions_to_test[hash_function_id];
-            hash_fptr<T> function = get_hash_function<T>(hash_function_enum);
+        for(size_t rdd = 0; rdd < repeats_different_data; rdd++){
+            size_t seed = noise(noise_id++, 0);
         
-            for(size_t rdd = 0; rdd < repeats_different_data; rdd++){
-                size_t seed = noise(noise_id++, 0);
+            for(size_t hash_function_id = 0; hash_function_id < all_hash_functions_size; hash_function_id++){ // sets the hashfunction. different functions lead to different data    
+                HashFunction hash_function_enum = functions_to_test[hash_function_id];
+                hash_fptr<T> function = get_hash_function<T>(hash_function_enum);
+        
                 generate_data_p0<T>( // the seed is for rdd the run id
                     data, data_size, distinct_value_count, function, 
                     collision_count[conf], collision_size[conf], seed
