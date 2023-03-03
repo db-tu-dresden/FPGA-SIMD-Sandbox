@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<stdint.h>
 
 #include "helper_kernel.hpp"
 
@@ -8,6 +9,44 @@ using namespace std;
 // simple multiplicative hashing function
 unsigned int hashx(int key, int HSIZE) {
     return ((unsigned long)((unsigned int)1300000077*key)* HSIZE)>>32;
+}
+
+/**	
+* adaption of c++ pow-function from cmath:
+* pow(double base, double exponent);
+*
+* own function calculate : result = x^a
+* return an uint32_t value -> in this project suitable for use within 64-element registers
+*/
+uint32_t exponentiation_primitive_uint32_t(int x, int a) {
+	uint32_t res = 1;
+	if (a == 0) {
+		return res;
+	} else {
+		for (int i=1; i<=a; i++) {
+			res = res * x;
+		}
+		return res;
+	}
+}
+
+/**	
+* adaption of c++ pow-function from cmath:
+* pow(double base, double exponent);
+*
+* own function calculate : result = x^a
+* return an uint64_t value -> in this project suitable for use within 64-element registers
+*/
+uint64_t exponentiation_primitive_uint64_t(int x, int a) {
+	uint64_t res = 1;
+	if (a == 0) {
+		return res;
+	} else {
+		for (int i=1; i<=a; i++) {
+			res = res * x;
+		}
+		return res;
+	}
 }
 
 /** 

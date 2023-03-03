@@ -2,7 +2,6 @@
 #define PRIMITIVES_HPP
 
 #include <array>
-#include <cmath>	//for pow() function
 #include "global_settings.hpp"
 
 /**
@@ -285,7 +284,7 @@ uint32_t mask2int_uint32_t(fpvec<T,B>& mask) {
 	#pragma unroll	
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (mask.elements[i] == 1) {
-			res += pow(2,i);
+			res += exponentiation_primitive_uint32_t(2,i);
 		}
 	}
 	return res;
@@ -307,7 +306,7 @@ uint64_t mask2int_uint64_t(fpvec<T,B>& mask) {
 	#pragma unroll	
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (mask.elements[i] == 1) {
-			res += pow(2,i);
+			res += exponentiation_primitive_uint64_t(2,i);
 		}
 	}
 	return res;
@@ -950,7 +949,7 @@ fpvec<uint64_t,512> maskz_conflict_ret_uint64_64elements(fpvec<T,B>& mask_k, fpv
 			uint64_t conflict_calculation = 0;
 			for (int j=0; j<i; j++) {
 				if(a.elements[j] == currentElement) {
-					conflict_calculation += pow(2,j);		
+					conflict_calculation += exponentiation_primitive_uint64_t(2,j);		
 				}
 				reg.elements[i] = (uint64_t)conflict_calculation;
 			}
