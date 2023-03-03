@@ -735,10 +735,10 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 * @param vindex : register of type fpvec<T,B> 
 * @param data_to_scatter : register of type fpvec<T,B>
 * @param scale : scale should be 1, 2, 4 or 8
-* @param HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets
+* @param tmp_HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets
 */
 template<typename T, int B>
-void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter, int scale, uint64_t HSIZE) {
+void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter, int scale, Type tmp_HSIZE) {
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
@@ -748,9 +748,10 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 						// omit *scale, because we currently work with Type=uint32_t in all stages
 						// if we want to use another datatype, we may adjust the scale paramter within
 						// this function; now scale doesn't have an usage
-//	std::cout<<"i = "<<i<<" || addr = "<<addr<<std::endl;	
-//	std::cout<<"data_to_scatter.elements[i];"<<data_to_scatter.elements[i]<<std::endl;						
-			baseStorage[(addr % HSIZE)] = (Type)data_to_scatter.elements[i];													
+			if (addr >= tmp_HSIZE) {
+				addr = tmp_HSIZE-addr;
+			}							
+			baseStorage[addr] = (Type)data_to_scatter.elements[i];													
 		} 
 	}
 }

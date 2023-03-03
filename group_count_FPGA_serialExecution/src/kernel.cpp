@@ -843,6 +843,14 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			fpvec<Type, regSize> foundPos = mask_cmpeq_epi32_mask(no_conflicts_mask, input_value, hash_map_value);
 			fpvec<Type, regSize> foundEmpty = mask_cmpeq_epi32_mask(no_conflicts_mask, zeroMask, hash_map_value);
 
+			/**
+			 * convert variable HSIZE to 32-bit
+			 * we don't need HSIZE as 64-bit integer, but this datatype cost much ressources on FPGA
+			 * @ TODO change datatype of HSIZE global to "TYPE"
+			 * @ TODO delete this conversion and use optimized HSIZE variable, when optimization above is done.  
+			*/ 
+			Type tmp_HSIZE = (Type)HSIZE;
+
 			if(mask2int(foundPos) != 0){		//A
 				// Now we have to gather the count. IMPORTANT! the count is a 32bit integer. 
 				// FOR NOW THIS IS CORRECT BUT MIGHT CHANGE LATER!
@@ -850,7 +858,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 				fpvec<Type, regSize> hash_map_value = mask_i32gather_epi32(zeroMask, foundPos, hash_map_position, countVec, 4);
 				// on this count we can know add the pre calculated values. and scatter it back to their positions
 				hash_map_value = maskz_add_epi32(foundPos, hash_map_value, input_add);
-				mask_i32scatter_epi32<Type, regSize>(countVec, foundPos, hash_map_position, hash_map_value, 4, HSIZE);
+				mask_i32scatter_epi32<Type, regSize>(countVec, foundPos, hash_map_position, hash_map_value, 4, tmp_HSIZE);
 					
 				// finaly we remove the entries we just saved from the no_conflicts_mask such that the work to be done shrinkes.
 				no_conflicts_mask = kAndn(foundPos, no_conflicts_mask);
@@ -869,8 +877,8 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 				to_save_data = kAnd(to_save_data, foundEmpty);
 
 				// with the cleaned mask we can now save the data.
-				mask_i32scatter_epi32<Type, regSize>(hashVec, to_save_data, hash_map_position, input_value, 4, HSIZE);
-				mask_i32scatter_epi32<Type, regSize>(countVec, to_save_data, hash_map_position, input_add, 4, HSIZE);
+				mask_i32scatter_epi32<Type, regSize>(hashVec, to_save_data, hash_map_position, input_value, 4, tmp_HSIZE);
+				mask_i32scatter_epi32<Type, regSize>(countVec, to_save_data, hash_map_position, input_add, 4, tmp_HSIZE);
 
 				//and again we need to remove the data from the todo list
 				no_conflicts_mask = kAndn(to_save_data, no_conflicts_mask);
@@ -880,7 +888,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			hash_map_position = maskz_add_epi32(no_conflicts_mask, hash_map_position, oneMask);
 
 			// Since there isn't a modulo operation we have to check if the values are bigger or equal the HSIZE AND IF we have to set them to zero
-			fpvec<Type, regSize> tmp_HSIZE_mask = set1<Type, regSize>(HSIZE);
+			fpvec<Type, regSize> tmp_HSIZE_mask = set1<Type, regSize>(tmp_HSIZE);
 			fpvec<Type, regSize> tobig = mask_cmp_epi32_mask_NLT(no_conflicts_mask, hash_map_position, tmp_HSIZE_mask);
 			hash_map_position = mask_set1(hash_map_position, tobig, (Type)0);
 
