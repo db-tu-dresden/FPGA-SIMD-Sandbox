@@ -11,6 +11,10 @@ unsigned int hashx(int key, int HSIZE) {
     return ((unsigned long)((unsigned int)1300000077*key)* HSIZE)>>32;
 }
 
+// ####################
+// OLD FUNCTIONS - in current version not used anymore
+// ####################
+
 /**	
 * adaption of c++ pow-function from cmath:
 * pow(double base, double exponent);
