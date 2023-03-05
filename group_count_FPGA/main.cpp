@@ -15,6 +15,19 @@
 * The Intel Intrinsics from the previous AVX512-based implementation were re-implemented without AVX512.
 * This code is intended to be able to run in parallel with the Intel OneAPI on FPGAs.
 */
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//	OVERVIEW about functions in kernel.cpp
+//
+//	LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA function v1 -  without aligned_start; version descbribed in paper
+// 	LinearProbingFPGA_variant2() == SoA_v2 -- SIMD for FPGA function v2 - first optimization: using aligned_start
+//	LinearProbingFPGA_variant3() == SoA_v3 -- SIMD for FPGA function v3 - with aligned start and approach of using permutexvar_epi32
+//	LinearProbingFPGA_variant4() == SoAoV_v1 -- SIMD for FPGA function v4 - use a vector with elements of type <fpvec<Type, regSize> as hash_map structure "around" the registers
+// 	LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA function v5 - 	search in loaded data register for conflicts and add the sum of occurences per element to countVec instead of 
+//																					process each item individually, even though it occurs multiple times in the currently loaded data		
+// 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -704,6 +717,184 @@ int  main(int argc, char** argv){
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
 //// end of LinearProbingFPGA_variant4()
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//// Forward declare LinearProbingFPGA_variant5()
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 5 (SoA_conflict_v1) ### \n\n");
+
+    /////////////////////////////////////////////////////////////
+    /////// declare additional variables and datastructures - only for LinearProbingFPGA_variant4()
+    
+    Type *buffer_h;
+    Type *buffer_d;
+
+    /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
+
+    // Host buffer 
+    if ((arr_h = malloc_host<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
+        std::terminate();
+    }
+    if ((hashVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'hashVec_h'\n";
+        std::terminate();
+    }
+    if ((countVec_h = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'countVec_h'\n";
+        std::terminate();
+    }  
+    if ((buffer_h = malloc_device<Type>((elementCount * sizeof(Type)), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'buffer_h'\n";
+        std::terminate();
+    }  
+
+    // Device buffer  
+    if ((arr_d = malloc_device<Type>(dataSize * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
+        std::terminate();
+    }
+    if ((hashVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'hashVec_d'\n";
+        std::terminate();
+    }
+    if ((countVec_d = malloc_device<Type>(HSIZE * sizeof(uint32_t), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'countVec_d'\n";
+        std::terminate();
+    }  
+    if ((buffer_d = malloc_device<Type>((elementCount * sizeof(Type)), q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'buffer_d'\n";
+        std::terminate();
+    }  
+
+    // check if memory for input array and HashTable (hashVec and countVec) is allocated correctly (on host)
+    if (arr_h != NULL) {
+        std::cout << "Memory allocated - " << dataSize << " values, between 1 and " << distinctValues << std::endl;
+    } else {
+        std::cout << "Memory not allocated!" << std::endl;
+    }
+    if (hashVec_h != NULL ||  countVec_h != NULL) {
+        std::cout << "HashTable allocated - " <<HSIZE<< " values" << std::endl;
+    } else {
+        std::cout << "HashTable not allocated" << std::endl;
+    }
+
+    // Init input buffer
+    generateData(arr_h, distinctValues, dataSize);    
+    std::cout <<"Generation of initial data done."<< std::endl; 
+
+    // Copy input host buffer to input device buffer
+    q.memcpy(arr_d, arr_h, dataSize * sizeof(uint32_t));
+    q.wait();	
+
+    // init HashMap
+    initializeHashMap(hashVec_h,countVec_h,HSIZE);
+    
+    // Copy with zero initialized HashMap (hashVec, countVec) from host to device
+    q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
+    q.wait();
+    q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(uint32_t));
+    q.wait();
+
+    // Init buffer_h with zero's and copy to buffer_d
+	for(int k=0; k<elementCount; k++) {
+		buffer_h[k] = (Type)0;
+	}
+    q.memcpy(buffer_d, buffer_h, (elementCount * sizeof(Type)));
+    q.wait();
+
+    // track timing information, in ms
+    double pcie_time_v5=0.0;
+
+//SIMD for FPGA function v5 (SoA_conflict_v1)
+    try {
+        ////////////////////////////////////////////////////////////////////////////
+        std::cout <<"=============================="<<std::endl;
+        std::cout <<"Kernel-Start : LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA Variant v5:"<<std::endl;
+        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
+
+        // dummy run to program FPGA, dont care first run for measurement
+        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, buffer_d, dataSize, HSIZE);
+
+        // Re-Initialize HashMap after dummy run
+        initializeHashMap(hashVec_h,countVec_h,HSIZE);
+        q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
+        q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(uint32_t));
+        q.wait();
+
+        // measured run on FPGA
+        auto begin_v5 = std::chrono::high_resolution_clock::now();
+        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, buffer_d, dataSize, HSIZE);
+        auto end_v5 = std::chrono::high_resolution_clock::now();
+        duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
+
+        std::cout<<"Kernel runtime of function LinearProbingFPGA_variant5(): "<< (diff_v5.count()) << " ms." <<std::endl;
+        std::cout <<"=============================="<<std::endl;
+        pcie_time_v5=diff_v5.count();
+        ////////////////////////////////////////////////////////////////////////////
+    } 
+    catch (sycl::exception const& e) {
+        std::cout << "Caught a synchronous SYCL exception: " << e.what() << "\n";
+        std::terminate();
+    }   
+
+    // Copy output device buffer to output host buffer 
+    q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(uint32_t));
+    q.wait();  
+    q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(uint32_t));
+    q.wait();  
+
+    /**
+     * Test print to detect the following error, which has occurred irregularly in the past. 
+     * Element Validation
+     * ERROR   Count           76      has a count of 1249992  but should have a count of 1249994
+     * Element Validation found 1 Error
+     * ==============================
+     * i || hashVec || countVec ||
+     * 0 || 76 || 1249992 || 1249992
+     * 1 || 76 || 2 || 2
+    */
+    /*
+    std::cout<<"i || hashVec || countVec ||"<<std::endl;
+    for(int i=0; i<HSIZE; i++) {
+        std::cout<<i<<" || "<<hashVec_d[i]<<" || "<<countVec_d[i]<<" || "<<countVec_h[i]<<std::endl;
+    }  
+    */
+    
+    std::cout << "Value in variable dataSize: " << dataSize << std::endl;
+    std::cout<< " " <<std::endl;
+
+    // check result for correctness
+    validate(dataSize, hashVec_h, countVec_h, HSIZE);
+    validate_element(arr_h, dataSize, hashVec_h, countVec_h, HSIZE);
+    std::cout<< " " <<std::endl;
+
+    // free USM memory
+    sycl::free(arr_h, q);
+    sycl::free(hashVec_h, q);
+    sycl::free(countVec_h, q);
+    sycl::free(buffer_h, q); 
+    
+    sycl::free(arr_d, q);
+    sycl::free(hashVec_d, q);
+    sycl::free(countVec_d, q);   
+    sycl::free(buffer_d, q); 
+
+    // print result
+    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    double input_size_mb_v5 = dataSize * sizeof(Type) * 1e-6;
+	std::cout << "Input_size_mb: " << input_size_mb_v5 <<std::endl;
+    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v5 / (pcie_time_v5 * 1e-3)) << " MB/s\n";
+
+    std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 5 ### "<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+    std::cout <<"=============================================="<<std::endl;
+//// end of LinearProbingFPGA_variant5()
 ////////////////////////////////////////////////////////////////////////////////
 }
 // end of main()

@@ -1,0 +1,9 @@
+/data/intel_fpga/devcloudLoginToolSetup.sh: line 1054: /opt/intel/openvino/deployment_tools/../bin/setupvars.sh: No such file or directory
+main.cpp:101:10: warning: variable 'size' set but not used [-Wunused-but-set-variable]
+    long size = kDDRInterleavedChunkSize * 4;
+         ^
+1 warning generated.
+main.cpp:101:10: warning: variable 'size' set but not used [-Wunused-but-set-variable]
+    long size = kDDRInterleavedChunkSize * 4;
+         ^
+1 warning generated.

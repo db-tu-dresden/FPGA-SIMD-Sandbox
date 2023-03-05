@@ -23,7 +23,7 @@ tools_setup -t S10OAPI
 #source /glob/development-tools/versions/oneapi/2022.3/oneapi/setvars.sh --force
 
 
-cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel_v5
+cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v5
 
 # Running project in FPGA Hardware Mode
 printf "\\n%s\\n" "Running on FPGA Hardware:"

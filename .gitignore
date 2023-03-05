@@ -4,3 +4,15 @@ group_count_AVX512/CMakeFiles/*
 group_count_FPGA/main.prj/*
 
 group_count_AVX512/CMakeCache.txt
+
+group_count_FPGA_singleKernel_v1/main.prj/*
+group_count_FPGA_singleKernel_v2/main.prj/*
+group_count_FPGA_singleKernel_v3/main.prj/*
+group_count_FPGA_singleKernel_v4/main.prj/*
+group_count_FPGA_singleKernel_v5/main.prj/*
+
+
+group_count_FPGA_v5_oM/*
+
+
+FPGA-SIMD-Sandbox.tar.gz
