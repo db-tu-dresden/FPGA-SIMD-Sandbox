@@ -12,6 +12,6 @@ using namespace sycl;
 
 class kernelV2;
 
-void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE);
+void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE, size_t size);
 
 #endif  // KERNEL_HPP
