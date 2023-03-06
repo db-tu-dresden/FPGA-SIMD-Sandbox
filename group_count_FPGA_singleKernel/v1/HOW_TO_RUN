@@ -29,6 +29,10 @@ From the login-2 node this should already work fine:
     --> select 5 or 6
 -	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1 
 -   source /opt/intel/inteloneapi/setvars.sh
+
+-   add 2nd paramater to next command, if you want to change the "size" parameter within main;
+    this currently have no effects on the dataSize of the project, but if no additional parameter is set, 
+    the dataSize-parameter defines the size and thus also the iteration parameter.
 -   ./main.fpga_emu
 
 
@@ -43,7 +47,7 @@ From the login-2 node this should already work fine:
 -	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1 
 
 -   execute main.fpga on FPGA via batchjob:
--   qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=00:05:00
+-   qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=01:00:00
 -   After the execution ist finished, check the log files run_hw.e... and run_hw.o...
 
 

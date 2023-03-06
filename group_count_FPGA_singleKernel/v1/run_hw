@@ -13,14 +13,14 @@
 
 
 # # run this by
-# qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=00:05:00
+# qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=01:00:00
 # # monitor job via
 # watch -n 1 qstat -n -1
 
 # Initial Setup
 source /data/intel_fpga/devcloudLoginToolSetup.sh
 tools_setup -t S10OAPI
-#source /glob/development-tools/versions/oneapi/2022.3/oneapi/setvars.sh --force
+# source /glob/development-tools/versions/oneapi/2022.3/oneapi/setvars.sh --force
 
 
 cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1
@@ -29,6 +29,7 @@ cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1
 printf "\\n%s\\n" "Running on FPGA Hardware:"
 aocl initialize acl0 pac_s10_usm
 
-./main.fpga 40960000
+# ./main.fpga 160000000
+./main.fpga
 
 error_check

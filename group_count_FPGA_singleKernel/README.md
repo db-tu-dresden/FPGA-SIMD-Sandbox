@@ -90,7 +90,7 @@ The following compile- and execution steps are only generally formulated and do 
 -	`cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel`
 
 (2) Execute main.fpga on FPGA via batchjob:
--   `qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=00:05:00`
+-   `qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=01:00:00`
 -   After the execution ist finished, check the log files run_hw.e... and run_hw.o...
 
 (3) Alternative: Execute (interactive on a FPGA node)
@@ -104,7 +104,7 @@ The following compile- and execution steps are only generally formulated and do 
 (b) `source /data/intel_fpga/devcloudLoginToolSetup.sh`
 (c) `tools_setup -t S10OAPI`
 (d) `aocl initialize acl0 pac_s10_usm`
-(e) `./main.fpga 40960000` 
+(e) `./main.fpga` 
 
 
 ## overview about functions in kernel.cpp
