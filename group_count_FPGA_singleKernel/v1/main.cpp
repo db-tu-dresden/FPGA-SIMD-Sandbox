@@ -200,7 +200,7 @@ int  main(int argc, char** argv){
 
     // Device buffer  
     if ((arr_d = malloc_device<Type>(number_CL*multiplier, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
+        std::cerr << "ERROR: could not allocate space for 'arr_d'\n";
         std::terminate();
     }
     if ((hashVec_d = malloc_device<Type>(HSIZE, q)) == nullptr) {
