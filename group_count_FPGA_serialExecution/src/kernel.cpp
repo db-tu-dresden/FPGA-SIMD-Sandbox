@@ -56,6 +56,7 @@
 
 constexpr size_t kDDRChannels = DDR_CHANNELS;		
 constexpr size_t kDDRWidth = DDR_WIDTH;				
+constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
 constexpr size_t kPCIeWidth = PCIE_WIDTH;
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -84,8 +85,9 @@ class kernelV5;
  * @param hashVec store value of k at position hashx(k)
  * @param countVec store the count of occurence of k at position hashx(k)
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE) {
+void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE, size_t size) {
 	/** 
 	 * define example register
 	 * fpvec<uint32_t> testReg;
@@ -95,17 +97,42 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	 **/
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(Type) == 0);							
+	static_assert(kDDRWidth % sizeof(int) == 0);
+  	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);							
 
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
-	constexpr size_t kNumLSUs = kDDRChannels;         
+	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(Type);
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);		
+	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
 
-	const size_t iterations = loops;
+	constexpr size_t kNumLSUs = kDDRChannels;  
+	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;    
+
+	// ensure size is nice
+	assert(size % kValuesPerInterleavedChunk == 0);
+	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
 	assert(dataSize % elementCount == 0);
 	assert(dataSize % kValuesPerLSU == 0);
-	assert(dataSize % kNumLSUs == 0);
+	assert(dataSize % kNumLSUs == 0);   
+
+	size_t total_chunks = size / kValuesPerInterleavedChunk;
+	size_t chunks_per_lsu = total_chunks / kNumLSUs;
+	// calculation of iterations; value will be bigger than dataSize/elementCount
+	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
+
+	/** 
+	 * recalculate iterations, because we must ierate through all data lines of input array
+	 * the input array contains dataSize lines 
+	 * per cycle we can load #(regSize/sizeof(Type)) elements
+	 * !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	 * 
+	 * const size_t iterations =  loops;
+	 * Update: We don't use this simple calculation of iterations anymore.
+	 * Instead we use the iterations_calculated = 2.500.032 (our "simple" iterations=loops=2.500.000 would be smaller)
+	 * This prevents the "losing" of some values at the end of the input array, which is caused by the fact that the four DDR memory controllers 
+	 * only ever load from their own 4k pages. This leads to small offsets, which require a slightly higher number of iterations. 
+	*/
 
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
@@ -126,8 +153,13 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
 		// dataVec = load<Type, regSize>(input, i_cnt);	
 
+		// calculate chunk_idx and chunk_offset for current iteration step
+		const int i_cnt_const = i_cnt;
+		const int chunk_idx = i_cnt_const / kIterationsPerChunk;
+		const int chunk_offset = i_cnt_const % kIterationsPerChunk;
+
 		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
-		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
 
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -232,21 +264,47 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
  * @param hashVec store value of k at position hashx(k)
  * @param countVec store the count of occurence of k at position hashx(k)
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE) {
+void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(Type) == 0);							
+	static_assert(kDDRWidth % sizeof(int) == 0);
+  	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);							
 
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
-	constexpr size_t kNumLSUs = kDDRChannels;         
+	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(Type);
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);		
+	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
 
-	const size_t iterations = loops;
+	constexpr size_t kNumLSUs = kDDRChannels;  
+	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;    
+
+	// ensure size is nice
+	assert(size % kValuesPerInterleavedChunk == 0);
+	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
 	assert(dataSize % elementCount == 0);
 	assert(dataSize % kValuesPerLSU == 0);
-	assert(dataSize % kNumLSUs == 0);
+	assert(dataSize % kNumLSUs == 0);   
+
+	size_t total_chunks = size / kValuesPerInterleavedChunk;
+	size_t chunks_per_lsu = total_chunks / kNumLSUs;
+	// calculation of iterations; value will be bigger than dataSize/elementCount
+	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
+
+	/** 
+	 * recalculate iterations, because we must ierate through all data lines of input array
+	 * the input array contains dataSize lines 
+	 * per cycle we can load #(regSize/sizeof(Type)) elements
+	 * !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	 * 
+	 * const size_t iterations =  loops;
+	 * Update: We don't use this simple calculation of iterations anymore.
+	 * Instead we use the iterations_calculated = 2.500.032 (our "simple" iterations=loops=2.500.000 would be smaller)
+	 * This prevents the "losing" of some values at the end of the input array, which is caused by the fact that the four DDR memory controllers 
+	 * only ever load from their own 4k pages. This leads to small offsets, which require a slightly higher number of iterations. 
+	*/
 
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
@@ -265,8 +323,13 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
 		// dataVec = load<Type, regSize>(input, i_cnt);	
 
+		// calculate chunk_idx and chunk_offset for current iteration step
+		const int i_cnt_const = i_cnt;
+		const int chunk_idx = i_cnt_const / kIterationsPerChunk;
+		const int chunk_offset = i_cnt_const % kIterationsPerChunk;
+
 		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
-		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
 
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -402,21 +465,48 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
  * @param hashVec store value of k at position hashx(k)
  * @param countVec store the count of occurence of k at position hashx(k)
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE, size_t size) {
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(Type) == 0);							
+	static_assert(kDDRWidth % sizeof(int) == 0);
+  	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);							
 
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
-	constexpr size_t kNumLSUs = kDDRChannels;         
+	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(Type);
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);		
+	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
 
-	const size_t iterations = loops;
+	constexpr size_t kNumLSUs = kDDRChannels;  
+	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;    
+
+	// ensure size is nice
+	assert(size % kValuesPerInterleavedChunk == 0);
+	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
 	assert(dataSize % elementCount == 0);
 	assert(dataSize % kValuesPerLSU == 0);
-	assert(dataSize % kNumLSUs == 0);
+	assert(dataSize % kNumLSUs == 0);   
+
+	size_t total_chunks = size / kValuesPerInterleavedChunk;
+	size_t chunks_per_lsu = total_chunks / kNumLSUs;
+	// calculation of iterations; value will be bigger than dataSize/elementCount
+	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
+
+	/** 
+	 * recalculate iterations, because we must ierate through all data lines of input array
+	 * the input array contains dataSize lines 
+	 * per cycle we can load #(regSize/sizeof(Type)) elements
+	 * !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	 * 
+	 * const size_t iterations =  loops;
+	 * Update: We don't use this simple calculation of iterations anymore.
+	 * Instead we use the iterations_calculated = 2.500.032 (our "simple" iterations=loops=2.500.000 would be smaller)
+	 * This prevents the "losing" of some values at the end of the input array, which is caused by the fact that the four DDR memory controllers 
+	 * only ever load from their own 4k pages. This leads to small offsets, which require a slightly higher number of iterations. 
+	*/
 
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
@@ -437,8 +527,13 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
 		// dataVec = load<Type, regSize>(input, i_cnt);	
 
+		// calculate chunk_idx and chunk_offset for current iteration step
+		const int i_cnt_const = i_cnt;
+		const int chunk_idx = i_cnt_const / kIterationsPerChunk;
+		const int chunk_offset = i_cnt_const % kIterationsPerChunk;
+
 		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
-		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
 
 		/**
 		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
@@ -570,21 +665,47 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
  * @param hashVec store value of k at position hashx(k)
  * @param countVec store the count of occurence of k at position hashx(k)
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(Type) == 0);							
+	static_assert(kDDRWidth % sizeof(int) == 0);
+  	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);							
 
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
-	constexpr size_t kNumLSUs = kDDRChannels;         
+	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(Type);
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);		
+	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
 
-	const size_t iterations = loops;
+	constexpr size_t kNumLSUs = kDDRChannels;  
+	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;    
+
+	// ensure size is nice
+	assert(size % kValuesPerInterleavedChunk == 0);
+	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
 	assert(dataSize % elementCount == 0);
 	assert(dataSize % kValuesPerLSU == 0);
-	assert(dataSize % kNumLSUs == 0);
+	assert(dataSize % kNumLSUs == 0);   
+
+	size_t total_chunks = size / kValuesPerInterleavedChunk;
+	size_t chunks_per_lsu = total_chunks / kNumLSUs;
+	// calculation of iterations; value will be bigger than dataSize/elementCount
+	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
+
+	/** 
+	 * recalculate iterations, because we must ierate through all data lines of input array
+	 * the input array contains dataSize lines 
+	 * per cycle we can load #(regSize/sizeof(Type)) elements
+	 * !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	 * 
+	 * const size_t iterations =  loops;
+	 * Update: We don't use this simple calculation of iterations anymore.
+	 * Instead we use the iterations_calculated = 2.500.032 (our "simple" iterations=loops=2.500.000 would be smaller)
+	 * This prevents the "losing" of some values at the end of the input array, which is caused by the fact that the four DDR memory controllers 
+	 * only ever load from their own 4k pages. This leads to small offsets, which require a slightly higher number of iterations. 
+	*/
 
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
@@ -683,12 +804,17 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
 		// dataVec = load<Type, regSize>(input, i_cnt);	
 
-		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
-		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);
+		// calculate chunk_idx and chunk_offset for current iteration step
+		const int i_cnt_const = i_cnt;
+		const int chunk_idx = i_cnt_const / kIterationsPerChunk;
+		const int chunk_offset = i_cnt_const % kIterationsPerChunk;
 
-		/**
-		* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
-		* @param p current element of input data array
+		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
+		dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
+
+	    /**
+		 * iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+		 * @param p current element of input data array
 		**/ 	
     	int p = 0;
 		while (p < elementCount) {
@@ -749,21 +875,47 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
  * @param hashVec store value of k at position hashx(k)
  * @param countVec store the count of occurence of k at position hashx(k)
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
-	static_assert(kDDRWidth % sizeof(Type) == 0);							
+	static_assert(kDDRWidth % sizeof(int) == 0);
+  	static_assert(kDDRInterleavedChunkSize % sizeof(int) == 0);							
 
-	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);				
-	constexpr size_t kNumLSUs = kDDRChannels;         
+	constexpr size_t kValuesPerInterleavedChunk = kDDRInterleavedChunkSize / sizeof(Type);
+	constexpr size_t kValuesPerLSU = kDDRWidth / sizeof(Type);		
+	static_assert(kValuesPerInterleavedChunk % kValuesPerLSU == 0);
 
-	const size_t iterations = loops;
+	constexpr size_t kNumLSUs = kDDRChannels;  
+	constexpr size_t kIterationsPerChunk = kValuesPerInterleavedChunk / kValuesPerLSU;    
+
+	// ensure size is nice
+	assert(size % kValuesPerInterleavedChunk == 0);
+	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
 	assert(dataSize % elementCount == 0);
 	assert(dataSize % kValuesPerLSU == 0);
-	assert(dataSize % kNumLSUs == 0);
+	assert(dataSize % kNumLSUs == 0);   
+
+	size_t total_chunks = size / kValuesPerInterleavedChunk;
+	size_t chunks_per_lsu = total_chunks / kNumLSUs;
+	// calculation of iterations; value will be bigger than dataSize/elementCount
+	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
+
+	/** 
+	 * recalculate iterations, because we must ierate through all data lines of input array
+	 * the input array contains dataSize lines 
+	 * per cycle we can load #(regSize/sizeof(Type)) elements
+	 * !! That means dataSize must be a multiple of (regSize/sizeof(Type)) !! 
+	 * 
+	 * const size_t iterations =  loops;
+	 * Update: We don't use this simple calculation of iterations anymore.
+	 * Instead we use the iterations_calculated = 2.500.032 (our "simple" iterations=loops=2.500.000 would be smaller)
+	 * This prevents the "losing" of some values at the end of the input array, which is caused by the fact that the four DDR memory controllers 
+	 * only ever load from their own 4k pages. This leads to small offsets, which require a slightly higher number of iterations. 
+	*/
 
 	// ensure global defined regSize is nice
     // old:  assert((regSize == 64) || (regSize == 128) || (regSize == 192) || (regSize == 256));
@@ -792,11 +944,16 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
-		// load the to aggregate data
+		// load the data
 		// fpvec<Type, regSize> input_value = load_epi32(oneMask, input, p, HSIZE);		// not used anymore
 
+		// calculate chunk_idx and chunk_offset for current iteration step
+		const int i_cnt_const = i_cnt;
+		const int chunk_idx = i_cnt_const / kIterationsPerChunk;
+		const int chunk_offset = i_cnt_const % kIterationsPerChunk;
+
 		// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
-		input_value = maxLoad_per_clock_cycle<Type, regSize>(input, i_cnt, kNumLSUs, kValuesPerLSU, elementCount);	
+		input_value = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
 
 		// how much the given count should be increased for the given input.
 		fpvec<Type, regSize> input_add = set1<Type, regSize>(one);

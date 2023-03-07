@@ -522,16 +522,17 @@ fpvec<T,B> load(T* p, int i_cnt) {
 * Function is based on the approach of parallel load with all 4 memory controller 
 */
 template<typename T, int B>
-fpvec<T,B> maxLoad_per_clock_cycle(T* input, int i_cnt, size_t kNumLSUs, size_t kValuesPerLSU, const Type elementCount) {
+fpvec<T,B> maxLoad_per_clock_cycle(T* input, size_t kNumLSUs, size_t kValuesPerLSU, const int chunk_idx, const size_t kValuesPerInterleavedChunk, const int chunk_offset) {
 	auto reg = fpvec<T,B> {};
-	const int i_cnt_const = i_cnt;
+	// Load complete CL in one clock cycle, (same for PCIe and DDR4)
 	#pragma unroll
 	for (size_t l = 0; l < kNumLSUs; l++) {
 		#pragma unroll
 		for (size_t k = 0; k < kValuesPerLSU; k++) {
-					
-			const int idx = (i_cnt_const*elementCount)
-							+ (l*kValuesPerLSU)
+							
+			const int idx = (chunk_idx*kValuesPerInterleavedChunk*kNumLSUs)
+							+ (chunk_offset*kValuesPerLSU)
+							+ (l*kValuesPerInterleavedChunk)
 							+ k;
 
 			reg.elements[l*kValuesPerLSU+k] = input[idx];

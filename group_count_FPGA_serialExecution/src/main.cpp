@@ -68,6 +68,40 @@ struct MyException : public exception {
 ////////////////////////////////////////////////////////////////////////////////
 
 int  main(int argc, char** argv){
+
+    /**
+     * calculate parameters for memory allocation
+     *
+     * If a second parameter is passed when running the main.fpga file, 
+     * use this as "size", otherwise define the parameter "size" using the value of
+     * variable dataSize, which is defined in global_settings.hpp.
+    */ 
+    long size = 0;
+    if ( argc != 2 ) { // argc should be 2 for correct execution
+        size = dataSize;
+	} else {
+		size = atoi(argv[1]);
+	}
+    printf("Input vector length (atoi(argv[1])): %zd \n", size);
+
+    size_t number_CL_buckets = 0;
+    size_t number_CL = 0;
+	
+	if(size % (4096) == 0)
+	{
+		number_CL_buckets = size / (4096);
+	}
+	else 
+	{
+		number_CL_buckets = size / (4096) + 1;
+	}
+	
+    number_CL = number_CL_buckets * (4096/multiplier);
+    
+	printf("Number CL buckets: %zd \n", number_CL_buckets);
+    printf("Number CLs: %zd \n", number_CL);
+
+
     // print global settings
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"============= Program Start =================="<<std::endl; 
@@ -84,7 +118,7 @@ int  main(int argc, char** argv){
      */
     uint32_t *arr;
     
-    arr = (uint32_t *) aligned_alloc(64,dataSize * sizeof(uint32_t));
+    arr = (uint32_t *) aligned_alloc(64,number_CL*multiplier * sizeof(uint32_t));
     if (arr != NULL) {
         std::cout << "Memory allocated - " << dataSize << " values, between 1 and " << distinctValues << std::endl;
     } else {
@@ -136,7 +170,8 @@ int  main(int argc, char** argv){
     catch (std::exception const& e) {
         std::cout << "Caught a exception: " << e.what() << "\n";
         std::terminate();
-    }        
+    }    
+       
     // check result for correctness
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
@@ -168,12 +203,12 @@ int  main(int argc, char** argv){
 
         // dummy run
         initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
 
         // measured run
         initializeHashMap(hashVec,countVec,HSIZE);
         auto begin_v1 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
         auto end_v1 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v1 = end_v1 - begin_v1;
 
@@ -193,7 +228,7 @@ int  main(int argc, char** argv){
 
     // print result
     std::cout << "Final Evaluation of the Throughput: " <<std::endl;
-    double input_size_mb_v1 = dataSize * sizeof(Type) * 1e-6;
+    double input_size_mb_v1 = size * sizeof(Type) * 1e-6;
 	std::cout << "Input_size_mb: " << input_size_mb_v1 <<std::endl;
     std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v1 / (pcie_time_v1 * 1e-3)) << " MB/s\n";
     // note: Value is not to be taken seriously in pure host execution!
@@ -218,12 +253,12 @@ int  main(int argc, char** argv){
 
         // dummy run
         initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
 
         // measured run
         initializeHashMap(hashVec,countVec,HSIZE);
         auto begin_v2 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
         auto end_v2 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v2 = end_v2 - begin_v2;
 
@@ -243,7 +278,7 @@ int  main(int argc, char** argv){
 
     // print result
     std::cout << "Final Evaluation of the Throughput: " <<std::endl;
-    double input_size_mb_v2 = dataSize * sizeof(Type) * 1e-6;
+    double input_size_mb_v2 = size * sizeof(Type) * 1e-6;
 	std::cout << "Input_size_mb: " << input_size_mb_v2 <<std::endl;
     std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v2 / (pcie_time_v2 * 1e-3)) << " MB/s\n";
     // note: Value is not to be taken seriously in pure host execution!
@@ -268,12 +303,12 @@ int  main(int argc, char** argv){
 
         // dummy run
         initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
 
         // measured run
         initializeHashMap(hashVec,countVec,HSIZE);
         auto begin_v3 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
         auto end_v3 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v3 = end_v3 - begin_v3;
 
@@ -293,7 +328,7 @@ int  main(int argc, char** argv){
 
     // print result
     std::cout << "Final Evaluation of the Throughput: " <<std::endl;
-    double input_size_mb_v3 = dataSize * sizeof(Type) * 1e-6;
+    double input_size_mb_v3 = size * sizeof(Type) * 1e-6;
 	std::cout << "Input_size_mb: " << input_size_mb_v3 <<std::endl;
     std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v3 / (pcie_time_v3 * 1e-3)) << " MB/s\n";
     // note: Value is not to be taken seriously in pure host execution!
@@ -318,12 +353,12 @@ int  main(int argc, char** argv){
 
         // dummy run
         initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant4(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant4(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
 
         // measured run
         initializeHashMap(hashVec,countVec,HSIZE);
         auto begin_v4 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant4(arr, dataSize, hashVec, countVec, HSIZE);
+       LinearProbingFPGA_variant4(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
         auto end_v4 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v4 = end_v4 - begin_v4;
 
@@ -343,7 +378,7 @@ int  main(int argc, char** argv){
 
     // print result
     std::cout << "Final Evaluation of the Throughput: " <<std::endl;
-    double input_size_mb_v4 = dataSize * sizeof(Type) * 1e-6;
+    double input_size_mb_v4 = size * sizeof(Type) * 1e-6;
 	std::cout << "Input_size_mb: " << input_size_mb_v4 <<std::endl;
     std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v4 / (pcie_time_v4 * 1e-3)) << " MB/s\n";
     // note: Value is not to be taken seriously in pure host execution!
@@ -368,12 +403,12 @@ int  main(int argc, char** argv){
 
         // dummy run
         initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, HSIZE, dataSize);  //difference value for size parameter compared to v1-v4
 
         // measured run
         initializeHashMap(hashVec,countVec,HSIZE);
         auto begin_v5 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, HSIZE, dataSize);  //difference value for size parameter compared to v1-v4
         auto end_v5 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
 
@@ -386,6 +421,7 @@ int  main(int argc, char** argv){
         std::cout << "Caught a exception: " << e.what() << "\n";
         std::terminate();
     }        
+
     // check result for correctness
     validate(dataSize, hashVec,countVec, HSIZE);
     validate_element(arr, dataSize, hashVec, countVec, HSIZE);
@@ -393,7 +429,7 @@ int  main(int argc, char** argv){
 
     // print result
     std::cout << "Final Evaluation of the Throughput: " <<std::endl;
-    double input_size_mb_v5 = dataSize * sizeof(Type) * 1e-6;
+    double input_size_mb_v5 = size * sizeof(Type) * 1e-6;
 	std::cout << "Input_size_mb: " << input_size_mb_v5 <<std::endl;
     std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v5 / (pcie_time_v5 * 1e-3)) << " MB/s\n";
     // note: Value is not to be taken seriously in pure host execution!
