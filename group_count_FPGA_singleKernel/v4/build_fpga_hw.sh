@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # # run this by
-# qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_fpga_hw.sh -l walltime=23:00:00
+# after devCloud Update 08-03-2023: Use fpga_compile node instead of fpga_runtime nodes ! 
+# new : qsub -l nodes=1:fpga_compile:ppn=2 -d . build_hw -l walltime=23:59:00
+# old : qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_hw -l walltime=23:59:00
 # # monitor job via
 # watch -n 1 qstat -n -1
 

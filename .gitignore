@@ -16,3 +16,9 @@ group_count_FPGA_v5_oM/*
 
 
 FPGA-SIMD-Sandbox.tar.gz
+
+group_count_FPGA_singleKernel/v1/.ipynb_checkpoints/*
+group_count_FPGA_singleKernel/v2/.ipynb_checkpoints/*
+group_count_FPGA_singleKernel/v3/.ipynb_checkpoints/*
+group_count_FPGA_singleKernel/v4/.ipynb_checkpoints/*
+group_count_FPGA_singleKernel/v5/.ipynb_checkpoints/*

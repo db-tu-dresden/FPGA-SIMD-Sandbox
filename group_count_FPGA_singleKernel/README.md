@@ -90,7 +90,9 @@ The following compile- and execution steps are only generally formulated and do 
 -	`cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel`
 
 (2) Execute main.fpga on FPGA via batchjob:
--   `qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=01:00:00`
+-   after devCloud Update 08-03-2023: Use fpga_compile node instead of fpga_runtime nodes ! 
+-   new : `qsub -l nodes=1:fpga_compile:ppn=2 -d . build_hw -l walltime=23:59:00`
+-	old : `qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_hw -l walltime=23:59:00`
 -   After the execution ist finished, check the log files run_hw.e... and run_hw.o...
 
 (3) Alternative: Execute (interactive on a FPGA node)

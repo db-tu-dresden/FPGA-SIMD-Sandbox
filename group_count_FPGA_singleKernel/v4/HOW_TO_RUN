@@ -38,12 +38,15 @@ From the login-2 node this should already work fine:
 -	source /data/intel_fpga/devcloudLoginToolSetup.sh
 -	qsub -l nodes=1:fpga_compile:ppn=2 -d . build_lib -l walltime=00:10:00
 -	after 2-4 minutes the lib/lib.a or lib/lib_rtl.a file is created
--	qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_hw -l walltime=23:59:00
+
+-   after devCloud Update 08-03-2023: Use fpga_compile node instead of fpga_runtime nodes ! 
+-   new : qsub -l nodes=1:fpga_compile:ppn=2 -d . build_hw -l walltime=23:59:00
+-	old : qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_hw -l walltime=23:59:00
 -	after 3-4 hours the main.fpga file is created
 -	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v4 
 
 -   execute main.fpga on FPGA via batchjob:
--   qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=00:05:00
+-   qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=01:00:00
 -   After the execution ist finished, check the log files run_hw.e... and run_hw.o...
 
 

@@ -103,7 +103,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// old calculation of iterations; value would be a little bit bigger than our calculation
+	// calculation of iterations; value will be bigger than dataSize/elementCount
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 	
 	/** 
