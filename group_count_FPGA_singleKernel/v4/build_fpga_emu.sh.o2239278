@@ -1,7 +1,7 @@
 
 ########################################################################
-#      Date:           Sun 05 Mar 2023 06:56:27 AM PST
-#    Job ID:           2233061.v-qsvr-1.aidevcloud
+#      Date:           Wed 08 Mar 2023 09:13:19 AM PST
+#    Job ID:           2239278.v-qsvr-1.aidevcloud
 #      User:           u177951
 # Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:00:00
 ########################################################################
@@ -30,7 +30,7 @@ usage: source setvars.sh [--force] [--config=file] [--help] [...]
 icpx -fsycl -Wall  -fintelfpga -DFPGA_EMULATOR helper_kernel.cpp kernel.cpp main.cpp helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o main.fpga_emu  
 
 ########################################################################
-# End of output for job 2233061.v-qsvr-1.aidevcloud
-# Date: Sun 05 Mar 2023 06:56:52 AM PST
+# End of output for job 2239278.v-qsvr-1.aidevcloud
+# Date: Wed 08 Mar 2023 09:13:50 AM PST
 ########################################################################
 

@@ -1,5 +1,5 @@
-#ifndef HELPER_MAIN_HPP
-#define HELPER_MAIN_HPP
+#ifndef HELPER_MAIN_HPP__
+#define HELPER_MAIN_HPP__
 
 using namespace std;
 
@@ -20,4 +20,4 @@ void generateData(T* arr, uint64_t distinctValues, uint64_t dataSize) {
     }
 } 
 
-#endif  // HELPER_MAIN_HPP
+#endif  // HELPER_MAIN_HPP__
