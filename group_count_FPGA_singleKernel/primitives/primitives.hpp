@@ -1,5 +1,5 @@
-#ifndef PRIMITIVES_HPP
-#define PRIMITIVES_HPP
+#ifndef PRIMITIVES_HPP__
+#define PRIMITIVES_HPP__
 
 #include <array>
 #include "../config/global_settings.hpp"
@@ -614,9 +614,10 @@ fpvec<T,B> createCutlowMask(T cutlowUnsigned) {
 template<typename T, int B>
 fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		Type currentElement = a.elements[i];
+		#pragma unroll
 		for (int j=0; j<i; j++) {
 			if(a.elements[j] == currentElement) {
 				reg.elements[i] = (Type)(j+1);
@@ -642,7 +643,7 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 template<typename T, int B>
 void mask_compressstoreu_epi32(Type* buffer, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
 	int buffer_position = 0;
-	#pragma nounroll								// DO NOT UNROLL, because the steps are dependent on each other ?!
+	#pragma unroll								// Unroll? - because the steps are dependent on each other ?!
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			buffer[buffer_position] = (Type)data.elements[i];
@@ -700,7 +701,7 @@ fpvec<T,B> setX_singleValue(T value) {
 template<typename T, int B>
 fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, uint32_t* data, int scale) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
 			size_t addr = 0 + vindex.elements[i];	// * scale * 8;	
@@ -726,15 +727,15 @@ fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>&
 template<typename T, int B>
 fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-	Type zero = 0;
-#pragma unroll
+//	Type zero = 0;
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			reg.elements[i] = a.elements[i] + b.elements[i];
 		}
-		else {
+		/*else {
 			reg.elements[i] = zero;
-		}
+		}*/
 	}
 	return reg;
 }
@@ -755,7 +756,7 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 */
 template<typename T, int B>
 void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter, int scale, Type tmp_HSIZE) {
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
 			Type addr = 0 + vindex.elements[i];	
@@ -782,7 +783,7 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 template<typename T, int B>
 fpvec<T,B> kAndn(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (a.elements[i] == 0) {
 			reg.elements[i] = 1;
@@ -831,37 +832,50 @@ fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 * 			(elements are zeroed out when the corresponding mask bit is not set). Each element's comparison forms a zero extended bit vector in dst."
 * 
 * customized maskz_conflict_epi32 - function:
-* This function check whether an element is already in the vector. 
+* This function check whether an element is already in the vector a. 
 * Only elements with a lower index are checked. 
 * As a result, element 0 in the vector never has a conflict. The bits for each element are then set accordingly. 
-* IMPORTANT: At the point where a conflict is found, the position of the first occurrence is written! 
-* IMPORTANT: The position is specified from 1 to #elementCount (NOT 0-n-1) !!
 *
-* adjustment against original Intel Intrinsic:
-* 104 71 106 116 82 128 75 109 42 78 59 44 115 124 100 71 --> 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 
-* 104 71  71 116 82  71 75 109 42 78 59 44 115 124 100 71 --> 0 0 2 0 0 2 0 0 0 0 0 0 0 0 0 2 
+* example:
+* index :							  0  1   2  3  4   5  6   7  8  9 10 11  12  13  14 15
+* input array (e.g. loaded values):	104 71 106 82 82 128 75 109 82 94 59 44 115 124 100 94 
+* result of conflict_epi32:			  0  0   0  0  8   0  0   0 24  0  0  0   0   0   0 512 
+* example input[0..15]
+* 1st conflict @ input[4] : 0 0 0 1 ..0 == 0 + 0 + 0 + 2^3 = 8
+* 2st conflict @ input[8] : 0 0 0 1 1 ..0 = 0 + 0 + 0 + 2^3 + 2^4 = 24
+* 3st conflict @ input[15]: 0 0 0 0 0 0 0 0 1 ..0 = 0 + .. + 0 + 2^9 = 512
 *
 * Difference against conflict_epi32:	additional fpvec<T,B>& mask_k : if mask_k[i]==0 --> result[0]=0 ; else do conflict_epi32 algorithm
-*
-* We don't need this simplyfied maskz_conflict function anymore, we use maskz_conflict_ret_uint64_64elements() instead!
+* 
+* @param mask_k	- writing mask mask_k : if mask_k[i]==0 --> result[0]=0 ; else do conflict_epi32 algorithm
+* @param a		- register a : the register in which the algorithm search for conflicts
+* @param match_32bit	-	an array which contain the exponentation results for 2^m at position m of match_32bit
 */
 template<typename T, int B>
-fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
+fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a, uint32_t* match_32bit) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == 1) {
 			Type currentElement = a.elements[i];
+			Type conflict_calculation = 0x00000000;
 			for (int j=0; j<i; j++) {
 				if(a.elements[j] == currentElement) {
-					reg.elements[i] = (Type)(j+1);
-					j=i;	
-					break;			
+					// calculate exponentiation
+					/*if (j == 0) {
+						conflict_calculation += 1;
+					} else {
+						uint64_t tmp = 1;
+						for (int k=1; k<=j; k++) {
+							tmp = tmp * 2;
+						}
+						conflict_calculation += tmp;
+					}*/
+					conflict_calculation += match_32bit[j]; 
 				}
-			}
-		} else {
-			reg.elements[i] = (Type)(0);
-		}	
+			}	
+			reg.elements[i] = conflict_calculation;
+		}
 	}	
 	return reg;
 }
@@ -879,13 +893,13 @@ fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
 template<typename T, int B>
 fpvec<T,B> register_and(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (a.elements[i] == b.elements[i]) {
 			reg.elements[i] = (T)1;
-		} else {
+		} /*else {
 			reg.elements[i] = (T)0;
-		}
+		}*/
 	}
 	return reg;
 }
@@ -902,7 +916,7 @@ fpvec<T,B> register_and(fpvec<T,B>& a, fpvec<T,B>& b) {
 template<typename T, int B>
 fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (zeroMask.elements[i] == 1) {
 			if (a.elements[i] < b.elements[i]) {
@@ -919,101 +933,7 @@ fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,
 	return reg;
 }
 
-/////////////////////////////////////////////////////////////
-/////  heavily customized features specific to v5  //////////
-/////////////////////////////////////////////////////////////
-
-
-/**	#34
-* serial primitive for Intel Intrinsic:
-* __m512i _mm512_maskz_conflict_epi32 (__mmask16 k, __m512i a)
-* original description: "Test each 32-bit element of a for equality with all other elements in a closer to the least significant bit using zeromask k 
-* 			(elements are zeroed out when the corresponding mask bit is not set). Each element's comparison forms a zero extended bit vector in dst."
-* 
-* customized maskz_conflict_ret_uint64_64elements - function:
-* This function check whether an element is already in the vector. 
-* Only elements with a lower index are checked. 
-* As a result, element 0 in the vector never has a conflict. The bits for each element are then set accordingly.
-* 
-* example:
-* index :							  0  1   2  3  4   5  6   7  8  9 10 11  12  13  14 15
-* input array (e.g. loaded values):	104 71 106 82 82 128 75 109 82 94 59 44 115 124 100 94 
-* result of conflict_epi32:			  0  0   0  0  8   0  0   0 24  0  0  0   0   0   0 512 
-* example input[0..15]
-* 1st conflict @ input[4] : 0 0 0 1 ..0 == 0 + 0 + 0 + 2^3 = 8
-* 2st conflict @ input[8] : 0 0 0 1 1 ..0 = 0 + 0 + 0 + 2^3 + 2^4 = 24
-* 3st conflict @ input[15]: 0 0 0 0 0 0 0 0 1 ..0 = 0 + .. + 0 + 2^9 = 512
-*
-* Difference against conflict_epi32:	additional fpvec<T,B>& mask_k : if mask_k[i]==0 --> result[0]=0 ; else do conflict_epi32 algorithm from above
-*
-* IMPORTANT: 	Adjustment of maskz_conflict_ret_uint64_64elements against: _mm512_maskz_conflict_epi32 : Due to the fact, that the input registers for this function
-*				containing up to 64 32-bit-elements in our implementation for LinearProbing_V5, we need to return a fpvec<uint64_t,512> which give us the possibility to return
-*				64-bit integers which can describe the real conflict situation for 64 positions.
-* IMPORTANT: 	This solution is a function specially adapted to LinearProbing_v5 and only works within it as long as the different input and output data formats are observed! 
-*				It is aimed to the current FPGA project, which works with 64-element data registers with 32-bit data elements (= 2048 bits per register)! 		
-* working example config:
-* @param1: fpvec<uint32_t,256>& mask_k
-* @param2: fpvec<uint32_t,256>& a
-* return: fpvec<uint64_t,512> 				
-*/
-template<typename T, int B>
-fpvec<uint64_t,512> maskz_conflict_ret_uint64_64elements(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
-	auto reg = fpvec<uint64_t,512>{};
-	#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		if(mask_k.elements[i] == 1) {
-			Type currentElement = a.elements[i];
-			uint64_t conflict_calculation = 0;
-			for (int j=0; j<i; j++) {
-				if(a.elements[j] == currentElement) {
-					// calculate exponentiation
-					if (j == 0) {
-						conflict_calculation += 1;
-					} else {
-						uint64_t tmp = 1;
-						for (int k=1; k<=j; k++) {
-							tmp = tmp * 2;
-						}
-						conflict_calculation += tmp;
-					}
-				}
-				reg.elements[i] = (uint64_t)conflict_calculation;
-			}
-		} else {
-			reg.elements[i] = (uint64_t)(0);
-		}	
-	}	
-	return reg;
-}
-
-/**	#35
-* adaption of Intel Intrinsic:
-* __mmask16 _mm512_cmpeq_epi32_mask (__m512i a, __m512i b)
-* original description: "Compare packed 32-bit integers in a and b for equality, and store the results in mask vector k."
-*
-* IMPORTANT: 	This solution is a function specially adapted to LinearProbing_v5 and only works within it as long as the different input and output data formats are observed! 
-*				It is aimed to the current FPGA project, which works with 64-element data registers with 32-bit data elements (= 2048 bits per register)! 		
-*
-* Compare every element of to registers of type fpvec<uint64_t,512> (64 64-bit elements), but return the result as fpvec<uint32_t,256> !
-* @return uint32_t 1, if elements at this position are equal	
-* @return uint32_t 0, if elements at this position are unequal	
-* @return fpvec<uint32_t,256> with 0 or 1 as representation for equality-comparison for every position
-*/
-template<typename T, int B>
-fpvec<T, B> cmpeq_epi64_reg_return_uint32_mask(fpvec<uint64_t,512>& a, fpvec<uint64_t,512>& b) {
-	fpvec<uint32_t,256> reg = fpvec<T,B>{};
-#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		if (a.elements[i] == b.elements[i]) {
-			reg.elements[i] = (T)1;
-		} else {
-			reg.elements[i] = (T)0;
-		}
-	}
-	return reg;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // PRIMITIVES_HPP
+#endif // PRIMITIVES_HPP__

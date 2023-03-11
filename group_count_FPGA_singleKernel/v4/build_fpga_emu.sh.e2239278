@@ -1,9 +1,0 @@
-/data/intel_fpga/devcloudLoginToolSetup.sh: line 1054: /opt/intel/openvino/deployment_tools/../bin/setupvars.sh: No such file or directory
-kernel.cpp:61:18: warning: unused variable 'kPCIeWidth' [-Wunused-const-variable]
-constexpr size_t kPCIeWidth = PCIE_WIDTH;
-                 ^
-1 warning generated.
-kernel.cpp:61:18: warning: unused variable 'kPCIeWidth' [-Wunused-const-variable]
-constexpr size_t kPCIeWidth = PCIE_WIDTH;
-                 ^
-1 warning generated.
