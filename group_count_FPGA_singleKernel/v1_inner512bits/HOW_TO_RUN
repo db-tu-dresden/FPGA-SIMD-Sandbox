@@ -1,0 +1,61 @@
+###############################
+## Based on Template by:
+##          Intel Corporation 
+##          Christian Faerber
+##          PSG CE EMEA TS-FAE 
+##          June 2022
+###############################
+
+#########################################
+(Intel DevCloud with new accounts)
+FIX FOR ENV-ERROR WHILE COMPILING "Error: Failed to open quartus_sh_compile.log" 
+
+-   From the login-2 node, there are .bash_* files in the path /etc/skel. If you copy these over to the root home directory, these files will provide the paths you need. 
+-   cp /etc/skel/.bash_* ~/
+
+#########################################
+
+This is easily working inside Intel devCloud.
+From the login-2 node this should already work fine:
+
+## BUILD EMULATOR-FILE:
+-	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1_inner512bits 
+-	source /data/intel_fpga/devcloudLoginToolSetup.sh
+-	qsub -l nodes=1:fpga_compile:ppn=2 -d . build_lib -l walltime=00:10:00
+-	after 2-4 minutes the lib/lib.a or lib/lib_rtl.a file is created
+-   qsub -l nodes=1:fpga_compile:ppn=2 -d . build_fpga_emu.sh -l walltime=23:00:00
+-   source /data/intel_fpga/devcloudLoginToolSetup.sh
+-   devloud_login
+    --> select 5 or 6
+-	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1_inner512bits 
+-   source /opt/intel/inteloneapi/setvars.sh
+
+-   add 2nd paramater to next command, if you want to change the "size" parameter within main;
+    this currently have no effects on the dataSize of the project, but if no additional parameter is set, 
+    the dataSize-parameter defines the size and thus also the iteration parameter.
+-   ./main.fpga_emu
+
+
+## BUILD FPGA-FILE:
+
+-	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1_inner512bits 
+-	source /data/intel_fpga/devcloudLoginToolSetup.sh
+-	qsub -l nodes=1:fpga_compile:ppn=2 -d . build_lib -l walltime=00:10:00
+-	after 2-4 minutes the lib/lib.a or lib/lib_rtl.a file is created
+
+-   after devCloud Update 08-03-2023: Use fpga_compile node instead of fpga_runtime nodes ! 
+-   new : qsub -l nodes=1:fpga_compile:ppn=2 -d . build_hw -l walltime=23:59:00
+-	old : qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . build_hw -l walltime=23:59:00
+-	after 3-4 hours the main.fpga file is created
+-	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v1_inner512bits 
+
+-   execute main.fpga on FPGA via batchjob:
+-   qsub -l nodes=1:fpga_runtime:stratix10:ppn=2 -d . run_hw -l walltime=01:00:00
+-   After the execution ist finished, check the log files run_hw.e... and run_hw.o...
+
+
+You can check the status of all stages with: 
+-   watch -n 1 qstat -n -1
+
+Or after the process in the queue is done:
+Check the log files .e... and .o...
