@@ -13,9 +13,9 @@ tools_setup -t S10OAPI
 export PATH=/glob/intel-python/python2/bin:$PATH
 
 
-cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v5 
+cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/zOld_notWorking/v5_2048bit_permanent 
 
-# Running project in FPGA Hardware Mode (this takes approximately 1 hour)
+# Running project in FPGA Hardware Mode (this takes approximately 3-4 hour)
 printf "\\n%s\\n" "Running in FPGA Hardware compile Mode:"
 
 
