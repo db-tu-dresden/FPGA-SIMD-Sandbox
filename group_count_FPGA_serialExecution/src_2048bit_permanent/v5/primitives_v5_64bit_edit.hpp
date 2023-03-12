@@ -2,7 +2,7 @@
 #define PRIMITIVES_HPP
 
 #include <array>
-#include "global_settings.hpp"
+#include "../../config/global_settings.hpp"
 
 /**
  * This file contains the scalar primitves of the Intel Intrinsics, which are used 
@@ -617,6 +617,7 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 #pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		Type currentElement = a.elements[i];
+		#pragma unroll
 		for (int j=0; j<i; j++) {
 			if(a.elements[j] == currentElement) {
 				reg.elements[i] = (Type)(j+1);
@@ -642,7 +643,7 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 template<typename T, int B>
 void mask_compressstoreu_epi32(Type* buffer, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
 	int buffer_position = 0;
-	#pragma nounroll								// DO NOT UNROLL, because the steps are dependent on each other ?!
+	#pragma unroll								// DO NOT UNROLL, because the steps are dependent on each other ?!
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			buffer[buffer_position] = (Type)data.elements[i];
@@ -852,6 +853,7 @@ fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == 1) {
 			Type currentElement = a.elements[i];
+			#pragma unroll
 			for (int j=0; j<i; j++) {
 				if(a.elements[j] == currentElement) {
 					reg.elements[i] = (Type)(j+1);
@@ -957,17 +959,17 @@ fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,
 * return: fpvec<uint64_t,512> 				
 */
 template<typename T, int B>
-fpvec<uint64_t,512> maskz_conflict_ret_uint64_64elements(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
-	auto reg = fpvec<uint64_t,512>{};
+fpvec<uint64_t,512> maskz_conflict_ret_uint64_64elements(fpvec<T,B>& mask_k, fpvec<T,B>& a, uint64_t* match_64bit) {
+	fpvec<uint64_t,512> reg = fpvec<uint64_t,512>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == 1) {
 			Type currentElement = a.elements[i];
-			uint64_t conflict_calculation = 0;
+			uint64_t conflict_calculation = 0x0000000000000000;
 			for (int j=0; j<i; j++) {
 				if(a.elements[j] == currentElement) {
 					// calculate exponentiation
-					if (j == 0) {
+					/*if (j == 0) {
 						conflict_calculation += 1;
 					} else {
 						uint64_t tmp = 1;
@@ -975,13 +977,14 @@ fpvec<uint64_t,512> maskz_conflict_ret_uint64_64elements(fpvec<T,B>& mask_k, fpv
 							tmp = tmp * 2;
 						}
 						conflict_calculation += tmp;
-					}
+					}*/
+					conflict_calculation += match_64bit[j]; 
 				}
-				reg.elements[i] = (uint64_t)conflict_calculation;
-			}
-		} else {
+			}	
+			reg.elements[i] = conflict_calculation;
+		}/* else {
 			reg.elements[i] = (uint64_t)(0);
-		}	
+		}	*/
 	}	
 	return reg;
 }
@@ -1017,3 +1020,202 @@ fpvec<T, B> cmpeq_epi64_reg_return_uint32_mask(fpvec<uint64_t,512>& a, fpvec<uin
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // PRIMITIVES_HPP
+
+
+/*
+						switch ( j )
+					{
+						case 0 :
+							conflict_calculation += 0x0000000000000001;
+							break;
+						case 1 :
+							conflict_calculation += 0x0000000000000002;
+							break;
+						case 2 :
+							conflict_calculation += 0x0000000000000004;
+							break;		
+						case 3 :
+							conflict_calculation += 0x0000000000000008;
+							break;			
+						case 4 :
+							conflict_calculation += 0x0000000000000010;
+							break;								
+						case 5 :
+							conflict_calculation += 0x0000000000000020;
+							break;							
+						case 6 :
+							conflict_calculation += 0x0000000000000040;
+							break;								
+						case 7 :
+							conflict_calculation += 0x0000000000000080;
+							break;								
+						case 8 :
+							conflict_calculation += 0x0000000000000100;
+							break;	
+						case 9 :
+							conflict_calculation += 0x0000000000000200;
+							break;
+						case 10 :
+							conflict_calculation += 0x0000000000000400;
+							break;
+						case 11 :
+							conflict_calculation += 0x0000000000000800;
+							break;		
+						case 12 :
+							conflict_calculation += 0x0000000000001000;
+							break;			
+						case 13 :
+							conflict_calculation += 0x0000000000002000;
+							break;								
+						case 14 :
+							conflict_calculation += 0x0000000000004000;
+							break;							
+						case 15 :
+							conflict_calculation += 0x0000000000008000;
+							break;								
+						case 16 :
+							conflict_calculation += 0x0000000000010000;
+							break;								
+						case 17 :
+							conflict_calculation += 0x0000000000020000;
+							break;					
+						case 18 :
+							conflict_calculation += 0x0000000000040000;
+							break;
+						case 19 :
+							conflict_calculation += 0x0000000000080000;
+							break;
+						case 20 :
+							conflict_calculation += 0x0000000000100000;
+							break;		
+						case 21 :
+							conflict_calculation += 0x0000000000200000;
+							break;			
+						case 22 :
+							conflict_calculation += 0x0000000000400000;
+							break;								
+						case 23 :
+							conflict_calculation += 0x0000000000800000;
+							break;							
+						case 24 :
+							conflict_calculation += 0x0000000001000000;
+							break;								
+						case 25 :
+							conflict_calculation += 0x0000000002000000;
+							break;								
+						case 26 :
+							conflict_calculation += 0x0000000004000000;
+							break;	
+						case 27 :
+							conflict_calculation += 0x0000000008000000;
+							break;
+						case 28 :
+							conflict_calculation += 0x0000000010000000;
+							break;
+						case 29 :
+							conflict_calculation += 0x0000000020000000;
+							break;		
+						case 30 :
+							conflict_calculation += 0x0000000040000000;
+							break;			
+						case 31 :
+							conflict_calculation += 0x0000000080000000;
+							break;								
+						case 32 :
+							conflict_calculation += 0x0000000100000000;
+							break;							
+						case 33 :
+							conflict_calculation += 0x0000000200000000;
+							break;								
+						case 34 :
+							conflict_calculation += 0x0000000400000000;
+							break;								
+						case 35 :
+							conflict_calculation += 0x0000000800000000;
+							break;		
+						case 36 :
+							conflict_calculation += 0x0000001000000000;
+							break;								
+						case 37 :
+							conflict_calculation += 0x0000002000000000;
+							break;								
+						case 38 :
+							conflict_calculation += 0x0000004000000000;
+							break;					
+						case 39 :
+							conflict_calculation += 0x0000008000000000;
+							break;
+						case 40 :
+							conflict_calculation += 0x0000010000000000;
+							break;
+						case 41 :
+							conflict_calculation += 0x0000020000000000;
+							break;		
+						case 42 :
+							conflict_calculation += 0x0000040000000000;
+							break;			
+						case 43 :
+							conflict_calculation += 0x0000080000000000;
+							break;								
+						case 44 :
+							conflict_calculation += 0x0000100000000000;
+							break;							
+						case 45 :
+							conflict_calculation += 0x0000200000000000;
+							break;								
+						case 46 :
+							conflict_calculation += 0x0000400000000000;
+							break;								
+						case 47 :
+							conflict_calculation += 0x0000800000000000;
+							break;	
+						case 48 :
+							conflict_calculation += 0x0001000000000000;
+							break;
+						case 49 :
+							conflict_calculation += 0x0002000000000000;
+							break;
+						case 50 :
+							conflict_calculation += 0x0004000000000000;
+							break;		
+						case 51 :
+							conflict_calculation += 0x0008000000000000;
+							break;			
+						case 52 :
+							conflict_calculation += 0x0010000000000000;
+							break;								
+						case 53 :
+							conflict_calculation += 0x0020000000000000;
+							break;							
+						case 54 :
+							conflict_calculation += 0x0040000000000000;
+							break;								
+						case 55 :
+							conflict_calculation += 0x0080000000000000;
+							break;								
+						case 56 :
+							conflict_calculation += 0x0100000000000000;
+							break;		
+						case 57 :
+							conflict_calculation += 0x0200000000000000;
+							break;							
+						case 58 :
+							conflict_calculation += 0x0400000000000000;
+							break;								
+						case 59 :
+							conflict_calculation += 0x0800000000000000;
+							break;								
+						case 60 :
+							conflict_calculation += 0x1000000000000000;
+							break;		
+						case 61 :
+							conflict_calculation += 0x2000000000000000;
+							break;								
+						case 62 :
+							conflict_calculation += 0x4000000000000000;
+							break;								
+						case 63 :
+							conflict_calculation += 0x8000000000000000;
+							break;																																									
+					}
+					*/

@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <array>
 #include <iomanip>
-#include <chrono>
 #include <numeric>
 #include <vector>
 #include <time.h>
@@ -32,10 +31,10 @@
 #include <unistd.h>
 
 
-#include "global_settings.hpp"
+#include "../config/global_settings.hpp"
 #include "kernel.hpp"
+#include "../helper/helper_main.hpp"
 #include "LinearProbing_scalar.hpp"
-#include "helper_main.hpp"
 
 using namespace std::chrono;
 
@@ -393,7 +392,7 @@ int  main(int argc, char** argv){
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //// Forward declare LinearProbingFPGA_variant5()    //SIMD for FPGA function v5 (SoA_conflict_v1) 
-    // track timing information, in ms
+/*    // track timing information, in ms
     double pcie_time_v5=0.0;
     try {
         ////////////////////////////////////////////////////////////////////////////
@@ -437,7 +436,7 @@ int  main(int argc, char** argv){
     std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 5 ### "<<std::endl;
     std::cout <<"=============================================="<<std::endl;
     std::cout <<"=============================================="<<std::endl;
-
+*/
 //// end of LinearProbingFPGA_variant5()
 ////////////////////////////////////////////////////////////////////////////////
 

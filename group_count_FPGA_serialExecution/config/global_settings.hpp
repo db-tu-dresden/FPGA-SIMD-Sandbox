@@ -48,11 +48,14 @@
     *           every register has a overall size of 2048 bit so that it can be loaded in one cycle using the 4 memory controllers
     */
     constexpr int regSize = 256; 
+    constexpr int inner_regSize = 64; 
+  //  static assert(regSize % inner_regSize == 0);
 
 // DO NOT CHANGE!
     // const Type loops = (dataSize / (regSize/sizeof(Type)));
         // We don't need loops anymore, since we calculate the iterations using the DDR4-parameter and the calculated offset due to 4k pages
     const Type elementCount = (regSize/sizeof(Type));
+    const Type inner_elementCount = (inner_regSize/sizeof(Type));
     // @ TODO : check, if Type & regSize match regarding max 2048 bit for FPGA with 4x DDR4 memory controller
  	
 ////////////////////////////////////////////////////////////////////////////////
