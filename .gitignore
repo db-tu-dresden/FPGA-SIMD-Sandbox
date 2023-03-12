@@ -21,8 +21,8 @@ group_count_FPGA_singleKernel/v1_2048bit_permanent/main.prj/*
 group_count_FPGA_singleKernel/v2_2048bit_permanent/main.prj/*
 group_count_FPGA_singleKernel/v3_2048bit_permanent/main.prj/*
 
-group_count_FPGA_singleKernel/zOld_notWorking/v4_2048bit_permanent//main.prj/*
-group_count_FPGA_singleKernel/zOld_notWorking/v5_2048bit_permanent//main.prj/*
+group_count_FPGA_singleKernel/zOnlyEmulationWorking/v4_2048bit_permanent//main.prj/*
+group_count_FPGA_singleKernel/zOnlyEmulationWorking/v5_2048bit_permanent//main.prj/*
 
 
 group_count_FPGA_v5_oM/*
