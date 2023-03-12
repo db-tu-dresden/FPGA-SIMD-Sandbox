@@ -58,7 +58,7 @@
 constexpr size_t kDDRChannels = DDR_CHANNELS;		
 constexpr size_t kDDRWidth = DDR_WIDTH;				
 constexpr size_t kDDRInterleavedChunkSize = DDR_INTERLEAVED_CHUNK_SIZE;
-constexpr size_t kPCIeWidth = PCIE_WIDTH;
+// constexpr size_t kPCIeWidth = PCIE_WIDTH;
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,134 +146,134 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			////////////////////////////////////////////////////////////////////////////////
 
 			// define dataVec register
-			fpvec<Type, regSize> dataVec;
+			fpvec<Type, regSize> iValues;
 
 			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
 			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				
-				// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
-				// dataVec = load<Type, regSize>(input, i_cnt);	
-
 				// calculate chunk_idx and chunk_offset for current iteration step
 				const int i_cnt_const = i_cnt;
 				const int chunk_idx = i_cnt_const / kIterationsPerChunk;
 				const int chunk_offset = i_cnt_const % kIterationsPerChunk;
 
 				// Load complete CL (register) in one clock cycle (same for PCIe and DDR4)
-				dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
+				iValues = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
 
 				/**
 				* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 				* @param p current element of input data array
 				**/ 	
-				int p = 0;
-				#pragma nounroll
-				while (p < elementCount) {
 
-					// load #elementCount input values --> use the #elementCount elements of dataVec	/// !! change compared to the serial implementation !!
-					fpvec<Type, regSize> iValues = dataVec;
+				// remove first while loop
+				// Due to the parallel processing of the entire register (16 elements), 
+				// the outer while loop is no longer necessary, since the elements are not processed individually.
+				// int p = 0;
+				// while (p < elementCount) {
+				// 		load #inner_elementCount input values --> use the #elementCount elements of dataVec	/// !! change compared to the serial implementation !!
+				// 		old: fpvec<Type, regSize> iValues = dataVec;
+				// 		commented out, since unnecessary double assignment; direct assignment on line 176
 
-					//iterate over the input values
-					int i=0;
-					while (i<elementCount) {
+				//iterate over the input values
+				int k=0;
+				while (k<elementCount) {
 
-						// broadcast single value from input at postion i into a new SIMD register
-						fpvec<Type, regSize> idx = set1<Type, regSize>((Type)i);
-						fpvec<Type, regSize> broadcastCurrentValue = permutexvar_epi32(idx,iValues);
+					// broadcast single value from input at postion k into a new SIMD register
+					fpvec<Type, regSize> idx = set1<Type, regSize>((Type)k);
+					fpvec<Type, regSize> broadcastCurrentValue = permutexvar_epi32(idx,iValues);
 
-						Type inputValue = (Type)broadcastCurrentValue.elements[0];
-						Type hash_key = hashx(inputValue,HSIZE);
+					Type inputValue = (Type)broadcastCurrentValue.elements[0];
+					Type hash_key = hashx(inputValue,HSIZE);
 
-						// compute the aligned start position within the hashMap based the hash_key
-						Type remainder = hash_key % elementCount; // should be equal to (hash_key/elementCount)*elementCount;
-						Type aligned_start = hash_key - remainder;
+					// compute the aligned start position within the hashMap based the hash_key
+					Type remainder = hash_key % elementCount; // should be equal to (hash_key/elementCount)*elementCount;
+					Type aligned_start = hash_key - remainder;
 					
-						while (1) {
-							// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-							TypeSigned overflow = (aligned_start + elementCount) - HSIZE;
-							overflow = overflow < 0 ? 0 : overflow;
-							Type oferflowUnsigned = (Type)overflow;
+					while (1) {
+						// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
+						TypeSigned overflow = (aligned_start + elementCount) - HSIZE;
+						overflow = overflow < 0 ? 0 : overflow;
+						Type oferflowUnsigned = (Type)overflow;
 
-							// use function createOverflowCorrectionMask() to create overflow correction mask
-							fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
+						// use function createOverflowCorrectionMask() to create overflow correction mask
+						fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
 
-							// Calculating a cutlow correction mask and a overflow_and_cutlow_mask 
-							TypeSigned cutlow = elementCount - remainder; // should be in a range from 1 to elementCount
-							Type cutlowUnsigned = (Type)cutlow;
-							fpvec<Type, regSize> cutlow_mask = createCutlowMask<Type, regSize>(cutlowUnsigned);
+						// Calculating a cutlow correction mask and a overflow_and_cutlow_mask 
+						TypeSigned cutlow = elementCount - remainder; // should be in a range from 1 to elementCount
+						Type cutlowUnsigned = (Type)cutlow;
+						fpvec<Type, regSize> cutlow_mask = createCutlowMask<Type, regSize>(cutlowUnsigned);
 							
-							fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
+						fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 
-							// Load 16 consecutive elements from hashVec, starting from position hash_key
-							fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
+						// Load 16 consecutive elements from hashVec, starting from position hash_key
+						fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
 						
-							// compare vector with broadcast value against vector with following elements for equality
-							fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
+						// compare vector with broadcast value against vector with following elements for equality
+						fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
 				
-							/**
-							* case distinction regarding the content of the mask "compareRes"
-							* 
-							* CASE (A):
-							* inputValue does match one of the keys in nextElements (key match)
-							* just increment the associated count entry in countVec
-							**/ 
-							if (mask2int(compareRes) != 0) {
-								// compute the matching position indicated by a one within the compareRes mask
-								// the position can be calculated two ways.
-								// example: 00010000 is our matching mask
-								// we could count the leading zeros and get the position like 7 - leadingzeros
-								// we calculate the trailing zeros and get the position implicitly 
-								Type matchPos = ctz_onceBultin(compareRes); 
+						/**
+						* case distinction regarding the content of the mask "compareRes"
+						* 
+						* CASE (A):
+						* inputValue does match one of the keys in nextElements (key match)
+						* just increment the associated count entry in countVec
+						**/ 
+						if (mask2int(compareRes) != 0) {
+							// compute the matching position indicated by a one within the compareRes mask
+							// the position can be calculated two ways.
+							// example: 00010000 is our matching mask
+							// we could count the leading zeros and get the position like 7 - leadingzeros
+							// we calculate the trailing zeros and get the position implicitly 
+							Type matchPos = ctz_onceBultin(compareRes); 
 								
-								// WE COULD DO THIS LIKE VARIANT ONE.
-								// This would mean we wouldn't calculate the match pos since it is clear already.                
-								// increase the counter in countVec
-								countVec[aligned_start+matchPos]++;			
-								i++;
+							// WE COULD DO THIS LIKE VARIANT ONE.
+							// This would mean we wouldn't calculate the match pos since it is clear already.                
+							// increase the counter in countVec
+							countVec[aligned_start+matchPos]++;			
+							k++;
+							break;
+						}   
+						else {
+							/**
+							* CASE (B): 
+							* --> inputValue does NOT match any of the keys in nextElements (no key match)
+							* --> compare "nextElements" with zero
+							* CASE (B1):   resulting mask of this comparison is not 0
+							*             --> insert inputValue into next possible slot       
+							*                 
+							* CASE (B2):  resulting mask of this comparison is 0
+							*             --> no free slot in current 16-slot array
+							*             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
+							*             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
+							**/ 
+
+							// checkForFreeSpace. A free space is indicated by 1.
+							fpvec<Type, regSize> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_and_cutlow_mask, zeroMask, nextElements);
+							Type innerMask = mask2int(checkForFreeSpace);
+							if(innerMask != 0) {                // CASE B1    
+								//this does not calculate the correct position. we should rather look at trailing zeros.
+								Type pos = ctz_onceBultin(checkForFreeSpace);
+								
+								hashVec[aligned_start+pos] = (Type)inputValue;
+								countVec[aligned_start+pos]++;				
+								k++;
 								break;
 							}   
-							else {
-								/**
-								* CASE (B): 
-								* --> inputValue does NOT match any of the keys in nextElements (no key match)
-								* --> compare "nextElements" with zero
-								* CASE (B1):   resulting mask of this comparison is not 0
-								*             --> insert inputValue into next possible slot       
-								*                 
-								* CASE (B2):  resulting mask of this comparison is 0
-								*             --> no free slot in current 16-slot array
-								*             --> load next +16 elements (add +16 to hash_key and re-iterate through while-loop without incrementing p)
-								*             --> attention for the overflow of hashVec & countVec ! (% HSIZE, continuation at position 0)
-								**/ 
-
-								// checkForFreeSpace. A free space is indicated by 1.
-								fpvec<Type, regSize> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_and_cutlow_mask, zeroMask, nextElements);
-								Type innerMask = mask2int(checkForFreeSpace);
-								if(innerMask != 0) {                // CASE B1    
-									//this does not calculate the correct position. we should rather look at trailing zeros.
-									Type pos = ctz_onceBultin(checkForFreeSpace);
-									
-									hashVec[aligned_start+pos] = (Type)inputValue;
-									countVec[aligned_start+pos]++;				
-									i++;
-									break;
-								}   
-								else {    			               // CASE B2                    
-									//aligned_start = (aligned_start+16) % HSIZE;
-									// since we now use the overflow mask we can do this to change our position
-									// we ALSO need to set the remainder to 0.
-									remainder = 0;
-									aligned_start +=elementCount;
-									if(aligned_start >= HSIZE){
-										aligned_start = 0;
-									}
+							else {    			               // CASE B2                    
+								//aligned_start = (aligned_start+16) % HSIZE;
+								// since we now use the overflow mask we can do this to change our position
+								// we ALSO need to set the remainder to 0.
+								remainder = 0;
+								aligned_start +=elementCount;
+								if(aligned_start >= HSIZE){
+									aligned_start = 0;
 								}
 							}
 						}
 					}
-					p+=elementCount;	
-				}	
+				}
+				// delete following line with deactivating outer while-loop
+				// p+=elementCount;	
 			}
 		});
 	}).wait();
