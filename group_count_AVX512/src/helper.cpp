@@ -124,3 +124,41 @@ void validate_element(uint32_t *data, uint64_t dataSize, uint32_t*hashVec, uint3
         std::cout << "Element Validation didn't find any Errors\n";
     }
 }
+
+/**	
+* adaption of c++ pow-function from cmath:
+* pow(double base, double exponent);
+*
+* own function calculate : result = x^a
+* return an uint32_t value -> in this project suitable for use within 64-element registers
+*/
+uint32_t exponentiation_primitive_uint32_t(int x, int a) {
+	uint32_t res = 1;
+	if (a == 0) {
+		return res;
+	} else {
+		for (int i=1; i<=a; i++) {
+			res = res * x;
+		}
+		return res;
+	}
+}
+
+/**	
+* adaption of c++ pow-function from cmath:
+* pow(double base, double exponent);
+*
+* own function calculate : result = x^a
+* return an uint64_t value -> in this project suitable for use within 64-element registers
+*/
+uint64_t exponentiation_primitive_uint64_t(int x, int a) {
+	uint64_t res = 1;
+	if (a == 0) {
+		return res;
+	} else {
+		for (int i=1; i<=a; i++) {
+			res = res * x;
+		}
+		return res;
+	}
+}
