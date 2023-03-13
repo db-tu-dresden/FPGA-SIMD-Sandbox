@@ -643,7 +643,7 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 template<typename T, int B>
 void mask_compressstoreu_epi32(Type* buffer, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
 	int buffer_position = 0;
-	#pragma unroll								// Unroll? - because the steps are dependent on each other ?!
+	#pragma unroll								// DO NOT UNROLL, because the steps are dependent on each other ?!
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			buffer[buffer_position] = (Type)data.elements[i];
@@ -765,9 +765,9 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 						// omit *scale, because we currently work with Type=uint32_t in all stages
 						// if we want to use another datatype, we may adjust the scale paramter within
 						// this function; now scale doesn't have an usage
-			if (addr >= tmp_HSIZE) {
+		/*	if (addr >= tmp_HSIZE) {
 				addr = tmp_HSIZE-addr;
-			}							
+			}		*/					
 			baseStorage[addr] = (Type)data_to_scatter.elements[i];													
 		} 
 	}
@@ -814,13 +814,14 @@ fpvec<T,B> kAndn(fpvec<T,B>& a, fpvec<T,B>& b) {
 template<typename T, int B>
 fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (a.elements[i] == b.elements[i]) {
 			reg.elements[i] = (Type)1;
-		} else {
+		} 
+		/*else {
 			reg.elements[i] = (Type)0;
-		}
+		}*/
 	}
 	return reg;
 }
@@ -856,26 +857,26 @@ fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a, uint32_t* mat
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
-		if(mask_k.elements[i] == 1) {
-			Type currentElement = a.elements[i];
-			Type conflict_calculation = 0x00000000;
-			for (int j=0; j<i; j++) {
-				if(a.elements[j] == currentElement) {
-					// calculate exponentiation
-					/*if (j == 0) {
-						conflict_calculation += 1;
-					} else {
-						uint64_t tmp = 1;
-						for (int k=1; k<=j; k++) {
-							tmp = tmp * 2;
-						}
-						conflict_calculation += tmp;
-					}*/
-					conflict_calculation += match_32bit[j]; 
-				}
-			}	
-			reg.elements[i] = conflict_calculation;
-		}
+		Type currentElement = a.elements[i];
+		Type conflict_calculation = 0x00000000;
+		const int upper_limit = i;
+		#pragma unroll
+		for (int j=0; j<upper_limit; j++) {
+			if((mask_k.elements[upper_limit] == 1) && (a.elements[j] == currentElement)) {
+				// calculate exponentiation
+				/*if (j == 0) {
+					conflict_calculation += 1;
+				} else {
+					uint64_t tmp = 1;
+					for (int k=1; k<=j; k++) {
+						tmp = tmp * 2;
+					}
+					conflict_calculation += tmp;
+				}*/
+				conflict_calculation += match_32bit[j]; 
+			}
+		}	
+		reg.elements[i] = conflict_calculation;
 	}	
 	return reg;
 }
@@ -918,22 +919,20 @@ fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
-		if (zeroMask.elements[i] == 1) {
-			if (a.elements[i] < b.elements[i]) {
-				reg.elements[i] = 0;
-			}	
-			else {
-				reg.elements[i] = 1;
-			}
-		}	
-		else {
+		if ((zeroMask.elements[i] == 1) && (a.elements[i] < b.elements[i])) {
 			reg.elements[i] = 0;
 		}	
-	}
+		else {
+			reg.elements[i] = 1;
+		}
+	}	
+		/*else {
+			reg.elements[i] = 0;
+		}*/	
 	return reg;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // PRIMITIVES_HPP__
+#endif // PRIMITIVES_HPP
