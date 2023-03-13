@@ -1,8 +1,8 @@
-#ifndef PRIMITIVES_HPP__
-#define PRIMITIVES_HPP__
+#ifndef PRIMITIVES_HPP
+#define PRIMITIVES_HPP
 
 #include <array>
-#include "../config/global_settings.hpp"
+#include "global_settings.hpp"
 
 /**
  * This file contains the scalar primitves of the Intel Intrinsics, which are used 

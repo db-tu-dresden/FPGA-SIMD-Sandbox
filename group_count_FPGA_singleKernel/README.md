@@ -28,6 +28,7 @@ The following compile- and execution steps are only generally formulated and do 
 ## overview of directory structures and differences in the respective projects
 -   /config/       --> contain the global_settings.hpp file, which contains all global settings (equal for all projects)
 -   /helper/       --> contain all helper files for main and kernel (equal for all projects)
+-   /primitives/   --> contain the primitives.hpp file, which contains all primitiv-functions (converted Intel Intrinsics)
 
 -   /v1_inner512bits/   --> contain project with kernelV1, which contains function LinearProbingFPGA_variant1()
 -   /v2_inner512bits/   --> contain project with kernelV2, which contains function LinearProbingFPGA_variant2()                           
