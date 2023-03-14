@@ -1,9 +1,9 @@
 
 ########################################################################
-#      Date:           Sat 11 Mar 2023 09:25:59 AM PST
-#    Job ID:           2246028.v-qsvr-1.aidevcloud
+#      Date:           Mon 13 Mar 2023 01:58:13 PM PDT
+#    Job ID:           2250257.v-qsvr-1.aidevcloud
 #      User:           u177951
-# Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:00:00
+# Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:59:00
 ########################################################################
 
 sourcing /opt/intel/inteloneapi/setvars.sh
@@ -27,10 +27,15 @@ usage: source setvars.sh [--force] [--config=file] [--help] [...]
   
   The SETVARS_ARGS environment variable is cleared on exiting setvars.sh.
   
-icpx -fsycl -Wall  -fintelfpga -DFPGA_EMULATOR kernel.cpp main.cpp ../helper/helper_kernel.cpp ../helper/helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o main.fpga_emu  
+
+Running in FPGA Hardware compile Mode:
+icpx -fsycl -Wall  -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga kernel.cpp main.cpp ../helper/helper_kernel.cpp ../helper/helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a  
+Saving target image to "/home/u177951/tmp/kernel-961c82-44ece7/extract/aocx.0"
+Unable to reuse any of the previous FPGA binaries.
+aoc: Compiling for FPGA. This process may take several hours to complete.  Prior to performing this compile, be sure to check the reports to ensure the design will meet your performance targets.  If the reports indicate performance targets are not being met, code edits may be required.  Please refer to the oneAPI FPGA Optimization Guide for information on performance tuning applications for FPGAs.
 
 ########################################################################
-# End of output for job 2246028.v-qsvr-1.aidevcloud
-# Date: Sat 11 Mar 2023 09:26:28 AM PST
+# End of output for job 2250257.v-qsvr-1.aidevcloud
+# Date: Mon 13 Mar 2023 09:40:59 PM PDT
 ########################################################################
 

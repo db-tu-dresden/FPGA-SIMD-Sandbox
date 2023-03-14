@@ -1,9 +1,9 @@
 
 ########################################################################
-#      Date:           Fri Mar 10 09:10:05 PST 2023
-#    Job ID:           2243860.v-qsvr-1.aidevcloud
+#      Date:           Mon 13 Mar 2023 03:15:35 PM PDT
+#    Job ID:           2250279.v-qsvr-1.aidevcloud
 #      User:           u177951
-# Resources:           cput=75:00:00,neednodes=1:fpga_runtime:stratix10:ppn=2,nodes=1:fpga_runtime:stratix10:ppn=2,walltime=23:59:00
+# Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:00:00
 ########################################################################
 
 sourcing /opt/intel/inteloneapi/setvars.sh
@@ -27,14 +27,10 @@ usage: source setvars.sh [--force] [--config=file] [--help] [...]
   
   The SETVARS_ARGS environment variable is cleared on exiting setvars.sh.
   
-
-Running in FPGA Hardware compile Mode:
-icpx -fsycl -Wall  -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga helper_kernel.cpp kernel.cpp main.cpp helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a  
-warning: -reuse-exe file 'main.fpga' not found; ignored
-aoc: Compiling for FPGA. This process may take several hours to complete.  Prior to performing this compile, be sure to check the reports to ensure the design will meet your performance targets.  If the reports indicate performance targets are not being met, code edits may be required.  Please refer to the oneAPI FPGA Optimization Guide for information on performance tuning applications for FPGAs.
+icpx -fsycl -Wall  -fintelfpga -DFPGA_EMULATOR kernel.cpp main.cpp ../helper/helper_kernel.cpp ../helper/helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o main.fpga_emu  
 
 ########################################################################
-# End of output for job 2243860.v-qsvr-1.aidevcloud
-# Date: Fri Mar 10 13:48:03 PST 2023
+# End of output for job 2250279.v-qsvr-1.aidevcloud
+# Date: Mon 13 Mar 2023 03:16:05 PM PDT
 ########################################################################
 
