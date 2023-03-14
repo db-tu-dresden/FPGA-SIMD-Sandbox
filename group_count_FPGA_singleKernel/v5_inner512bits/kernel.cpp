@@ -17,8 +17,8 @@
 #include <sycl/ext/intel/fpga_extensions.hpp>
 
 #include "kernel.hpp"
-#include "global_settings.hpp"
-#include "helper_kernel.hpp"
+#include "../config/global_settings.hpp"
+#include "../helper/helper_kernel.hpp"
 #include "primitives.hpp"
 
 #include "lib/lib.hpp"
@@ -215,7 +215,7 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<Type, regSize> input_value;
 
 			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
-			// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
+			#pragma nounroll		// compiler should realize that this loop cannot be unrolled
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
 				// calculate chunk_idx and chunk_offset for current iteration step
@@ -236,7 +236,7 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					}	
 				}
 
-				#pragma nounroll	// ???
+				#pragma nounroll
 				for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
 					// read 512-bit segments of loaded data and work through the algorithm with segments of only 512-bits
 					fpvec<Type, inner_regSize> tmp_workingData = workingData[i];

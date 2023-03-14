@@ -5,7 +5,7 @@
 #include <sycl/ext/intel/fpga_extensions.hpp>
 
 #include "lib/lib.hpp"
-#include "global_settings.hpp"
+#include "../config/global_settings.hpp"
 #include "primitives.hpp"
 
 using namespace sycl;

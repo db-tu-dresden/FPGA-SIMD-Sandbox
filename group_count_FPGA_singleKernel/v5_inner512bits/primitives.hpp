@@ -2,7 +2,7 @@
 #define PRIMITIVES_HPP
 
 #include <array>
-#include "global_settings.hpp"
+#include "../config/global_settings.hpp"
 
 /**
  * This file contains the scalar primitves of the Intel Intrinsics, which are used 
@@ -617,7 +617,7 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		Type currentElement = a.elements[i];
-		#pragma unroll
+		#pragma nounroll
 		for (int j=0; j<i; j++) {
 			if(a.elements[j] == currentElement) {
 				reg.elements[i] = (Type)(j+1);
@@ -860,7 +860,7 @@ fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a, uint32_t* mat
 		Type currentElement = a.elements[i];
 		Type conflict_calculation = 0x00000000;
 		const int upper_limit = i;
-		#pragma unroll
+		#pragma nounroll
 		for (int j=0; j<upper_limit; j++) {
 			if((mask_k.elements[upper_limit] == 1) && (a.elements[j] == currentElement)) {
 				// calculate exponentiation
@@ -917,7 +917,7 @@ fpvec<T,B> register_and(fpvec<T,B>& a, fpvec<T,B>& b) {
 template<typename T, int B>
 fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-	#pragma unroll
+	#pragma nounroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if ((zeroMask.elements[i] == 1) && (a.elements[i] < b.elements[i])) {
 			reg.elements[i] = 0;

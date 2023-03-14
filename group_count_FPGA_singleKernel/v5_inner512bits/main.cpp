@@ -52,9 +52,9 @@
 // Sleep
 #include <unistd.h>
 
-#include "global_settings.hpp"
+#include "../config/global_settings.hpp"
 #include "kernel.hpp"
-#include "helper_main.hpp"
+#include "../helper/helper_main.hpp"
 
 
 using namespace sycl;
