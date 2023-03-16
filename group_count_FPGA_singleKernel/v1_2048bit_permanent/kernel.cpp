@@ -133,8 +133,27 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		h.single_task<kernelV1>([=]() [[intel::kernel_args_restrict]] {
 
 		device_ptr<Type> input(arr_d);
-		device_ptr<Type> hashVec(hashVec_d);
-		device_ptr<Type> countVec(countVec_d);
+		device_ptr<Type> hashVec_globalMem(hashVec_d);
+		device_ptr<Type> countVec_globalMem(countVec_d);
+			
+		////////////////////////////////////////////////////////////////////////////////
+		//// declare private variables for hashVec & countVec
+		/* The Intel oneAPI DPC++/C++ Compiler creates a kernel memory in hardware.
+		* Kernel memory is sometimes referred to as on-chip memory because it is created from
+		* memory sources (such as RAM blocks) available on the FPGA.
+		* 
+		* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
+		* more accurate with MLABs. This memory type is significantly faster than store/load operations to global memory.
+		* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
+		*  
+		* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
+		*/
+			
+		[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type hashVec[globalHSIZE] = {};
+		[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type countVec[globalHSIZE] = {}; 
+		
+		////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////
 
 		////////////////////////////////////////////////////////////////////////////////
 		//// declare some basic masks and arrays
@@ -153,9 +172,6 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
 		for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
-			// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
-			// dataVec = load<Type, regSize>(input, i_cnt);	
-
 			// calculate chunk_idx and chunk_offset for current iteration step
 			const int i_cnt_const = i_cnt;
 			const int chunk_idx = i_cnt_const / kIterationsPerChunk;
@@ -168,9 +184,9 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 			* @param p current element of input data array
 			**/ 	
-			int p = 0;
-			// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
-			while (p < elementCount) {
+			// int p = 0;
+			// while (p < elementCount) {
+			for(int p=0; p<elementCount; p++) {
 			
 				// get single value from current dataVec register at position p
 				Type inputValue = dataVec.elements[p];
@@ -212,7 +228,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						
 						// selective store of changed value
 						mask_storeu_epi32(countVec, hash_key, compareRes,nextCounts);
-						p++;
+						// p++;
 						break;
 					}   
 					else {
@@ -236,7 +252,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 							// use 
 							hashVec[hash_key+pos] = (uint32_t)inputValue;
 							countVec[hash_key+pos]++;
-							p++;
+							// p++;
 							break;
 						} 
 						else {         			          // CASE B2   
@@ -248,6 +264,12 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					}
 				} 
 			}	
+		}		
+		//store results back to global memory
+		#pragma unroll 2
+		for(int i=0; i<globalHSIZE; i++) {
+			hashVec_globalMem[i]=hashVec[i];
+			countVec_globalMem[i]=countVec[i];
 		}
 		});
 	}).wait();

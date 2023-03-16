@@ -27,6 +27,9 @@
     static const float scale = 1.4;
     static const uint64_t HSIZE = distinctValues*scale;
     
+    #define globalHSIZE 179        // replace with result of distinctValues*scale
+    #define global_m_HSIZE_inner_v 12   // replace with result of (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector   WITH m_elements_per_vector = innerElementCount 
+
 //////// Up to this point the parameters can be adjusted.
 ////////////////////////////////////////////////////////////////////////////////
   
@@ -60,4 +63,30 @@
  	
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+
+
+/*
+#define distinctValues 128
+
+#define multiplier 16
+#define dataSize (multiplier*10000000)
+#define scale (1.4)
+#define HSIZE (distinctValues*scale)
+#define globalHSIZE (distinctValues*scale)
+
+#define regSize 256
+#define inner_regSize 64
+
+// correct as long as Type is set to uint32_t (= 4byte)
+#define elementCount 64             // result of (regSize/sizeof(Type));
+#define inner_elementCount 16       // result of (inner_regSize/sizeof(Type));
+                                    
+#define globalHSIZE (distinctValues*scale)        // replace with result of distinctValues*scale
+#define inner_elementCount
+#define global_m_HSIZE_inner_v ((HSIZE + inner_elementCount - 1) / inner_elementCount)
+
+--> Define Macro which delete comma of 
+
+
+*/
 #endif
