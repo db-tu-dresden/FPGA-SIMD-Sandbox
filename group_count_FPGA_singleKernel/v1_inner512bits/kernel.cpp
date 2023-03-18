@@ -148,8 +148,14 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		*  
 		* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
 		*/
+
+		// USING local MLAB on FPGA for hashVec and countVec array
 		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type hashVec[globalHSIZE] = {};
 		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[globalHSIZE] = {}; 
+
+		// USING local FPGA-RAM (result of declare these variables without additional attributes)
+	//	Type hashVec[globalHSIZE] = {};
+	//	Type countVec[globalHSIZE] = {};
 
 		// idea : implement hashVec and countVec as Registers
 		// Not working 
