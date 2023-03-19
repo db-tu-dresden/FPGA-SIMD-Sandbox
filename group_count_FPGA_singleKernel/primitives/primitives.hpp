@@ -34,7 +34,7 @@ template<typename T, int B>
 fpvec<T,B> setzero() {
 	auto reg = fpvec<T,B>{};
 	Type zero = 0;
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		reg.elements[i] = zero;
 	}
@@ -161,7 +161,7 @@ std::array<fpvec<T, B>, (B/sizeof(T))> cvtu32_create_writeMask_Matrix() {
 template<typename T, int B>
 fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, uint32_t* data, uint32_t startIndex) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			// old reg.elements[i] = data[(startIndex+i)%HSIZE];
@@ -183,7 +183,7 @@ fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, uint32_t* data, uint32_t startInde
 template<typename T, int B>
 fpvec<T,B> mask_cmpeq_epi32_mask(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (zeroMask.elements[i] == 1) {
 			if (a.elements[i] == b.elements[i]) {
@@ -209,7 +209,7 @@ fpvec<T,B> mask_cmpeq_epi32_mask(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,B>
 template<typename T, int B>
 fpvec<T,B> mask_add_epi32(fpvec<T,B>& src, fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			reg.elements[i] = a.elements[i] + b.elements[i];
@@ -235,7 +235,7 @@ fpvec<T,B> mask_add_epi32(fpvec<T,B>& src, fpvec<T,B>& writeMask, fpvec<T,B>& a,
 */
 template<typename T, int B>
 void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			// result[(startIndex+i)%HSIZE] = data.elements[i];
@@ -336,7 +336,7 @@ uint64_t mask2int_uint64_t(fpvec<T,B>& mask) {
 template<typename T, int B>
 fpvec<T,B> knot(fpvec<T,B>& src) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (src.elements[i] == 0) {
 			reg.elements[i] = 1;
@@ -376,14 +376,13 @@ Type clz_onceBultin(fpvec<T,B>& src) {
 * mem_addr must be aligned on a 64-byte boundary or a general-protection exception may be generated."
 *
 * customized load-function:
-* @param templateMask : Register of type fpvec<T,B>
-* @param data : array which contains the data which should be loaded
+* @param data : array which contains the data that should be loaded
 * @param startIndex : first index-position of data from where the data should be loaded
 */
 template<typename T, int B>
-fpvec<T,B> load_epi32(fpvec<T,B>& templateMask, uint32_t* data, uint32_t startIndex) {		// testen - fehlt Parameter <T> ?
+fpvec<T,B> load_epi32(uint32_t* data, uint32_t startIndex) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		reg.elements[i] = data[startIndex+i];
 	}
@@ -398,7 +397,7 @@ fpvec<T,B> load_epi32(fpvec<T,B>& templateMask, uint32_t* data, uint32_t startIn
 template<typename T, int B>
 fpvec<T,B> cmpeq_epi32_mask(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (a.elements[i] == b.elements[i]) {
 			reg.elements[i] = 1;
@@ -418,7 +417,7 @@ fpvec<T,B> cmpeq_epi32_mask(fpvec<T,B>& a, fpvec<T,B>& b) {
 template<typename T, int B>
 fpvec<T,B> permutexvar_epi32(fpvec<T,B>& idx, fpvec<T,B>& a) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		T id = idx.elements[i];
 		T value = a.elements[id];
@@ -487,7 +486,7 @@ fpvec<T,B> mask_set1(fpvec<T,B>& src, fpvec<T,B>& writeMask, Type value) {
 */
 template<typename T, int B>
 void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& data) {
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		result[(startIndex+i)] = data.elements[i];
 	}
@@ -556,7 +555,7 @@ fpvec<T,B> createOverflowCorrectionMask(T oferflowUnsigned) {
 	const int overflow = (B/sizeof(T)) - oferflowUnsigned;
 	Type one = 1;
 	Type zero = 0;
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (i<overflow) {
 			reg.elements[i] = one;
@@ -577,7 +576,7 @@ fpvec<T,B> createCutlowMask(T cutlowUnsigned) {
 	const int cutlow_const = (B/sizeof(T)) - cutlowUnsigned;
 	Type one = 1;
 	Type zero = 0;
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (i<cutlow_const) {
 			reg.elements[i] = zero;

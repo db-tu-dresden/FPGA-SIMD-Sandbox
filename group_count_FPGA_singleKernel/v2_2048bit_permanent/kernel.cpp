@@ -221,7 +221,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						fpvec<Type, regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 
 						// Load 16 consecutive elements from hashVec, starting from position hash_key
-						fpvec<Type, regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
+						fpvec<Type, regSize> nextElements = load_epi32<Type, regSize>(hashVec, aligned_start);
 
 						// compare vector with broadcast value against vector with following elements for equality
 						fpvec<Type, regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
