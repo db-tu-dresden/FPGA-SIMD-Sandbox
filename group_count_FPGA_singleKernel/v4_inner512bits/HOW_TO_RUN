@@ -25,7 +25,7 @@ From the login-2 node this should already work fine:
 -	after 2-4 minutes the lib/lib.a or lib/lib_rtl.a file is created
 -   qsub -l nodes=1:fpga_compile:ppn=2 -d . build_fpga_emu.sh -l walltime=23:00:00
 -   source /data/intel_fpga/devcloudLoginToolSetup.sh
--   devloud_login
+-   devcloud_login
     --> select 5 or 6
 -	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_singleKernel/v4_inner512bits  
 -   source /opt/intel/inteloneapi/setvars.sh
