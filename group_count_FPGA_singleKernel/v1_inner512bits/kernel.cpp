@@ -154,8 +154,9 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[globalHSIZE] = {}; 
 
 		// USING local FPGA-RAM (result of declare these variables without additional attributes)
-	//	Type hashVec[globalHSIZE] = {};
-	//	Type countVec[globalHSIZE] = {};
+		// if RAM-utilization rises above 90% while compiling, set memory attribute to intel::max_replicates(1)
+		// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type hashVec[globalHSIZE] = {};
+		// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type countVec[globalHSIZE] = {};
 
 		// idea : implement hashVec and countVec as Registers
 		// Not working 
