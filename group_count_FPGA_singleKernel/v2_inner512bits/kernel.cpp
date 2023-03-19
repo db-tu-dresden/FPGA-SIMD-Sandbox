@@ -133,8 +133,31 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		h.single_task<kernelV2>([=]() [[intel::kernel_args_restrict]] {
 
 			device_ptr<Type> input(arr_d);
-			device_ptr<Type> hashVec(hashVec_d);
-			device_ptr<Type> countVec(countVec_d);
+			device_ptr<Type> hashVec_globalMem(hashVec_d);
+			device_ptr<Type> countVec_globalMem(countVec_d);
+			
+			////////////////////////////////////////////////////////////////////////////////
+			//// declare private variables for hashVec & countVec
+			/* The Intel oneAPI DPC++/C++ Compiler creates a kernel memory in hardware.
+			* Kernel memory is sometimes referred to as on-chip memory because it is created from
+			* memory sources (such as RAM blocks) available on the FPGA.
+			* 
+			* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
+			* more accurate with MLABs. This memory type is significantly faster than store/load operations to global memory.
+			* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
+			*  
+			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
+			*/
+			// USING local MLAB on FPGA for hashVec and countVec array
+			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type hashVec[globalHSIZE] = {};
+			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[globalHSIZE] = {}; 
+
+			// USING local FPGA-RAM (result of declare these variables without additional attributes)
+			//	Type hashVec[globalHSIZE] = {};
+			//	Type countVec[globalHSIZE] = {};
+
+			////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////
 
 			////////////////////////////////////////////////////////////////////////////////
 			//// declare some basic masks and arrays
@@ -171,7 +194,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					}	
 				}
 
-				#pragma unroll
+				#pragma nounroll
 				for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
 					// read 512-bit segments of loaded data and work through the algorithm with segments of only 512-bits
 					fpvec<Type, inner_regSize> tmp_workingData = workingData[i];
@@ -180,9 +203,10 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 					* @param p current element of input data array
 					**/ 	
-					int p = 0;
+					// int p = 0;
+					// while (p < inner_elementCount) {
 					// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
-					while (p < inner_elementCount) {
+					for(int p=0; p<inner_elementCount; p++) {
 						// get single value from current dataVec register at position p
 						Type inputValue = tmp_workingData.elements[p];
 
@@ -190,7 +214,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						Type hash_key = hashx(inputValue,HSIZE);
 
 						// compute the aligned start position within the hashMap based the hash_key
-						Type remainder = hash_key % elementCount; // should be equal to (hash_key/elementCount)*elementCount;
+						Type remainder = hash_key % inner_elementCount; // should be equal to (hash_key/inner_elementCount)*inner_elementCount;
 						Type aligned_start = hash_key - remainder;
 						
 						/**
@@ -216,7 +240,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 							fpvec<Type, inner_regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 
 							// Load 16 consecutive elements from hashVec, starting from position hash_key
-							fpvec<Type, inner_regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
+							fpvec<Type, inner_regSize> nextElements = load_epi32<Type, inner_regSize>(hashVec, aligned_start);
 
 							// compare vector with broadcast value against vector with following elements for equality
 							fpvec<Type, inner_regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -248,7 +272,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 								// This would mean we wouldn't calculate the match pos since it is clear already.
 								// increase the counter in countVec
 								countVec[aligned_start+matchPos]++;
-								p++;
+								// p++;
 								break;
 							}   
 							else {
@@ -273,7 +297,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 									hashVec[aligned_start+pos] = (uint32_t)inputValue;
 									countVec[aligned_start+pos]++;
-									p++;
+									// p++;
 									break;
 								}
 								else {                   // CASE B2 
@@ -290,6 +314,13 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						}					
 					}	
 				}	
+			}
+
+			//store results back to global memory
+			#pragma unroll
+			for(int i=0; i<globalHSIZE; i++) {
+				hashVec_globalMem[i]=hashVec[i];
+				countVec_globalMem[i]=countVec[i];
 			}
 		});
 	}).wait();
