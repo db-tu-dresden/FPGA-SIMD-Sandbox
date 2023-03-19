@@ -132,32 +132,41 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-//// Create two buffer on FPGA to realize the hash_map and the count_map structure (= array of type )
-
-	// define two vector of #m_HSIZE_v registers of type fpvec<Type, regSize> -> used to realize hash_map and count_map on FPGA
-    fpvec<Type, inner_regSize> hash_map_data[m_HSIZE_v];
-    fpvec<Type, inner_regSize> count_map_data[m_HSIZE_v];
-
-	// Create 2 buffers, each holding m_HSIZE_v registers of type  integers
-    sycl::buffer<fpvec<Type, inner_regSize>> hash_map_Buf(&hash_map_data[0], m_HSIZE_v);
-    sycl::buffer<fpvec<Type, inner_regSize>> count_map_Buf(&count_map_data[0], m_HSIZE_v);
-////////////////////////////////////////////////////////////////////////////////	
-
-////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
 	q.submit([&](handler& h) {
-
-		// Create device accessors for the buffers.
-		// The property no_init lets the runtime know that the
-		// previous contents of the buffer can be discarded.
-		sycl::accessor hash_map(hash_map_Buf, h, sycl::read_write, sycl::no_init);
-		sycl::accessor count_map(count_map_Buf, h, sycl::read_write, sycl::no_init);
 
 		h.single_task<kernelV4>([=]() [[intel::kernel_args_restrict]] {
 
 			device_ptr<Type> input(arr_d);
-			device_ptr<Type> hashVec(hashVec_d);
-			device_ptr<Type> countVec(countVec_d);
+			device_ptr<Type> hashVec_globalMem(hashVec_d);
+			device_ptr<Type> countVec_globalMem(countVec_d);
+			
+			////////////////////////////////////////////////////////////////////////////////
+			//// declare private variables for hashVec & countVec
+			/* The Intel oneAPI DPC++/C++ Compiler creates a kernel memory in hardware.
+			* Kernel memory is sometimes referred to as on-chip memory because it is created from
+			* memory sources (such as RAM blocks) available on the FPGA.
+			* 
+			* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
+			* more accurate with MLABs. This memory type is significantly faster than store/load operations to global memory.
+			* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
+			*  
+			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
+			*/
+			// USING local MLAB on FPGA for hashVec and countVec array
+			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> hash_map[global_m_HSIZE_inner_v];
+			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> count_map[global_m_HSIZE_inner_v];
+
+			// USING local FPGA-RAM (result of declare these variables without additional attributes)
+			// std::array<fpvec<Type, inner_regSize>, global_m_HSIZE_inner_v> hash_map {};
+			// std::array<fpvec<Type, inner_regSize>, global_m_HSIZE_inner_v> count_map {};
+			
+			// USING local FPGA-RAM (result of declare these variables without additional attributes)
+			// fpvec<Type, inner_regSize> hash_map[global_m_HSIZE_inner_v];
+			// fpvec<Type, inner_regSize> count_map[global_m_HSIZE_inner_v];
+		
+			////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////
 
 			////////////////////////////////////////////////////////////////////////////////
 			//// declare some basic masks and arrays
@@ -168,12 +177,20 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
 
-			// loading data. On the first exec this should result in only 0 vals.   
+			// loading data. On the first exec this should result in only 0 vals.
+	
+	// TESTING UNROLL		
+			#pragma unroll 2
 			for(size_t i = 0; i < m_HSIZE_v; i++){
-				size_t h = i * m_elements_per_vector;
-
-				hash_map[i] = load_epi32(oneMask, hashVec, h);
-				count_map[i] = load_epi32(oneMask, countVec, h);
+				
+				// size_t h = i * m_elements_per_vector;
+				// hash_map[i] = load_epi32<Type, inner_regSize>(countVec, h);
+				// count_map[i] = load_epi32(countVec, h);
+				
+				// Because we know, that this is the first statement within the algorithm, 
+				// there can't be any data in hashVec or countVec -> so we simply set zeromasks to every element of the hashmap
+				hash_map[i] = zeroMask;
+				count_map[i] = zeroMask;
 			}
 
 			/**
@@ -257,7 +274,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					}	
 				}
 
-				#pragma unroll
+				#pragma nounroll
 				for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
 					// read 512-bit segments of loaded data and work through the algorithm with segments of only 512-bits
 					fpvec<Type, inner_regSize> tmp_workingData = workingData[i];
@@ -266,8 +283,9 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
 					* @param p current element of input data array
 					**/ 	
-					int p = 0;
-					while (p < inner_elementCount) {
+					// int p = 0;
+					// while (p < inner_elementCount) {
+					for(int p=0; p<inner_elementCount; p++) {
 						Type inputValue = tmp_workingData.elements[p];
 						Type hash_key = hashx(inputValue,m_HSIZE_v);
 						fpvec<Type, inner_regSize> broadcastCurrentValue = set1<Type, inner_regSize>(inputValue);
@@ -280,7 +298,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 							// found match
 							if (mask2int(compareRes) != 0) {
 								count_map[hash_key] = mask_add_epi32(count_map[hash_key], compareRes, count_map[hash_key], oneMask);
-								p++;
+								// p++;
 								break;
 							} else { // no match found
 								// deterime free position within register
@@ -292,10 +310,14 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 									hash_map[hash_key] = mask_set1<Type, inner_regSize>(hash_map[hash_key], masks[pos], inputValue);
 									//set count to one
 									count_map[hash_key] = mask_set1<Type, inner_regSize>(count_map[hash_key], masks[pos], (Type)1);
-									p++;
+									// p++;
 									break;
 								}   else    { // CASE B2
-									hash_key = (hash_key + 1) % m_HSIZE_v;
+									// hash_key = (hash_key + 1) % m_HSIZE_v;
+									hash_key = (hash_key + 1);															
+									if (hash_key >= m_HSIZE_v) {
+										hash_key = hash_key-m_HSIZE_v;
+									}	
 								}
 							}
 						}
@@ -306,12 +328,12 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// #### END OF FPGA parallelized part ####
 			// #######################################
 
-			//store data from hash_ma
+			//store data from hash_map & count_map back to global memory	
 			for(size_t i = 0; i < m_HSIZE_v; i++){
 				size_t h = i * m_elements_per_vector;
 						
-				store_epi32(hashVec, h, hash_map[i]);
-				store_epi32(countVec, h, count_map[i]);
+				store_epi32(hashVec_globalMem, h, hash_map[i]);
+				store_epi32(countVec_globalMem, h, count_map[i]);
 			}
 		});
 	}).wait();
