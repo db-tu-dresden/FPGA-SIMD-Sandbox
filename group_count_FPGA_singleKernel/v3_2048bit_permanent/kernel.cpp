@@ -295,11 +295,10 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				// p+=elementCount;	
 			}
 			//store results back to global memory
-			#pragma unroll 2
-			for(int i=0; i<globalHSIZE; i++) {
-				hashVec_globalMem[i]=hashVec[i];
-				countVec_globalMem[i]=countVec[i];
-			}
+			// #pragma unroll
+			// for(int i=0; i<globalHSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
+			memcpy(hashVec_globalMem, hashVec, globalHSIZE * sizeof(Type));
+ 			memcpy(countVec_globalMem, countVec, globalHSIZE * sizeof(Type));
 		});
 	}).wait();
 }   
