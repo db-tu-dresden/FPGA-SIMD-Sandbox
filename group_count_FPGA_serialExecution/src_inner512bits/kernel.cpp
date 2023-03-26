@@ -88,7 +88,7 @@ class kernelV5;
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant1(uint32_t *input, uint32_t *hashVec, uint32_t *countVec, size_t size) {
 	/** 
 	 * define example register
 	 * fpvec<uint32_t> testReg;
@@ -113,13 +113,13 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 
 	/** 
@@ -148,7 +148,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	// define dataVec register
 	fpvec<Type, regSize> dataVec;
 
-	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+	// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
 		// calculate chunk_idx and chunk_offset for current iteration step
@@ -162,8 +162,8 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 		// split loaded data into 4 "working register" á 512 bit to work over data segments of 512bits
 		std::array<fpvec<Type, inner_regSize>, (inner_regSize/sizeof(Type))> workingData {};
 		for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
-			for (int j=0; j<inner_elementCount; j++) {
-				workingData[i].elements[j] = dataVec.elements[((i*inner_elementCount)+j)];
+			for (int j=0; j<elements_per_inner_register; j++) {
+				workingData[i].elements[j] = dataVec.elements[((i*elements_per_inner_register)+j)];
 			}	
 		}
 
@@ -172,11 +172,11 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 			fpvec<Type, inner_regSize> tmp_workingData = workingData[i];
 
 			/**
-			* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+			* iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 			* @param p current element of input data array
 			**/ 	
 			int p = 0;
-			while (p < inner_elementCount) {
+			while (p < elements_per_inner_register) {
 			
 				// get single value from current dataVec register at position p
 				Type inputValue = tmp_workingData.elements[p];
@@ -189,20 +189,20 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
 				while (1) {
 					// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-					TypeSigned overflow = (hash_key + inner_elementCount) - HSIZE;		
+					TypeSigned overflow = (hash_key + elements_per_inner_register) - HSIZE;		
 					overflow = overflow < 0? 0: overflow;
 					Type oferflowUnsigned = (Type)overflow;		
 
 					// throw exception, if calculated overflow is bigger than amount of elements within the register
 					// This case can only result from incorrectly configured global parameters.
-					if (oferflowUnsigned > inner_elementCount) {
-						throw std::out_of_range("Value of oferflowUnsigned is bigger than value of inner_elementCount - no valid values / range");
+					if (oferflowUnsigned > elements_per_inner_register) {
+						throw std::out_of_range("Value of oferflowUnsigned is bigger than value of elements_per_inner_register - no valid values / range");
 					}
 						
 					// use function createOverflowCorrectionMask() to create overflow correction mask
 					fpvec<Type, inner_regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, inner_regSize>(oferflowUnsigned);
 
-					// Load #elementCount consecutive elements from hashVec, starting from position hash_key
+					// Load #elements_per_register consecutive elements from hashVec, starting from position hash_key
 					fpvec<Type, inner_regSize> nextElements = mask_loadu(oneMask, hashVec, hash_key);
 
 					// compare vector with broadcast value against vector with following elements for equality
@@ -252,7 +252,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
 							break;
 						} 
 						else {         			          // CASE B2   
-							hash_key += inner_elementCount;			
+							hash_key += elements_per_inner_register;			
 							if(hash_key >= HSIZE){
 								hash_key = 0;
 							}							
@@ -277,7 +277,7 @@ void LinearProbingFPGA_variant1(uint32_t *input, uint64_t dataSize, uint32_t *ha
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *hashVec, uint32_t *countVec, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant2(uint32_t *input, uint32_t *hashVec, uint32_t *countVec, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -295,13 +295,13 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 
 	/** 
@@ -328,7 +328,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 	// define dataVec register
 	fpvec<Type, regSize> dataVec;
 
-	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+	// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 	
 		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
@@ -345,8 +345,8 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 		// split loaded data into 4 "working register" á 512 bit to work over data segments of 512bits
 		std::array<fpvec<Type, inner_regSize>, (inner_regSize/sizeof(Type))> workingData {};
 		for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
-			for (int j=0; j<inner_elementCount; j++) {
-				workingData[i].elements[j] = dataVec.elements[((i*inner_elementCount)+j)];
+			for (int j=0; j<elements_per_inner_register; j++) {
+				workingData[i].elements[j] = dataVec.elements[((i*elements_per_inner_register)+j)];
 			}	
 		}
 
@@ -355,11 +355,11 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 			fpvec<Type, inner_regSize> tmp_workingData = workingData[i];
 
 			/**
-			* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+			* iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 			* @param p current element of input data array
 			**/ 	
 			int p = 0;
-			while (p < inner_elementCount) {
+			while (p < elements_per_inner_register) {
 
 				// get single value from current dataVec register at position p
 				Type inputValue = tmp_workingData.elements[p];
@@ -368,7 +368,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 				Type hash_key = hashx(inputValue,HSIZE);
 
 				// compute the aligned start position within the hashMap based the hash_key
-				Type remainder = hash_key % inner_elementCount; // should be equal to (hash_key/elementCount)*elementCount;
+				Type remainder = hash_key % elements_per_inner_register; // should be equal to (hash_key/elements_per_inner_register)*elements_per_inner_register;
 				Type aligned_start = hash_key - remainder;
 
 				/**
@@ -379,28 +379,28 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 
 				while(1) {
 					// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-					TypeSigned overflow = (aligned_start + inner_elementCount) - HSIZE;
+					TypeSigned overflow = (aligned_start + elements_per_inner_register) - HSIZE;
 					overflow = overflow < 0 ? 0 : overflow;
 					Type oferflowUnsigned = (Type)overflow;
 
 					// throw exception, if calculated overflow is bigger than amount of elements within the register
 					// This case can only result from incorrectly configured global parameters.
-					if (oferflowUnsigned > inner_elementCount) {
-						throw std::out_of_range("Value of oferflowUnsigned is bigger than value of inner_elementCount - no valid values / range");
+					if (oferflowUnsigned > elements_per_inner_register) {
+						throw std::out_of_range("Value of oferflowUnsigned is bigger than value of elements_per_inner_register - no valid values / range");
 					}
 
 					// use function createOverflowCorrectionMask() to create overflow correction mask
 					fpvec<Type, inner_regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, inner_regSize>(oferflowUnsigned);
 
 					// Calculating a cutlow correction mask and a overflow_and_cutlow_mask 
-					TypeSigned cutlow = inner_elementCount - remainder; // should be in a range from 1 to inner_elementCount
+					TypeSigned cutlow = elements_per_inner_register - remainder; // should be in a range from 1 to elements_per_inner_register
 					Type cutlowUnsigned = (Type)cutlow;
 					fpvec<Type, inner_regSize> cutlow_mask = createCutlowMask<Type, inner_regSize>(cutlowUnsigned);
 					
 					fpvec<Type, inner_regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 		
 					// Load 16 consecutive elements from hashVec, starting from position hash_key
-					fpvec<Type, inner_regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
+					fpvec<Type, inner_regSize> nextElements = load_epi32<Type, inner_regSize>(hashVec, aligned_start);
 
 					// compare vector with broadcast value against vector with following elements for equality
 					fpvec<Type, inner_regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -466,7 +466,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
 						// since we now use the overflow mask we can do this to change our position
 						// we ALSO need to set the remainder to 0.  
 							remainder = 0;
-							aligned_start += inner_elementCount;			
+							aligned_start += elements_per_inner_register;			
 							if(aligned_start >= HSIZE){
 								aligned_start = 0;
 							}							
@@ -491,7 +491,7 @@ void LinearProbingFPGA_variant2(uint32_t *input, uint64_t dataSize, uint32_t *ha
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant3(uint32_t* input, uint32_t* hashVec, uint32_t* countVec, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
@@ -510,13 +510,13 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 
 	/** 
@@ -545,7 +545,7 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
     // define dataVec register
 	fpvec<Type, regSize> dataVec;
 
-	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+	// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 		
 		// old load-operation; works with regSize of 64, 128, 256 byte, but isn't optimized regarding parallel load by 4 memory controller
@@ -562,8 +562,8 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		// split loaded data into 4 "working register" á 512 bit to work over data segments of 512bits
 		std::array<fpvec<Type, inner_regSize>, (inner_regSize/sizeof(Type))> workingData {};
 		for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
-			for (int j=0; j<inner_elementCount; j++) {
-				workingData[i].elements[j] = dataVec.elements[((i*inner_elementCount)+j)];
+			for (int j=0; j<elements_per_inner_register; j++) {
+				workingData[i].elements[j] = dataVec.elements[((i*elements_per_inner_register)+j)];
 			}	
 		}
 
@@ -572,21 +572,21 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			fpvec<Type, inner_regSize> iValues = workingData[i];
 
 			/**
-			* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+			* iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 			* @param p current element of input data array
 			**/ 	
 			// remove first while loop
 			// Due to the parallel processing of the entire register (16 elements), 
 			// the outer while loop is no longer necessary, since the elements are not processed individually.
 			// int p = 0;
-			// while (p < elementCount) {
-			// 		load #inner_elementCount input values --> use the #elementCount elements of dataVec	/// !! change compared to the serial implementation !!
+			// while (p < elements_per_inner_register) {
+			// 		load #elements_per_inner_register input values --> use the #elements_per_inner_register elements of dataVec	/// !! change compared to the serial implementation !!
 			// 		old: fpvec<Type, regSize> iValues = dataVec;
 			// 		commented out, since unnecessary double assignment; direct assignment on line 176
 
 			//iterate over the input values
 			int k=0;
-			while (k<inner_elementCount) {
+			while (k<elements_per_inner_register) {
 
 				// broadcast single value from input at postion k into a new SIMD register
 				fpvec<Type, inner_regSize> idx = set1<Type, inner_regSize>((Type)k);
@@ -596,33 +596,33 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 				Type hash_key = hashx(inputValue,HSIZE);
 
 				// compute the aligned start position within the hashMap based the hash_key
-				Type remainder = hash_key % inner_elementCount; // should be equal to (hash_key/elementCount)*elementCount;
+				Type remainder = hash_key % elements_per_inner_register; // should be equal to (hash_key/elements_per_inner_register)*elements_per_inner_register;
 				Type aligned_start = hash_key - remainder;
 				
 				while (1) {
 					// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-					TypeSigned overflow = (aligned_start + inner_elementCount) - HSIZE;
+					TypeSigned overflow = (aligned_start + elements_per_inner_register) - HSIZE;
 					overflow = overflow < 0 ? 0 : overflow;
 					Type oferflowUnsigned = (Type)overflow;
 
 					// throw exception, if calculated overflow is bigger than amount of elements within the register
 					// This case can only result from incorrectly configured global parameters.
-					if (oferflowUnsigned > inner_elementCount) {
-						throw std::out_of_range("Value of oferflowUnsigned is bigger than value of elementCount - no valid values / range");
+					if (oferflowUnsigned > elements_per_inner_register) {
+						throw std::out_of_range("Value of oferflowUnsigned is bigger than value of elements_per_inner_register - no valid values / range");
 					}
 
 					// use function createOverflowCorrectionMask() to create overflow correction mask
 					fpvec<Type, inner_regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, inner_regSize>(oferflowUnsigned);
 
 					// Calculating a cutlow correction mask and a overflow_and_cutlow_mask 
-					TypeSigned cutlow = inner_elementCount - remainder; // should be in a range from 1 to elementCount
+					TypeSigned cutlow = elements_per_inner_register - remainder; // should be in a range from 1 to elements_per_inner_register
 					Type cutlowUnsigned = (Type)cutlow;
 					fpvec<Type, inner_regSize> cutlow_mask = createCutlowMask<Type, inner_regSize>(cutlowUnsigned);
 						
 					fpvec<Type, inner_regSize> overflow_and_cutlow_mask = mask_cmpeq_epi32_mask(oneMask, cutlow_mask, overflow_correction_mask);
 
 					// Load 16 consecutive elements from hashVec, starting from position hash_key
-					fpvec<Type, inner_regSize> nextElements = load_epi32(oneMask, hashVec, aligned_start);
+					fpvec<Type, inner_regSize> nextElements = load_epi32<Type, inner_regSize>(hashVec, aligned_start);
 						
 					// compare vector with broadcast value against vector with following elements for equality
 					fpvec<Type, inner_regSize> compareRes = mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
@@ -680,7 +680,7 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 							// since we now use the overflow mask we can do this to change our position
 							// we ALSO need to set the remainder to 0.
 							remainder = 0;
-							aligned_start += inner_elementCount;
+							aligned_start += elements_per_inner_register;
 							if(aligned_start >= HSIZE){
 								aligned_start = 0;
 							}
@@ -689,7 +689,7 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
 				}
 			}
 		// delete following line with deactivating outer while-loop
-		// p+=elementCount;	
+		// p+=elements_per_inner_register;	
 		}	
 	}	
 }
@@ -707,7 +707,7 @@ void LinearProbingFPGA_variant3(uint32_t* input, uint64_t dataSize, uint32_t* ha
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant4(uint32_t* input, uint32_t* hashVec, uint32_t* countVec, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -725,13 +725,13 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 
 	/** 
@@ -761,11 +761,6 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
     fpvec<Type, inner_regSize>* hash_map;
     fpvec<Type, inner_regSize>* count_map;
 
-	const size_t m_elements_per_vector = inner_elementCount; 			// should be equivalent to (regSize)/sizeof(Type);		
-	const size_t m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;
-	const size_t m_HSIZE = HSIZE;
- 
-
     // use a vector with elements of type <fpvec<uint32_t> as structure "around" the registers
     hash_map = new fpvec<Type, inner_regSize>[m_HSIZE_v];
     count_map = new fpvec<Type, inner_regSize>[m_HSIZE_v];
@@ -774,8 +769,8 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
     for(size_t i = 0; i < m_HSIZE_v; i++){
         size_t h = i * m_elements_per_vector;
 
-       	hash_map[i] = load_epi32(oneMask, hashVec, h);
-    	count_map[i] = load_epi32(oneMask, countVec, h);
+       	hash_map[i] = load_epi32<Type, inner_regSize>(hashVec, h);
+    	count_map[i] = load_epi32<Type, inner_regSize>(countVec, h);
 	}
 
 	/**
@@ -807,7 +802,7 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
     // creating writing masks
 	/** CREATING WRITING MASKS
 	 * 
-	 * Following line isn't needed anymore. Instead of zero_cvtu32_mask, please use zeroMask as mask with all 0 and elementCount elements!
+	 * Following line isn't needed anymore. Instead of zero_cvtu32_mask, please use zeroMask as mask with all 0 and elements_per_register elements!
 	 * fpvec<uint32_t> zero_cvtu32_mask = cvtu32_mask16((uint32_t)0);	
 	 *
 	 *	old code for creating writing masks:
@@ -816,7 +811,7 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
      *		masks[i-1] = cvtu32_mask16((uint32_t)(1 << (i-1)));
 	 *	}
 	 *
-	 * new solution is working with (variable) regSize and elementCount per register (e.g. 256 byte and 64 elements per register)
+	 * new solution is working with (variable) regSize and elements_per_register per register (e.g. 256 byte and 64 elements per register)
 	 * It generates a matrix of the required size according to the parameters used.  
 	*/
     std::array<fpvec<Type, inner_regSize>, (inner_regSize/sizeof(Type))> masks {};
@@ -838,7 +833,7 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	// define dataVec register
 	fpvec<Type, regSize> dataVec;
 
-	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+	// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
 		// calculate chunk_idx and chunk_offset for current iteration step
@@ -852,8 +847,8 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		// split loaded data into 4 "working register" á 512 bit to work over data segments of 512bits
 		std::array<fpvec<Type, inner_regSize>, (inner_regSize/sizeof(Type))> workingData {};
 		for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
-			for (int j=0; j<inner_elementCount; j++) {
-				workingData[i].elements[j] = dataVec.elements[((i*inner_elementCount)+j)];
+			for (int j=0; j<elements_per_inner_register; j++) {
+				workingData[i].elements[j] = dataVec.elements[((i*elements_per_inner_register)+j)];
 			}	
 		}
 
@@ -862,11 +857,11 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			fpvec<Type, inner_regSize> tmp_workingData = workingData[i];
 
 			/**
-			* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+			* iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 			* @param p current element of input data array
 			**/ 	
 			int p = 0;
-			while (p < inner_elementCount) {
+			while (p < elements_per_inner_register) {
 				Type inputValue = tmp_workingData.elements[p];
 				Type hash_key = hashx(inputValue,m_HSIZE_v);
 				fpvec<Type, inner_regSize> broadcastCurrentValue = set1<Type, inner_regSize>(inputValue);
@@ -927,7 +922,7 @@ void LinearProbingFPGA_variant4(uint32_t* input, uint64_t dataSize, uint32_t* ha
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, Type *match_32bit, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* countVec, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -945,13 +940,13 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 
 	/** 
@@ -979,13 +974,13 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 ////////////////////////////////////////////////////////////////////////////////
 //// starting point of the logic of the algorithm
 
-	Type *buffer = reinterpret_cast< Type* >( _mm_malloc( elementCount * sizeof(Type), regSize ) );
+	Type *buffer = reinterpret_cast< Type* >( _mm_malloc( elements_per_inner_register * sizeof(Type), regSize ) );
 
 	size_t p = 0;
 	
 	// AVX512-implementation of this LinearProbing-algorithm_v5 (SoA_conflict_v1) was actually using this while-loop.
 	// We replaced this solution through our for-loop for the loading cycles similar to the previous versions.
-	// while(p + elementCount < dataSize){
+	// while(p + elements_per_register < dataSize){
 
 	// #########################################
 	// #### START OF FPGA parallelized part ####
@@ -993,7 +988,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 	// define dataVec register
 	fpvec<Type, regSize> input_value;
 
-	// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+	// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 	for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
 		// calculate chunk_idx and chunk_offset for current iteration step
@@ -1007,8 +1002,8 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 		// split loaded data into 4 "working register" á 512 bit to work over data segments of 512bits
 		std::array<fpvec<Type, inner_regSize>, (inner_regSize/sizeof(Type))> workingData {};
 		for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
-			for (int j=0; j<inner_elementCount; j++) {
-				workingData[i].elements[j] = input_value.elements[((i*inner_elementCount)+j)];
+			for (int j=0; j<elements_per_inner_register; j++) {
+				workingData[i].elements[j] = input_value.elements[((i*elements_per_inner_register)+j)];
 			}	
 		}
 
@@ -1045,7 +1040,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 			// OR we use the input and hash it save it in to buffer and than make a maskz load for the hashed data
 			// OR we have a simdifyed Hash Algorithm! For the most cases we would need an avx... mod. 
 			// _mm512_store_epi32(buffer, tmp_workingData);
-			for(size_t i = 0; i < inner_elementCount; i++){
+			for(size_t i = 0; i < elements_per_inner_register; i++){
 				// old : buffer[i] = hashx(input[p + i], HSIZE);
 				// we don't need this offset-calculation (p+i), because we iterate through our data-register (tmp_workingData), which
 				// will be loaded with new data in every data-loading-iteration. So we just have to iterate through the elements within this register. 
@@ -1056,7 +1051,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 
 			while(mask2int(no_conflicts_mask) !=0) {
 				// now we can gather the data from the different positions where we have no conflicts.
-				fpvec<Type, inner_regSize> hash_map_value = mask_i32gather_epi32(zeroMask, no_conflicts_mask, hash_map_position, hashVec, 4);
+				fpvec<Type, inner_regSize> hash_map_value = mask_i32gather_epi32(zeroMask, no_conflicts_mask, hash_map_position, hashVec);
 				// with these we can calculate the different possible hits. Real hits and empty positions.
 				fpvec<Type, inner_regSize> foundPos = mask_cmpeq_epi32_mask(no_conflicts_mask, tmp_workingData, hash_map_value);
 				fpvec<Type, inner_regSize> foundEmpty = mask_cmpeq_epi32_mask(no_conflicts_mask, zeroMask, hash_map_value);
@@ -1073,10 +1068,10 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 					// Now we have to gather the count. IMPORTANT! the count is a 32bit integer. 
 					// FOR NOW THIS IS CORRECT BUT MIGHT CHANGE LATER!
 					// For 64bit integers we would need to find a different solution!
-					fpvec<Type, inner_regSize> hash_map_value = mask_i32gather_epi32(zeroMask, foundPos, hash_map_position, countVec, 4);
+					fpvec<Type, inner_regSize> hash_map_value = mask_i32gather_epi32(zeroMask, foundPos, hash_map_position, countVec);
 					// on this count we can know add the pre calculated values. and scatter it back to their positions
 					hash_map_value = maskz_add_epi32(foundPos, hash_map_value, input_add);
-					mask_i32scatter_epi32<Type, inner_regSize>(countVec, foundPos, hash_map_position, hash_map_value, 4, tmp_HSIZE);
+					mask_i32scatter_epi32<Type, inner_regSize>(countVec, foundPos, hash_map_position, hash_map_value);
 						
 					// finaly we remove the entries we just saved from the no_conflicts_mask such that the work to be done shrinkes.
 					no_conflicts_mask = kAndn(foundPos, no_conflicts_mask);
@@ -1084,7 +1079,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 
 				if(mask2int(foundEmpty) != 0){		//B1
 					// now we have to check for conflicts to prevent two different entries to write to the same position.
-					fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position, match_32bit);
+					fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position);
 	// deactivate to reduce ressource usage
 	//				fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
 	//				saveConflicts = register_and(saveConflicts, empty);
@@ -1095,8 +1090,8 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 					to_save_data = kAnd(to_save_data, foundEmpty);
 
 					// with the cleaned mask we can now save the data.
-					mask_i32scatter_epi32<Type, inner_regSize>(hashVec, to_save_data, hash_map_position, tmp_workingData, 4, tmp_HSIZE);
-					mask_i32scatter_epi32<Type, inner_regSize>(countVec, to_save_data, hash_map_position, input_add, 4, tmp_HSIZE);
+					mask_i32scatter_epi32<Type, inner_regSize>(hashVec, to_save_data, hash_map_position, tmp_workingData);
+					mask_i32scatter_epi32<Type, inner_regSize>(countVec, to_save_data, hash_map_position, input_add);
 
 					//and again we need to remove the data from the todo list
 					no_conflicts_mask = kAndn(to_save_data, no_conflicts_mask);
@@ -1112,7 +1107,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint64_t dataSize, uint32_t* ha
 
 				// we repeat this for one vector as long as their is still a value to be saved.
 			}
-			p += inner_elementCount;
+			p += elements_per_inner_register;
 		}
 	}	
 	// #######################################

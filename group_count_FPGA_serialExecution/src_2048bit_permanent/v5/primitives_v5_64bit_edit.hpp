@@ -685,6 +685,24 @@ fpvec<T,B> setX_singleValue(T value) {
 	return reg;
 }
 
+/**	#25.1
+* adaption of:
+* __m512i _mm512_set1_epi32 (int a)
+*
+* create an empty register reg
+* add "1" to this register at every position contained in buffer (value-1) !
+* size_t conflict_count = amount of conflicts contained in buffer
+* 
+*/
+template<typename T, int B>
+fpvec<T,B> setX_multipleValues(uint32_t* buffer, size_t conflict_count) {
+	auto reg = fpvec<T,B>{};
+	for(int i=0; i<conflict_count; i++) {
+		reg.elements[(buffer[i] - 1)] += 1; 
+	}
+	return reg;
+}
+
 /**	#26
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_mask_i32gather_epi32 (__m512i src, __mmask16 k, __m512i vindex, void const* base_addr, int scale)
@@ -697,11 +715,12 @@ fpvec<T,B> setX_singleValue(T value) {
 * @param vindex : register of type fpvec<T,B> 
 * @param data : void const* base_addr
 * @param scale : scale should be 1, 2, 4 or 8
+*		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays	
 */
 template<typename T, int B>
-fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, uint32_t* data, int scale) {
+fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, uint32_t* data) {
 	auto reg = fpvec<T,B>{};
-#pragma unroll
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
 			size_t addr = 0 + vindex.elements[i];	// * scale * 8;	
@@ -751,12 +770,14 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 * @param mask_k : writemask k (= register of type fpvec<T,B>)
 * @param vindex : register of type fpvec<T,B> 
 * @param data_to_scatter : register of type fpvec<T,B>
-* @param scale : scale should be 1, 2, 4 or 8
-* @param tmp_HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets
+* @param scale : scale should be 1, 2, 4 or 8		
+*		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays																						
+* @param tmp_HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets		
+*		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays	
 */
 template<typename T, int B>
-void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter, int scale, Type tmp_HSIZE) {
-#pragma unroll
+void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter) {
+	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
 			Type addr = 0 + vindex.elements[i];	
@@ -765,9 +786,7 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 						// omit *scale, because we currently work with Type=uint32_t in all stages
 						// if we want to use another datatype, we may adjust the scale paramter within
 						// this function; now scale doesn't have an usage
-			if (addr >= tmp_HSIZE) {
-				addr = tmp_HSIZE-addr;
-			}							
+			// if (addr >= HSIZE) { addr = HSIZE-addr; }						
 			baseStorage[addr] = (Type)data_to_scatter.elements[i];													
 		} 
 	}

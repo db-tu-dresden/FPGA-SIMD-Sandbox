@@ -123,7 +123,7 @@ int  main(int argc, char** argv){
     } else {
         std::cout << "Memory not allocated!" << std::endl;
     }
-    generateData(arr, distinctValues, dataSize);     
+    generateData(arr);     
     std::cout <<"Generation of initial data done."<< std::endl; 
 
     /**
@@ -431,13 +431,13 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
-        initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, match_64bit, HSIZE, dataSize);  //difference value for size parameter compared to v1-v4
+        initializeHashMap(hashVec,countVec);
+        LinearProbingFPGA_variant5(arr, hashVec, countVec, match_64bit, dataSize);  //difference value for size parameter compared to v1-v4
 
         // measured run
-        initializeHashMap(hashVec,countVec,HSIZE);
+        initializeHashMap(hashVec,countVec);
         auto begin_v5 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant5(arr, dataSize, hashVec, countVec, match_64bit, HSIZE, dataSize);  //difference value for size parameter compared to v1-v4
+        LinearProbingFPGA_variant5(arr, hashVec, countVec, match_64bit, dataSize);  //difference value for size parameter compared to v1-v4
         auto end_v5 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
 
@@ -452,8 +452,8 @@ int  main(int argc, char** argv){
     }        
 
     // check result for correctness
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    validate(hashVec,countVec);
+    validate_element(arr, hashVec, countVec);
     std::cout<< " " <<std::endl;
 
     // print result

@@ -6,7 +6,7 @@
 #include "../config/global_settings.hpp"
 #include "../helper/helper_kernel.hpp"
 
-void LinearProbingScalar(uint32_t* input, uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, int HSIZE) {
+void LinearProbingScalar(uint32_t* input, uint32_t* hashVec, uint32_t* countVec) {
 
     //iterate over input
     int p = 0;

@@ -123,7 +123,7 @@ int  main(int argc, char** argv){
     } else {
         std::cout << "Memory not allocated!" << std::endl;
     }
-    generateData(arr, distinctValues, dataSize);     
+    generateData(arr);     
     std::cout <<"Generation of initial data done."<< std::endl; 
 
     /**
@@ -151,13 +151,13 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
-        initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
+        initializeHashMap(hashVec,countVec);
+        LinearProbingScalar(arr, hashVec, countVec);
 
         // measured run
-        initializeHashMap(hashVec,countVec,HSIZE);
+        initializeHashMap(hashVec,countVec);
         auto begin_v0 = std::chrono::high_resolution_clock::now();
-        LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
+        LinearProbingScalar(arr, hashVec, countVec);
         auto end_v0 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v0 = end_v0 - begin_v0;
 
@@ -172,8 +172,8 @@ int  main(int argc, char** argv){
     }    
        
     // check result for correctness
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    validate(hashVec,countVec);
+    validate_element(arr, hashVec, countVec);
     std::cout<< " " <<std::endl;
 
     // print result
@@ -201,13 +201,13 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
-        initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        initializeHashMap(hashVec,countVec);
+        LinearProbingFPGA_variant1(arr, hashVec, countVec, number_CL*multiplier);
 
         // measured run
-        initializeHashMap(hashVec,countVec,HSIZE);
+        initializeHashMap(hashVec,countVec);
         auto begin_v1 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant1(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        LinearProbingFPGA_variant1(arr, hashVec, countVec, number_CL*multiplier);
         auto end_v1 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v1 = end_v1 - begin_v1;
 
@@ -221,8 +221,8 @@ int  main(int argc, char** argv){
         std::terminate();
     }        
     // check result for correctness
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    validate(hashVec,countVec);
+    validate_element(arr, hashVec, countVec);
     std::cout<< " " <<std::endl;
 
     // print result
@@ -251,13 +251,13 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
-        initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        initializeHashMap(hashVec,countVec);
+        LinearProbingFPGA_variant2(arr, hashVec, countVec, number_CL*multiplier);
 
         // measured run
-        initializeHashMap(hashVec,countVec,HSIZE);
+        initializeHashMap(hashVec,countVec);
         auto begin_v2 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant2(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        LinearProbingFPGA_variant2(arr, hashVec, countVec, number_CL*multiplier);
         auto end_v2 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v2 = end_v2 - begin_v2;
 
@@ -271,8 +271,8 @@ int  main(int argc, char** argv){
         std::terminate();
     }        
     // check result for correctness
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    validate(hashVec,countVec);
+    validate_element(arr, hashVec, countVec);
     std::cout<< " " <<std::endl;
 
     // print result
@@ -301,13 +301,13 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
-        initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        initializeHashMap(hashVec,countVec);
+        LinearProbingFPGA_variant3(arr, hashVec, countVec, number_CL*multiplier);
 
         // measured run
-        initializeHashMap(hashVec,countVec,HSIZE);
+        initializeHashMap(hashVec,countVec);
         auto begin_v3 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant3(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        LinearProbingFPGA_variant3(arr, hashVec, countVec, number_CL*multiplier);
         auto end_v3 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v3 = end_v3 - begin_v3;
 
@@ -321,8 +321,8 @@ int  main(int argc, char** argv){
         std::terminate();
     }        
     // check result for correctness
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    validate(hashVec,countVec);
+    validate_element(arr, hashVec, countVec);
     std::cout<< " " <<std::endl;
 
     // print result
@@ -351,13 +351,13 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run
-        initializeHashMap(hashVec,countVec,HSIZE);
-        LinearProbingFPGA_variant4(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        initializeHashMap(hashVec,countVec);
+        LinearProbingFPGA_variant4(arr, hashVec, countVec, number_CL*multiplier);
 
         // measured run
-        initializeHashMap(hashVec,countVec,HSIZE);
+        initializeHashMap(hashVec,countVec);
         auto begin_v4 = std::chrono::high_resolution_clock::now();
-       LinearProbingFPGA_variant4(arr, dataSize, hashVec, countVec, HSIZE, number_CL*multiplier);
+        LinearProbingFPGA_variant4(arr, hashVec, countVec, number_CL*multiplier);
         auto end_v4 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v4 = end_v4 - begin_v4;
 
@@ -371,8 +371,8 @@ int  main(int argc, char** argv){
         std::terminate();
     }        
     // check result for correctness
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
+    validate(hashVec,countVec);
+    validate_element(arr, hashVec, countVec);
     std::cout<< " " <<std::endl;
 
     // print result
