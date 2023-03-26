@@ -224,7 +224,7 @@ int  main(int argc, char** argv){
     }
 
     // Init input buffer
-    generateData<Type>(arr_h, distinctValues, dataSize);    
+    generateData<Type>(arr_h);    
     std::cout <<"Generation of initial data done."<< std::endl; 
 
     // Copy input host buffer to input device buffer
@@ -232,7 +232,7 @@ int  main(int argc, char** argv){
     q.wait();	
 
     // init HashMap
-    initializeHashMap(hashVec_h,countVec_h,HSIZE);
+    initializeHashMap(hashVec_h,countVec_h);
     
     // Copy with zero initialized HashMap (hashVec, countVec) from host to device
     q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(Type));
@@ -251,10 +251,10 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE, number_CL*multiplier);
+        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);
 
         // Re-Initialize HashMap after dummy run
-        initializeHashMap(hashVec_h,countVec_h,HSIZE);
+        initializeHashMap(hashVec_h,countVec_h);
         q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(Type));
         q.wait();
         q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(Type));
@@ -262,7 +262,7 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v3 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE, number_CL*multiplier);
+        LinearProbingFPGA_variant3(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);
         auto end_v3 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v3 = end_v3 - begin_v3;
 
@@ -286,8 +286,8 @@ int  main(int argc, char** argv){
     std::cout<< " " <<std::endl;
 
     // check result for correctness
-    validate(dataSize, hashVec_h, countVec_h, HSIZE);
-    validate_element(arr_h, dataSize, hashVec_h, countVec_h, HSIZE);
+    validate(hashVec_h, countVec_h);
+    validate_element(arr_h, hashVec_h, countVec_h);
     std::cout<< " " <<std::endl;
 
     // free USM memory

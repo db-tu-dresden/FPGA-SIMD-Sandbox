@@ -75,16 +75,14 @@ class kernelV4;
  * @param arr_d the input data array
  * @param hashVec_d store value of k at position hashx(k)
  * @param countVec_d store the count of occurence of k at position hashx(k)
- * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
- * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]				// global defined, not part of paramater list anymore
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])							// global defined, not part of paramater list anymore
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
- * @param hash_map_d vector of #m_HSIZE_v registers of type fpvec<Type, regSize> -> used to realize hash_map on FPGA
- * @param count_map_d vector of #m_HSIZE_v registers of type fpvec<Type, regSize> -> used to realize count_map on FPGA
- * @param m_elements_per_vector = inner_elementCount
- * @param m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;
- * @param m_HSIZE = HSIZE
+ * @param m_elements_per_vector = elements_per_inner_register												// global defined, not part of paramater list anymore
+ * @param m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;					// global defined, not part of paramater list anymore
+ * @param m_HSIZE = HSIZE																			// global defined, not part of paramater list anymore
  */
-void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE, size_t size, size_t m_elements_per_vector, size_t m_HSIZE_v, size_t m_HSIZE) {
+void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -102,13 +100,13 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 	
 	/** 
@@ -154,16 +152,12 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
 			*/
 			// USING local MLAB on FPGA for hashVec and countVec array
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> hash_map[global_m_HSIZE_inner_v];
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> count_map[global_m_HSIZE_inner_v];
-
+			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> hash_map[m_HSIZE_v];
+			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> count_map[m_HSIZE_v];
+		
 			// USING local FPGA-RAM (result of declare these variables without additional attributes)
-			// std::array<fpvec<Type, inner_regSize>, global_m_HSIZE_inner_v> hash_map {};
-			// std::array<fpvec<Type, inner_regSize>, global_m_HSIZE_inner_v> count_map {};
-			
-			// USING local FPGA-RAM (result of declare these variables without additional attributes)
-			// fpvec<Type, inner_regSize> hash_map[global_m_HSIZE_inner_v];
-			// fpvec<Type, inner_regSize> count_map[global_m_HSIZE_inner_v];
+			// fpvec<Type, inner_regSize> hash_map[m_HSIZE_v];
+			// fpvec<Type, inner_regSize> count_map[m_HSIZE_v];
 		
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
@@ -178,11 +172,8 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			////////////////////////////////////////////////////////////////////////////////
 
 			// loading data. On the first exec this should result in only 0 vals.
-	
-	// TESTING UNROLL		
 			#pragma unroll 2
 			for(size_t i = 0; i < m_HSIZE_v; i++){
-				
 				// size_t h = i * m_elements_per_vector;
 				// hash_map[i] = load_epi32<Type, inner_regSize>(countVec, h);
 				// count_map[i] = load_epi32(countVec, h);
@@ -221,7 +212,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 			/** CREATING WRITING MASKS
 			 * 
-			 * Following line isn't needed anymore. Instead of zero_cvtu32_mask, please use zeroMask as mask with all 0 and elementCount elements!
+			 * Following line isn't needed anymore. Instead of zero_cvtu32_mask, please use zeroMask as mask with all 0 and elements_per_register elements!
 			 * fpvec<uint32_t> zero_cvtu32_mask = cvtu32_mask16((uint32_t)0);	
 			 *
 			 *	old code for creating writing masks:
@@ -230,7 +221,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			 *		masks[i-1] = cvtu32_mask16((uint32_t)(1 << (i-1)));
 			 *	}
 			 *
-			 * new solution is working with (variable) regSize and elementCount per register (e.g. 256 byte and 64 elements per register)
+			 * new solution is working with (variable) regSize and elements_per_register per register (e.g. 256 byte and 64 elements per register)
 			 * It generates a matrix of the required size according to the parameters used.  
 			 */
 			std::array<fpvec<Type, inner_regSize>, (inner_regSize/sizeof(Type))> masks {};
@@ -252,7 +243,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// define dataVec register
 			fpvec<Type, regSize> dataVec;
 
-			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+			// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 			// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
@@ -269,8 +260,8 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				#pragma unroll
 				for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
 					#pragma unroll
-					for (int j=0; j<inner_elementCount; j++) {
-						workingData[i].elements[j] = dataVec.elements[((i*inner_elementCount)+j)];
+					for (int j=0; j<elements_per_inner_register; j++) {
+						workingData[i].elements[j] = dataVec.elements[((i*elements_per_inner_register)+j)];
 					}	
 				}
 
@@ -280,12 +271,12 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					fpvec<Type, inner_regSize> tmp_workingData = workingData[i];
 
 					/**
-					* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+					* iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 					* @param p current element of input data array
 					**/ 	
 					// int p = 0;
-					// while (p < inner_elementCount) {
-					for(int p=0; p<inner_elementCount; p++) {
+					// while (p < elements_per_inner_register) {
+					for(int p=0; p<elements_per_inner_register; p++) {
 						Type inputValue = tmp_workingData.elements[p];
 						Type hash_key = hashx(inputValue,m_HSIZE_v);
 						fpvec<Type, inner_regSize> broadcastCurrentValue = set1<Type, inner_regSize>(inputValue);
@@ -328,13 +319,19 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// #### END OF FPGA parallelized part ####
 			// #######################################
 
-			//store data from hash_map & count_map back to global memory	
-			for(size_t i = 0; i < m_HSIZE_v; i++){
-				size_t h = i * m_elements_per_vector;
-						
-				store_epi32(hashVec_globalMem, h, hash_map[i]);
-				store_epi32(countVec_globalMem, h, count_map[i]);
-			}
+			// store data from hash_map & count_map back to global memory	
+
+			// old approach : We use store_epi32() function and store every element of hashmap[] and count_map[] back to global memory
+			//	for(size_t i = 0; i < m_HSIZE_v; i++){
+			//		size_t h = i * m_elements_per_vector;
+			//		store_epi32(hashVec_globalMem, h, hash_map[i]);
+			//		store_epi32(countVec_globalMem, h, count_map[i]);
+			//	}
+
+			// Since the structures of hashmap[] and count_map[] consist of contiguous memory, 
+			// we can simply copy HSIZE*sizeof(Type) bytes back to global memory for both structures.
+			memcpy(hashVec_globalMem, hash_map, HSIZE * sizeof(Type));
+ 			memcpy(countVec_globalMem, count_map, HSIZE * sizeof(Type));
 		});
 	}).wait();
 }   

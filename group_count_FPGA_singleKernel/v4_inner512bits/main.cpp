@@ -183,16 +183,6 @@ int  main(int argc, char** argv){
     std::cout <<"=============================================="<<std::endl;
 	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 4 (SoAoV_v1) ### \n\n");
 
-    /////////////////////////////////////////////////////////////
-    /////// declare additional variables and datastructures - only for LinearProbingFPGA_variant4()
-    //// declare some function intern variables
-	const size_t m_elements_per_vector = inner_elementCount; 			// should be equivalent to (regSize)/sizeof(Type);		
-	const size_t m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;
-	const size_t m_HSIZE = HSIZE;
-			
-    /////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////
-
     // Host buffer 
     if ((arr_h = malloc_host<Type>(number_CL*multiplier, q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
@@ -234,7 +224,7 @@ int  main(int argc, char** argv){
     }
 
     // Init input buffer
-    generateData<Type>(arr_h, distinctValues, dataSize);    
+    generateData<Type>(arr_h);    
     std::cout <<"Generation of initial data done."<< std::endl; 
 
     // Copy input host buffer to input device buffer
@@ -242,7 +232,7 @@ int  main(int argc, char** argv){
     q.wait();		
 
     // init HashMap
-    initializeHashMap(hashVec_h,countVec_h,HSIZE);
+    initializeHashMap(hashVec_h,countVec_h);
     
     // Copy with zero initialized HashMap (hashVec, countVec) from host to device
     q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(Type));
@@ -261,10 +251,10 @@ int  main(int argc, char** argv){
         std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant4(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE, number_CL*multiplier, m_elements_per_vector, m_HSIZE_v, m_HSIZE);
+        LinearProbingFPGA_variant4(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);
 
         // Re-Initialize HashMap after dummy run
-        initializeHashMap(hashVec_h,countVec_h,HSIZE);
+        initializeHashMap(hashVec_h,countVec_h);
         q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(Type));
         q.wait();
         q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(Type));
@@ -272,7 +262,7 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v4 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant4(q, arr_d, hashVec_d, countVec_d, dataSize, HSIZE, number_CL*multiplier, m_elements_per_vector, m_HSIZE_v, m_HSIZE);
+        LinearProbingFPGA_variant4(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);
         auto end_v4 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v4 = end_v4 - begin_v4;
 
@@ -296,8 +286,8 @@ int  main(int argc, char** argv){
     std::cout<< " " <<std::endl;
 
     // check result for correctness
-    validate(dataSize, hashVec_h, countVec_h, HSIZE);
-    validate_element(arr_h, dataSize, hashVec_h, countVec_h, HSIZE);
+    validate(hashVec_h, countVec_h);
+    validate_element(arr_h, hashVec_h, countVec_h);
     std::cout<< " " <<std::endl;
 
     // free USM memory
