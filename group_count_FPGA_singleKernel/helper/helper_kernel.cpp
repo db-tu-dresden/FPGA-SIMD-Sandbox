@@ -3,12 +3,13 @@
 #include<stdint.h>
 
 #include "helper_kernel.hpp"
+#include "../config/global_settings.hpp"
 
 using namespace std;
 
 // simple multiplicative hashing function
-unsigned int hashx(int key, int HSIZE) {
-    return ((unsigned long)((unsigned int)1300000077*key)* HSIZE)>>32;
+unsigned int hashx(int key, int selectable_HSIZE) {
+    return ((unsigned long)((unsigned int)1300000077*key)* selectable_HSIZE)>>32;
 }
 
 // ####################

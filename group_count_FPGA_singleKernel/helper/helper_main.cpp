@@ -15,10 +15,11 @@
 #include <utility>
 
 #include "helper_main.hpp"
+#include "../config/global_settings.hpp"
 
 using namespace std;
 
-void initializeHashMap(uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+void initializeHashMap(uint32_t* hashVec, uint32_t* countVec) {
     //initalize hash array with zeros
     for (int i=0; i<HSIZE;i++) {
         hashVec[i]=0;
@@ -27,7 +28,7 @@ void initializeHashMap(uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
 }
 
 //validates only total count
-void validate(uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t HSIZE) {
+void validate(uint32_t* hashVec, uint32_t* countVec) {
     uint64_t sum=0;
     for (int i=0; i<HSIZE; i++) {
         if (hashVec[i]>0) {
@@ -40,7 +41,7 @@ void validate(uint64_t dataSize, uint32_t* hashVec, uint32_t* countVec, uint64_t
 }
 
 //validates if every entry has the right number of elements and if elements are missing.
-void validate_element(uint32_t *data, uint64_t dataSize, uint32_t*hashVec, uint32_t* countVec, uint64_t HSIZE) {
+void validate_element(uint32_t *data, uint32_t*hashVec, uint32_t* countVec) {
     std::cout << "Element Validation\n";
     size_t errors_found = 0;
     // uint32_t lowest = 0;         // variable not used

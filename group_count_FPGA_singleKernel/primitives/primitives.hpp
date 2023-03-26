@@ -167,9 +167,6 @@ fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, uint32_t* data, uint32_t startInde
 			// old reg.elements[i] = data[(startIndex+i)%HSIZE];
 			reg.elements[i] = data[startIndex+i];
 		}
-		else {
-			reg.elements[i] = 0;
-		}
 	}
 	return reg;
 }
@@ -189,12 +186,6 @@ fpvec<T,B> mask_cmpeq_epi32_mask(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,B>
 			if (a.elements[i] == b.elements[i]) {
 				reg.elements[i] = 1;
 			}	
-			else {
-				reg.elements[i] = 0;
-			}
-		}	
-		else {
-			reg.elements[i] = 0;
 		}	
 	}
 	return reg;
@@ -696,9 +687,10 @@ fpvec<T,B> setX_singleValue(T value) {
 * @param vindex : register of type fpvec<T,B> 
 * @param data : void const* base_addr
 * @param scale : scale should be 1, 2, 4 or 8
+*		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays	
 */
 template<typename T, int B>
-fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, uint32_t* data, int scale) {
+fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, uint32_t* data) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
@@ -732,9 +724,6 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 		if (writeMask.elements[i] == 1) {
 			reg.elements[i] = a.elements[i] + b.elements[i];
 		}
-		/*else {
-			reg.elements[i] = zero;
-		}*/
 	}
 	return reg;
 }
@@ -750,11 +739,13 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 * @param mask_k : writemask k (= register of type fpvec<T,B>)
 * @param vindex : register of type fpvec<T,B> 
 * @param data_to_scatter : register of type fpvec<T,B>
-* @param scale : scale should be 1, 2, 4 or 8
+* @param scale : scale should be 1, 2, 4 or 8 			
+*		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays	
 * @param tmp_HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets
+*		-> we don't need an additional parameter for HSIZE, since we defined this parameter global (global_settings.hpp) and our implementation don't need a modulo calculation in this function	
 */
 template<typename T, int B>
-void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter, int scale, Type tmp_HSIZE) {
+void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter) {
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
@@ -764,8 +755,8 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 						// omit *scale, because we currently work with Type=uint32_t in all stages
 						// if we want to use another datatype, we may adjust the scale paramter within
 						// this function; now scale doesn't have an usage
-		/*	if (addr >= tmp_HSIZE) {
-				addr = tmp_HSIZE-addr;
+		/*	if (addr >= HSIZE) {
+				addr = HSIZE-addr;
 			}		*/					
 			baseStorage[addr] = (Type)data_to_scatter.elements[i];													
 		} 
@@ -818,9 +809,6 @@ fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 		if (a.elements[i] == b.elements[i]) {
 			reg.elements[i] = (Type)1;
 		} 
-		/*else {
-			reg.elements[i] = (Type)0;
-		}*/
 	}
 	return reg;
 }
@@ -897,9 +885,7 @@ fpvec<T,B> register_and(fpvec<T,B>& a, fpvec<T,B>& b) {
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (a.elements[i] == b.elements[i]) {
 			reg.elements[i] = (T)1;
-		} /*else {
-			reg.elements[i] = (T)0;
-		}*/
+		} 
 	}
 	return reg;
 }
@@ -925,9 +911,6 @@ fpvec<T,B> mask_cmp_epi32_mask_NLT(fpvec<T,B>& zeroMask, fpvec<T,B>& a, fpvec<T,
 			reg.elements[i] = 1;
 		}
 	}	
-		/*else {
-			reg.elements[i] = 0;
-		}*/	
 	return reg;
 }
 
