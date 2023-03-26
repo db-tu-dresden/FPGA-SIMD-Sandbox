@@ -3,7 +3,7 @@
 
 using namespace std;
 
-unsigned int hashx(int key, int HSIZE);
+unsigned int hashx(int key, int selectable_HSIZE);
 
 uint32_t exponentiation_primitive_uint32_t(int x, int a);
 uint64_t exponentiation_primitive_uint64_t(int x, int a);

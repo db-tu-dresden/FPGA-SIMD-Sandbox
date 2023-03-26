@@ -31,7 +31,7 @@
 
 
 icpx -fsycl -O3 -o main src_inner512bits/main.cpp \
-    helper/helper_kernel.cpp \
-    helper/helper_main.cpp \
-    src_inner512bits/kernel.cpp \
-    src_inner512bits/LinearProbing_scalar.cpp \
+       helper/helper_kernel.cpp \
+       helper/helper_main.cpp \
+       src_inner512bits/kernel.cpp \
+       src_inner512bits/LinearProbing_scalar.cpp \
