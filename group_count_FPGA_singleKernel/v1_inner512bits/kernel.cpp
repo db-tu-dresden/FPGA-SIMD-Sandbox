@@ -75,11 +75,11 @@ class kernelV1;
  * @param arr_d the input data array
  * @param hashVec_d store value of k at position hashx(k)
  * @param countVec_d store the count of occurence of k at position hashx(k)
- * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
- * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]			// global defined, not part of paramater list anymore 
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])						// global defined, not part of paramater list anymore 
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -97,13 +97,13 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 	
 	/** 
@@ -150,18 +150,18 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		*/
 
 		// USING local MLAB on FPGA for hashVec and countVec array
-		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type hashVec[globalHSIZE] = {};
-		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[globalHSIZE] = {}; 
+		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type hashVec[HSIZE] = {};
+		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[HSIZE] = {}; 
 
 		// USING local FPGA-RAM (result of declare these variables without additional attributes)
 		// if RAM-utilization rises above 90% while compiling, set memory attribute to intel::max_replicates(1)
-		// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type hashVec[globalHSIZE] = {};
-		// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type countVec[globalHSIZE] = {};
+		// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type hashVec[HSIZE] = {};
+		// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type countVec[HSIZE] = {};
 
 		// idea : implement hashVec and countVec as Registers
 		// Not working 
-		// [[intel::fpga_register]] Type hashVec[globalHSIZE];
-		// [[intel::fpga_register]] Type countVec[globalHSIZE]; 
+		// [[intel::fpga_register]] Type hashVec[HSIZE];
+		// [[intel::fpga_register]] Type countVec[HSIZE]; 
 
 		////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		// define dataVec register
 		fpvec<Type, regSize> dataVec;
 
-		// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+		// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 		// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
 		for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
@@ -198,8 +198,8 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			#pragma unroll
 			for (int i=0; i<(regSize/inner_regSize); i++) {				// regSize/inner_regSize should be 4
 				#pragma unroll
-				for (int j=0; j<inner_elementCount; j++) {
-					workingData[i].elements[j] = dataVec.elements[((i*inner_elementCount)+j)];
+				for (int j=0; j<elements_per_inner_register; j++) {
+					workingData[i].elements[j] = dataVec.elements[((i*elements_per_inner_register)+j)];
 				}	
 			}
 
@@ -209,26 +209,26 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				fpvec<Type, inner_regSize> tmp_workingData = workingData[i];
 
 				/**
-				* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+				* iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 				* @param p current element of input data array
 				**/ 	
 
 				//		int p = 0;
 				//		// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
-				//		while (p < inner_elementCount) {
-				for(int p=0; p<inner_elementCount; p++) {
+				//		while (p < elements_per_inner_register) {
+				for(int p=0; p<elements_per_inner_register; p++) {
 					// get single value from current dataVec register at position p
 					Type inputValue = tmp_workingData.elements[p];
 				
 					// compute hash_key of the input value
-					Type hash_key = hashx(inputValue,HSIZE);
+					Type hash_key = hashx(inputValue, HSIZE);
 
 					// broadcast inputValue into a SIMD register
 					fpvec<Type, inner_regSize> broadcastCurrentValue = set1<Type, inner_regSize>(inputValue);
 
 					while (1) {
 						// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-						TypeSigned overflow = (hash_key + inner_elementCount) - HSIZE;		
+						TypeSigned overflow = (hash_key + elements_per_inner_register) - HSIZE;		
 						overflow = overflow < 0? 0: overflow;
 						Type oferflowUnsigned = (Type)overflow;		
 				
@@ -285,7 +285,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 								break;
 							} 
 							else {         			          // CASE B2   
-								hash_key += inner_elementCount;
+								hash_key += elements_per_inner_register;
 								if(hash_key >= HSIZE){
 									hash_key = 0;
 								}
@@ -297,9 +297,9 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 		}
 		//store results back to global memory
 		// #pragma unroll
-		// for(int i=0; i<globalHSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
-		memcpy(hashVec_globalMem, hashVec, globalHSIZE * sizeof(Type));
- 		memcpy(countVec_globalMem, countVec, globalHSIZE * sizeof(Type));
+		// for(int i=0; i<HSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
+		memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
+ 		memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));
 
 		});
 	}).wait();

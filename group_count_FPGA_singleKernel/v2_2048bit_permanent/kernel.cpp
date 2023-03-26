@@ -75,11 +75,11 @@ class kernelV2;
  * @param arr_d the input data array
  * @param hashVec_d store value of k at position hashx(k)
  * @param countVec_d store the count of occurence of k at position hashx(k)
- * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]
- * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])
+ * @param dataSize number of tuples respectively elements in hashVec[] and countVec[]		// global defined, not part of paramater list anymore 
+ * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])					// global defined, not part of paramater list anymore 
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint64_t dataSize, uint64_t HSIZE, size_t size) {
+void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -97,13 +97,13 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 	assert(size % kNumLSUs == 0);
 
 	// ensure dataSize is nice
-	assert(dataSize % elementCount == 0);
+	assert(dataSize % elements_per_register == 0);
 	assert(dataSize % kValuesPerLSU == 0);
 	assert(dataSize % kNumLSUs == 0);   
 
 	size_t total_chunks = size / kValuesPerInterleavedChunk;
 	size_t chunks_per_lsu = total_chunks / kNumLSUs;
-	// calculation of iterations; value will be bigger than dataSize/elementCount
+	// calculation of iterations; value will be bigger than dataSize/elements_per_register
 	const size_t iterations = chunks_per_lsu * kIterationsPerChunk;  
 	
 	/** 
@@ -148,8 +148,8 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			*  
 			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
 			*/
-			[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type hashVec[globalHSIZE] = {};
-			[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type countVec[globalHSIZE] = {}; 
+			[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type hashVec[HSIZE] = {};
+			[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type countVec[HSIZE] = {}; 
 
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// define dataVec register
 			fpvec<Type, regSize> dataVec;
 
-			// iterate over input data with a SIMD register size of regSize bytes (elementCount elements)
+			// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
 			#pragma nounroll
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				
@@ -182,20 +182,20 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				dataVec = maxLoad_per_clock_cycle<Type, regSize>(input, kNumLSUs, kValuesPerLSU, chunk_idx, kValuesPerInterleavedChunk, chunk_offset);
 
 				/**
-				* iterate over input data / always step by step through the currently 16 (or #elementCount) loaded elements
+				* iterate over input data / always step by step through the currently 16 (or #elements_per_register) loaded elements
 				* @param p current element of input data array
 				**/ 	
 				// int p = 0;
-				// while (p < elementCount) {
-				for(int p=0; p<elementCount; p++) {
+				// while (p < elements_per_register) {
+				for(int p=0; p<elements_per_register; p++) {
 					// get single value from current dataVec register at position p
 					Type inputValue = dataVec.elements[p];
 
 					// compute hash_key of the input value
-					Type hash_key = hashx(inputValue,HSIZE);
+					Type hash_key = hashx(inputValue, HSIZE);
 
 					// compute the aligned start position within the hashMap based the hash_key
-					Type remainder = hash_key % elementCount; // should be equal to (hash_key/elementCount)*elementCount;
+					Type remainder = hash_key % elements_per_register; // should be equal to (hash_key/elements_per_register)*elements_per_register;
 					Type aligned_start = hash_key - remainder;
 					
 					/**
@@ -206,7 +206,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 					while(1) {
 						// Calculating an overflow correction mask, to prevent errors form comparrisons of overflow values.
-						TypeSigned overflow = (aligned_start + elementCount) - HSIZE;
+						TypeSigned overflow = (aligned_start + elements_per_register) - HSIZE;
 						overflow = overflow < 0 ? 0 : overflow;
 						Type oferflowUnsigned = (Type)overflow;
 
@@ -214,7 +214,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						fpvec<Type, regSize> overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
 
 						// Calculating a cutlow correction mask and a overflow_and_cutlow_mask 
-						TypeSigned cutlow = elementCount - remainder; // should be in a range from 1 to elementCount
+						TypeSigned cutlow = elements_per_register - remainder; // should be in a range from 1 to elements_per_register
 						Type cutlowUnsigned = (Type)cutlow;
 						fpvec<Type, regSize> cutlow_mask = createCutlowMask<Type, regSize>(cutlowUnsigned);
 						
@@ -282,11 +282,11 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 								break;
 							}
 							else {                   // CASE B2 
-							//aligned_start = (aligned_start+16) % HSIZE;
+							// aligned_start = (aligned_start+16) % HSIZE;
 							// since we now use the overflow mask we can do this to change our position
 							// we ALSO need to set the remainder to 0.  
 								remainder = 0;
-								aligned_start +=elementCount;
+								aligned_start +=elements_per_register;
 								if(aligned_start >= HSIZE){
 									aligned_start = 0;
 								}
@@ -298,9 +298,9 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			}
 			//store results back to global memory
 			// #pragma unroll
-			// for(int i=0; i<globalHSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
-			memcpy(hashVec_globalMem, hashVec, globalHSIZE * sizeof(Type));
- 			memcpy(countVec_globalMem, countVec, globalHSIZE * sizeof(Type));
+			// for(int i=0; i<HSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
+			memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
+ 			memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));
 		});
 	}).wait();
 }   
