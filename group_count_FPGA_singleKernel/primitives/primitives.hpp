@@ -625,7 +625,6 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 * void _mm512_mask_compressstoreu_epi32 (void* base_addr, __mmask16 k, __m512i a)
 * original description: "Contiguously store the active 32-bit integers in a (those with their respective bit set in writemask k) to unaligned memory at base_addr."
 *
-*
 * @param buffer : 
 * @param writeMask : 
 * @param data : 
@@ -672,6 +671,24 @@ template<typename T, int B>
 fpvec<T,B> setX_singleValue(T value) {
 	auto reg = fpvec<T,B>{};
 	reg.elements[value-1] = 1;
+	return reg;
+}
+
+/**	#25.1
+* adaption of:
+* __m512i _mm512_set1_epi32 (int a)
+*
+* create an empty register reg
+* add "1" to this register at every position contained in buffer (value-1) !
+* size_t conflict_count = amount of conflicts contained in buffer
+* 
+*/
+template<typename T, int B>
+fpvec<T,B> setX_multipleValues(uint32_t* buffer, size_t conflict_count) {
+	auto reg = fpvec<T,B>{};
+	for(int i=0; i<conflict_count; i++) {
+		reg.elements[(buffer[i] - 1)] += 1; 
+	}
 	return reg;
 }
 
@@ -724,6 +741,9 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 		if (writeMask.elements[i] == 1) {
 			reg.elements[i] = a.elements[i] + b.elements[i];
 		}
+		/*else {
+			reg.elements[i] = zero;
+		}*/
 	}
 	return reg;
 }
@@ -739,10 +759,10 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 * @param mask_k : writemask k (= register of type fpvec<T,B>)
 * @param vindex : register of type fpvec<T,B> 
 * @param data_to_scatter : register of type fpvec<T,B>
-* @param scale : scale should be 1, 2, 4 or 8 			
+* @param scale : scale should be 1, 2, 4 or 8		
+*		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays																						
+* @param tmp_HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets		
 *		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays	
-* @param tmp_HSIZE : global HashSize (=size of hashVec and countVec) to avoid scatter over the vector borders through false offsets
-*		-> we don't need an additional parameter for HSIZE, since we defined this parameter global (global_settings.hpp) and our implementation don't need a modulo calculation in this function	
 */
 template<typename T, int B>
 void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter) {
@@ -755,9 +775,7 @@ void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>
 						// omit *scale, because we currently work with Type=uint32_t in all stages
 						// if we want to use another datatype, we may adjust the scale paramter within
 						// this function; now scale doesn't have an usage
-		/*	if (addr >= HSIZE) {
-				addr = HSIZE-addr;
-			}		*/					
+			// if (addr >= HSIZE) { addr = HSIZE-addr; }						
 			baseStorage[addr] = (Type)data_to_scatter.elements[i];													
 		} 
 	}
@@ -840,8 +858,18 @@ fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 * @param match_32bit	-	an array which contain the exponentation results for 2^m at position m of match_32bit
 */
 template<typename T, int B>
-fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a, uint32_t* match_32bit) {
+fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
 	auto reg = fpvec<T,B>{};
+	Type match_32bit[32] = {
+		0x00000001, 0x00000002, 0x00000004, 0x00000008,	
+		0x00000010, 0x00000020, 0x00000040, 0x00000080,			
+		0x00000100, 0x00000200, 0x00000400, 0x00000800,		
+	 	0x00001000, 0x00002000, 0x00004000, 0x00008000,		
+	 	0x00010000,	0x00020000, 0x00040000, 0x00080000,		
+	 	0x00100000,	0x00200000, 0x00400000, 0x00800000,		
+	 	0x01000000,	0x02000000, 0x04000000, 0x08000000,		
+	 	0x10000000, 0x20000000, 0x40000000, 0x80000000	
+	};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		Type currentElement = a.elements[i];
