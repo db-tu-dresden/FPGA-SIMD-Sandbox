@@ -1,0 +1,11 @@
+Changes against last runs :
+
+! Important:	the implementation for v5 contains also the following changes:
+			- usage of MLAB for hashVec and countVec
+			- usgae of "memcpy" for storing back the data to global_memory
+
+23-03-23  	using globale #define values from global_settings.hpp
+			--> no manual changes in configured setting values necessary
+			--> all variable values (HSIZE, elements_per_register, ... ) are calculated automatically!
+
+			! serial remainder is outsourced to host and executed after FPGA part

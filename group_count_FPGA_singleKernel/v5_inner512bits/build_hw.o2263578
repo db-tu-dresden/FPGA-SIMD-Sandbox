@@ -1,9 +1,9 @@
 
 ########################################################################
-#      Date:           Mon Mar 13 03:21:39 PDT 2023
-#    Job ID:           2248790.v-qsvr-1.aidevcloud
+#      Date:           Sun 26 Mar 2023 07:13:37 AM PDT
+#    Job ID:           2263578.v-qsvr-1.aidevcloud
 #      User:           u177951
-# Resources:           cput=75:00:00,neednodes=1:fpga_runtime:stratix10:ppn=2,nodes=1:fpga_runtime:stratix10:ppn=2,walltime=23:59:00
+# Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:59:00
 ########################################################################
 
 sourcing /opt/intel/inteloneapi/setvars.sh
@@ -29,21 +29,21 @@ usage: source setvars.sh [--force] [--config=file] [--help] [...]
   
 
 Running in FPGA Hardware compile Mode:
-icpx -fsycl -Wall  -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga helper_kernel.cpp kernel.cpp main.cpp helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a  
-warning: -reuse-exe file 'main.fpga' not found; ignored
+icpx -fsycl -Wall  -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga kernel.cpp scalar_remainder.cpp main.cpp ../helper/helper_kernel.cpp ../helper/helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a  
+Saving target image to "/home/u177951/tmp/kernel-668312-e4ad24/extract/aocx.0"
+Unable to reuse any of the previous FPGA binaries.
 aoc: Compiling for FPGA. This process may take several hours to complete.  Prior to performing this compile, be sure to check the reports to ensure the design will meet your performance targets.  If the reports indicate performance targets are not being met, code edits may be required.  Please refer to the oneAPI FPGA Optimization Guide for information on performance tuning applications for FPGAs.
-aoc: Warning: A timing failure has been detected in the outputted binary. There were 4 timing violations,
-with the worst one being a Hold failure of 41ps on clock:
- u0|dcp_iopll|dcp_iopll_clk2x                         
+aoc: Warning: A timing failure has been detected in the outputted binary. There were 7 timing violations,
+with the worst one being a Hold failure of 81ps on clock:
+ mem|mem_bank[1].emif_ddr4_inst|emif_s10_0_phy_clk_l_2                                                      
 Consider doing one or more of the following:
   - Recompiling with a different seed (using -Xsseed=<S>).
   - Reducing the area usage of your design.
   - If you are using a custom BSP, discuss the failure with your BSP vendor.
-Makefile:83: recipe for target 'hw' failed
 failed
 
 ########################################################################
-# End of output for job 2248790.v-qsvr-1.aidevcloud
-# Date: Mon Mar 13 16:12:57 PDT 2023
+# End of output for job 2263578.v-qsvr-1.aidevcloud
+# Date: Sun 26 Mar 2023 09:28:31 PM PDT
 ########################################################################
 

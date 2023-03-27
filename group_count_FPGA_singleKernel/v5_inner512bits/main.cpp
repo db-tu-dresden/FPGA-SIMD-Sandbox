@@ -37,7 +37,6 @@
 #include <algorithm>
 #include <array>
 #include <iomanip>
-#include <chrono>
 #include <numeric>
 #include <vector>
 #include <time.h>
@@ -54,6 +53,7 @@
 
 #include "../config/global_settings.hpp"
 #include "kernel.hpp"
+#include "scalar_remainder.hpp"
 #include "../helper/helper_main.hpp"
 
 
@@ -190,10 +190,9 @@ int  main(int argc, char** argv){
 	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 5 (SoA_conflict_v1) ### \n\n");
 
     /////////////////////////////////////////////////////////////
-    /////// declare additional variables and datastructures - only for LinearProbingFPGA_variant4()
+    /////// declare additional variables and datastructures - only for LinearProbingFPGA_variant5()
 
-    Type *match_32bit_h, *match_32bit_d;    
-//  Type *buffer_h, *buffer_d;
+    size_t *p_h, *p_d;
 
     /////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////
@@ -211,15 +210,11 @@ int  main(int argc, char** argv){
         std::cerr << "ERROR: could not allocate space for 'countVec_h'\n";
         std::terminate();
     }  
-    if ((match_32bit_h = malloc_host<Type>(32, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'match_32bit_h'\n";
+    if ((p_h = malloc_host<size_t>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'p_h'\n";
         std::terminate();
     }  
-/*  if ((buffer_h = malloc_host<Type>(elementCount, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'buffer_h'\n";
-        std::terminate();
-    }  
-*/
+
     // Device buffer  
     if ((arr_d = malloc_device<Type>(number_CL*multiplier, q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_d'\n";
@@ -233,15 +228,11 @@ int  main(int argc, char** argv){
         std::cerr << "ERROR: could not allocate space for 'countVec_d'\n";
         std::terminate();
     } 
-    if ((match_32bit_d = malloc_device<Type>(32, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'match_32bit_d'\n";
+    if ((p_d = malloc_device<size_t>(1, q)) == nullptr) {
+        std::cerr << "ERROR: could not allocate space for 'p_d'\n";
         std::terminate();
-    }       
-/*  if ((buffer_d = malloc_device<Type>(elementCount, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'buffer_d'\n";
-        std::terminate();
-    }  
-*/
+    } 
+
     // check if memory for input array and HashTable (hashVec and countVec) is allocated correctly (on host)
     if (arr_h != NULL) {
         std::cout << "Memory allocated - " << dataSize << " values, between 1 and " << distinctValues << std::endl;
@@ -255,7 +246,7 @@ int  main(int argc, char** argv){
     }
 
     // Init input buffer
-    generateData<Type>(arr_h, distinctValues, dataSize);    
+    generateData<Type>(arr_h);    
     std::cout <<"Generation of initial data done."<< std::endl; 
 
     // Copy input host buffer to input device buffer
@@ -263,7 +254,7 @@ int  main(int argc, char** argv){
     q.wait();	
 
     // init HashMap
-    initializeHashMap(hashVec_h,countVec_h,HSIZE);
+    initializeHashMap(hashVec_h,countVec_h);
     
     // Copy with zero initialized HashMap (hashVec, countVec) from host to device
     q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(Type));
@@ -271,29 +262,13 @@ int  main(int argc, char** argv){
     q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(Type));
     q.wait();
 
-    // fill the match_32bit array with 32 32bit elements to represent all possible matches found in an register up to 32 elements
-	// allocate the array with malloc_device
-	// copy this data to the FPGA
-	match_32bit_h[0] = 	    0x00000001;		match_32bit_h[1] = 	    0x00000002;		match_32bit_h[2] = 	    0x00000004;		match_32bit_h[3] = 	    0x00000008;		
-	match_32bit_h[4] = 	    0x00000010;		match_32bit_h[5] = 	    0x00000020;		match_32bit_h[6] = 	    0x00000040;		match_32bit_h[7] = 	    0x00000080;			
-	match_32bit_h[8] = 	    0x00000100;		match_32bit_h[9] = 	    0x00000200;		match_32bit_h[10] = 	0x00000400;		match_32bit_h[11] = 	0x00000800;		
-	match_32bit_h[12] = 	0x00001000;		match_32bit_h[13] = 	0x00002000;		match_32bit_h[14] = 	0x00004000;		match_32bit_h[15] = 	0x00008000;		
-	match_32bit_h[16] = 	0x00010000;		match_32bit_h[17] = 	0x00020000;		match_32bit_h[18] = 	0x00040000;		match_32bit_h[19] = 	0x00080000;		
-	match_32bit_h[20] = 	0x00100000;		match_32bit_h[21] = 	0x00200000;		match_32bit_h[22] = 	0x00400000;		match_32bit_h[23] = 	0x00800000;		
-	match_32bit_h[24] = 	0x01000000;		match_32bit_h[25] = 	0x02000000;		match_32bit_h[26] = 	0x04000000;		match_32bit_h[27] = 	0x08000000;		
-	match_32bit_h[28] = 	0x10000000;		match_32bit_h[29] = 	0x20000000;		match_32bit_h[30] = 	0x40000000;		match_32bit_h[31] = 	0x80000000;		
-
-    q.memcpy(match_32bit_d, match_32bit_h, 32 * sizeof(Type));
+    // Initialize variable p for the first time.
+    // This variable does not have to be re-initialized, if LinearProbingFPGA_variant5() is called multiple times 
+    // (The content of the variable is always set to 0 when the FPGA starts)
+    p_h[0]=0;
+    q.memcpy(p_d, p_h, sizeof(size_t));
     q.wait();
 
-/*
-    // Init buffer_h with zero's and copy to buffer_d
-	for(int k=0; k<elementCount; k++) {
-		buffer_h[k] = (Type)0;
-	}
-    q.memcpy(buffer_d, buffer_h, (elementCount * sizeof(Type)));
-    q.wait();
-*/
     // track timing information, in ms
     double pcie_time_v5=0.0;
 
@@ -302,13 +277,21 @@ int  main(int argc, char** argv){
         ////////////////////////////////////////////////////////////////////////////
         std::cout <<"=============================="<<std::endl;
         std::cout <<"Kernel-Start : LinearProbingFPGA_variant5() == SoA_conflict_v1 -- SIMD for FPGA Variant v5:"<<std::endl;
-        std::cout << "Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
+        std::cout <<"Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, match_32bit_d, dataSize, HSIZE, dataSize);  //difference value for size parameter compared to v1-v4
+        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, p_d, dataSize);  //difference value for size parameter compared to v1-v4
+        // Copy output device buffer to output host buffer 
+        q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(Type));
+        q.wait();  
+        q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(Type));
+        q.wait();  
+        q.memcpy(p_h, p_d, sizeof(size_t));
+        q.wait();
+        scalar_remainder_variant5(arr_h, hashVec_h, countVec_h, p_h);
 
         // Re-Initialize HashMap after dummy run
-        initializeHashMap(hashVec_h,countVec_h,HSIZE);
+        initializeHashMap(hashVec_h,countVec_h);
         q.memcpy(hashVec_d, hashVec_h, HSIZE * sizeof(Type));
         q.wait();
         q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(Type));
@@ -316,7 +299,19 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v5 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, match_32bit_d, dataSize, HSIZE, dataSize);  //difference value for size parameter compared to v1-v4
+        // start of algorithm
+            LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, p_d, dataSize);  //difference value for size parameter compared to v1-v4
+            // Copy output device buffer to output host buffer 
+            q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(Type));
+            q.wait();  
+            q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(Type));
+            q.wait();  
+            q.memcpy(p_h, p_d, sizeof(size_t));
+            q.wait();
+            // caluclate the remaining values on host-side
+
+            scalar_remainder_variant5(arr_h, hashVec_h, countVec_h, p_h);
+        // end of algorithm
         auto end_v5 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
 
@@ -329,13 +324,13 @@ int  main(int argc, char** argv){
         std::cout << "Caught a synchronous SYCL exception: " << e.what() << "\n";
         std::terminate();
     }   
-
+/*
     // Copy output device buffer to output host buffer 
     q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(Type));
     q.wait();  
     q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(Type));
     q.wait();  
-
+*/
     /**
      * Test print to detect the following error, which has occurred irregularly in the past. 
      * Element Validation
@@ -357,28 +352,26 @@ int  main(int argc, char** argv){
     std::cout<< " " <<std::endl;
 
     // check result for correctness
-    validate(dataSize, hashVec_h, countVec_h, HSIZE);
-    validate_element(arr_h, dataSize, hashVec_h, countVec_h, HSIZE);
+    validate(hashVec_h, countVec_h);
+    validate_element(arr_h, hashVec_h, countVec_h);
     std::cout<< " " <<std::endl;
 
     // free USM memory
     sycl::free(arr_h, q);
     sycl::free(hashVec_h, q);
     sycl::free(countVec_h, q);
-    sycl::free(match_32bit_h, q);  
-//    sycl::free(buffer_h, q); 
+    sycl::free(p_h, q);
     
     sycl::free(arr_d, q);
     sycl::free(hashVec_d, q);
     sycl::free(countVec_d, q);   
-    sycl::free(match_32bit_d, q);      
-//    sycl::free(buffer_d, q); 
+    sycl::free(p_d, q);
 
     // print result
-    std::cout << "Final Evaluation of the Throughput: " <<std::endl;
+    std::cout <<"Final Evaluation of the Throughput: "<<std::endl;
     double input_size_mb_v5 = size * sizeof(Type) * 1e-6;
-	std::cout << "Input_size_mb: " << input_size_mb_v5 <<std::endl;
-    std::cout << "HOST-DEVICE Throughput: " << (input_size_mb_v5 / (pcie_time_v5 * 1e-3)) << " MB/s\n";
+	std::cout <<"Input_size_mb: "<< input_size_mb_v5 <<std::endl;
+    std::cout <<"HOST-DEVICE Throughput: "<< (input_size_mb_v5 / (pcie_time_v5 * 1e-3)) << " MB/s\n";
 
     std::cout <<" ### End of Linear Probing for FPGA - SIMD Variant 5 ### "<<std::endl;
     std::cout <<"=============================================="<<std::endl;

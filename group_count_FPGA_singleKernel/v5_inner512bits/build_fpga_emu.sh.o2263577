@@ -1,7 +1,7 @@
 
 ########################################################################
-#      Date:           Tue 14 Mar 2023 08:17:23 AM PDT
-#    Job ID:           2251221.v-qsvr-1.aidevcloud
+#      Date:           Sun 26 Mar 2023 07:10:54 AM PDT
+#    Job ID:           2263577.v-qsvr-1.aidevcloud
 #      User:           u177951
 # Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:00:00
 ########################################################################
@@ -27,10 +27,10 @@ usage: source setvars.sh [--force] [--config=file] [--help] [...]
   
   The SETVARS_ARGS environment variable is cleared on exiting setvars.sh.
   
-icpx -fsycl -Wall  -fintelfpga -DFPGA_EMULATOR helper_kernel.cpp helper_main.cpp kernel.cpp main.cpp lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o main.fpga_emu  
+icpx -fsycl -Wall  -fintelfpga -DFPGA_EMULATOR kernel.cpp scalar_remainder.cpp main.cpp ../helper/helper_kernel.cpp ../helper/helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a -fsycl-device-code-split=off -o main.fpga_emu  
 
 ########################################################################
-# End of output for job 2251221.v-qsvr-1.aidevcloud
-# Date: Tue 14 Mar 2023 08:17:49 AM PDT
+# End of output for job 2263577.v-qsvr-1.aidevcloud
+# Date: Sun 26 Mar 2023 07:11:42 AM PDT
 ########################################################################
 

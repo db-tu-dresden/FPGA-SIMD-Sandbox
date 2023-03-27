@@ -23,7 +23,7 @@ LIB_DIRS :=
 
 # Files
 INCS := $(wildcard )
-SRC := $(wildcard *.cpp)
+SRC := $(wildcard *.cpp ../helper/*.cpp)
 LIBS :=
 
 
@@ -82,8 +82,13 @@ report: $(SRC) Makefile
 hw: $(SRC) Makefile
 	icpx -fsycl $(ALL_CXXFLAGS) -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=$(TARGET).fpga -Xsoutput-report-folder=$(TARGET).prj -Xsboard=$(BOARD) -o $(TARGET).fpga $(SRC) lib/lib_sycl.a lib/lib_rtl.a $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L)
 
+# working:	icpx -fsycl $(ALL_CXXFLAGS) -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=$(TARGET).fpga -Xsoutput-report-folder=$(TARGET).prj -Xsboard=$(BOARD) -o $(TARGET).fpga $(SRC) lib/lib_sycl.a lib/lib_rtl.a $(foreach D,$(LIB_DIRS),-L$D) $(foreach L,$(LIBS),-l$L)
 
 ## delete -Xsprofile before "-reuse ..." --> profil-flag isn't necessary for FPGA-HW-Synthesis, only for analysis with VTune
+
+# test 11-03-2023:	ADD		-Xshyper-optimized-handshaking=auto		--> no optimizations for us, don't use
+# test 11-03-2023:	REMOVE:	-v	 									--> no optimizations for us, don't use
+
 
 
 ## ## ## ## ##

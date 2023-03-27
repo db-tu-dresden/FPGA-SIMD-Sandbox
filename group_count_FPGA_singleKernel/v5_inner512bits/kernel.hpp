@@ -6,13 +6,14 @@
 
 #include "lib/lib.hpp"
 #include "../config/global_settings.hpp"
-#include "primitives.hpp"
+#include "../primitives/primitives.hpp"
 
 using namespace sycl;
 
 
 class kernelV5;
 
-void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, uint32_t *match_32bit_d, uint64_t dataSize, uint64_t HSIZE, size_t size);
+
+void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, size_t *p_d, size_t size);
 
 #endif  // KERNEL_HPP
