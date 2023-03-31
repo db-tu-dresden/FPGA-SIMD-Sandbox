@@ -42,7 +42,6 @@
 #include <time.h>
 #include <tuple>
 #include <utility>
-
 #include <CL/sycl.hpp>
 #include <sycl/ext/intel/fpga_extensions.hpp>
 

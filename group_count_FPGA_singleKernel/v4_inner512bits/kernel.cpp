@@ -138,29 +138,6 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			device_ptr<Type> input(arr_d);
 			device_ptr<Type> hashVec_globalMem(hashVec_d);
 			device_ptr<Type> countVec_globalMem(countVec_d);
-			
-			////////////////////////////////////////////////////////////////////////////////
-			//// declare private variables for hashVec & countVec
-			/* The Intel oneAPI DPC++/C++ Compiler creates a kernel memory in hardware.
-			* Kernel memory is sometimes referred to as on-chip memory because it is created from
-			* memory sources (such as RAM blocks) available on the FPGA.
-			* 
-			* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
-			* more accurate with MLABs. This memory type is significantly faster than store/load operations to global memory.
-			* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
-			*  
-			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
-			*/
-			// USING local MLAB on FPGA for hashVec and countVec array
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> hash_map[m_HSIZE_v];
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] fpvec<Type, inner_regSize> count_map[m_HSIZE_v];
-		
-			// USING local FPGA-RAM (result of declare these variables without additional attributes)
-			// fpvec<Type, inner_regSize> hash_map[m_HSIZE_v];
-			// fpvec<Type, inner_regSize> count_map[m_HSIZE_v];
-		
-			////////////////////////////////////////////////////////////////////////////////
-			////////////////////////////////////////////////////////////////////////////////
 
 			////////////////////////////////////////////////////////////////////////////////
 			//// declare some basic masks and arrays
@@ -170,9 +147,27 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<Type, inner_regSize> zeroMask = set1<Type, inner_regSize>(zero);
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
+			
+			////////////////////////////////////////////////////////////////////////////////
+			//// declare private variables for hashVec & countVec
+			/* The Intel oneAPI DPC++/C++ Compiler creates a kernel memory in hardware.
+			* Kernel memory is sometimes referred to as on-chip memory because it is created from
+			* memory sources (such as RAM blocks) available on the FPGA.
+			* 
+			* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
+			* more accurate with M20K RAM Blocks. This memory type is significantly faster than store/load operations from/to global memory.
+			* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
+			*  
+			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
+			* Due to the fact that our HSIZE can also be significantly larger, we consciously use M20K RAM blocks instead of MLAB memory, 
+			* since the STRATIX FPGA has approx. 10000 M20K blocks - which corresponds to approx. 20MB and is therefore better suited for larger data structures.
+			*/
+			// USING M20K RAM BLOCKS on FPGA to implement hashVec and countVec (embedded memory) and initialize these with zero
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<fpvec<Type, inner_regSize>, m_HSIZE_v> hash_map;
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<fpvec<Type, inner_regSize>, m_HSIZE_v> count_map;
 
-			// loading data. On the first exec this should result in only 0 vals.
-			#pragma unroll 2
+			// loading data. On the first exec this should result in only 0 vals. / or better initalize hash_map and count_map with vectors full of 0
+			#pragma unroll 16
 			for(size_t i = 0; i < m_HSIZE_v; i++){
 				// size_t h = i * m_elements_per_vector;
 				// hash_map[i] = load_epi32<Type, inner_regSize>(countVec, h);
@@ -183,6 +178,8 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				hash_map[i] = zeroMask;
 				count_map[i] = zeroMask;
 			}
+			////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////
 
 			/**
 			 * calculate overflow in last register of hash_map and count_map, to prevent errors from storing elements in hash_map[m_HSIZE_v-1] in positions that are >HSIZE 
@@ -217,9 +214,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			 *
 			 *	old code for creating writing masks:
 			 *	std::array<fpvec<uint32_t>, 16> masks {};
-			 *	for(uint32_t i = 1; i <= 16; i++){
-			 *		masks[i-1] = cvtu32_mask16((uint32_t)(1 << (i-1)));
-			 *	}
+			 *	for(uint32_t i = 1; i <= 16; i++){ masks[i-1] = cvtu32_mask16((uint32_t)(1 << (i-1))); }
 			 *
 			 * new solution is working with (variable) regSize and elements_per_register per register (e.g. 256 byte and 64 elements per register)
 			 * It generates a matrix of the required size according to the parameters used.  
@@ -244,7 +239,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<Type, regSize> dataVec;
 
 			// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
-			// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
+			#pragma nounroll		// compiler should realize that this loop cannot be unrolled
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 
 				// calculate chunk_idx and chunk_offset for current iteration step
@@ -320,18 +315,13 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// #######################################
 
 			// store data from hash_map & count_map back to global memory	
-
-			// old approach : We use store_epi32() function and store every element of hashmap[] and count_map[] back to global memory
-			//	for(size_t i = 0; i < m_HSIZE_v; i++){
-			//		size_t h = i * m_elements_per_vector;
-			//		store_epi32(hashVec_globalMem, h, hash_map[i]);
-			//		store_epi32(countVec_globalMem, h, count_map[i]);
-			//	}
-
-			// Since the structures of hashmap[] and count_map[] consist of contiguous memory, 
-			// we can simply copy HSIZE*sizeof(Type) bytes back to global memory for both structures.
-			memcpy(hashVec_globalMem, hash_map, HSIZE * sizeof(Type));
- 			memcpy(countVec_globalMem, count_map, HSIZE * sizeof(Type));
+			// memcpy(hashVec_globalMem, hash_map, HSIZE * sizeof(Type));
+			// memcpy(countVec_globalMem, hash_map, HSIZE * sizeof(Type));		--> will be handled as for-loop with #pragma unroll through the compiler -> not working for large HSIZE
+			for(size_t i = 0; i < m_HSIZE_v; i++){
+				size_t h = i * m_elements_per_vector;
+				store_epi32(hashVec_globalMem, h, hash_map[i]);
+				store_epi32(countVec_globalMem, h, count_map[i]);
+			}
 		});
 	}).wait();
 }   

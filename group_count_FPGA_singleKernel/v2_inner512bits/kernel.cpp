@@ -143,19 +143,22 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			* memory sources (such as RAM blocks) available on the FPGA.
 			* 
 			* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
-			* more accurate with MLABs. This memory type is significantly faster than store/load operations to global memory.
+			* more accurate with M20K RAM Blocks. This memory type is significantly faster than store/load operations from/to global memory.
 			* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
 			*  
 			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
+			* Due to the fact that our HSIZE can also be significantly larger, we consciously use M20K RAM blocks instead of MLAB memory, 
+			* since the STRATIX FPGA has approx. 10000 M20K blocks - which corresponds to approx. 20MB and is therefore better suited for larger data structures.
 			*/
-			// USING local MLAB on FPGA for hashVec and countVec array
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type hashVec[HSIZE] = {};
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[HSIZE] = {}; 
+			// USING M20K RAM BLOCKS on FPGA to implement hashVec and countVec (embedded memory) and initialize these with zero
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> hashVec;
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> countVec;
 
-			// USING local FPGA-RAM (result of declare these variables without additional attributes)
-			//	Type hashVec[HSIZE] = {};
-			//	Type countVec[HSIZE] = {};
-
+			#pragma unroll 16		
+			for(int i=0; i<HSIZE; i++) {
+				hashVec[i]=0; 
+				countVec[i]=0;	
+			}
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
 
@@ -172,7 +175,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			fpvec<Type, regSize> dataVec;
 
 			// iterate over input data with a SIMD register size of regSize bytes (elements_per_register elements)
-			// #pragma nounroll		// compiler should realize that this loop cannot be unrolled
+			#pragma nounroll		// compiler should realize that this loop cannot be unrolled
 			for (int i_cnt = 0; i_cnt < iterations; i_cnt++) {
 				
 				// calculate chunk_idx and chunk_offset for current iteration step
@@ -217,10 +220,8 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						Type remainder = hash_key % elements_per_inner_register; // should be equal to (hash_key/elements_per_inner_register)*elements_per_inner_register;
 						Type aligned_start = hash_key - remainder;
 						
-						/**
-						* broadcast element p of input[] to vector of type fpvec<uint32_t>
-						* broadcastCurrentValue contains sixteen times value of input[i]
-						**/
+						// broadcast element p of input[] to vector of type fpvec<Type, inner_regSize>
+						// broadcastCurrentValue contains sixteen times value of input[i]
 						fpvec<Type, inner_regSize> broadcastCurrentValue = set1<Type, inner_regSize>(inputValue);
 
 						while(1) {
@@ -315,12 +316,18 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					}	
 				}	
 			}
+			// store results back to global memory
+			// memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
+			// memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));		--> will be handled as for-loop with #pragma unroll through the compiler -> not working for large HSIZE
+			// we can't use #pragma unroll, due to unknown value of HSIZE 
+			// -> High value of HSIZE in combination with pragma unroll can cause HIGH RAM UITLIZATION (~199%)
+			// Because we know, that we are working often with 16 elements per register (16x32bit=512bit), we unroll with factor 16
+			#pragma unroll 16					
+			for(int i=0; i<HSIZE; i++) {
+				hashVec_globalMem[i]=hashVec[i]; 
+				countVec_globalMem[i]=countVec[i]; 	
+			}
 
-			//store results back to global memory
-			// #pragma unroll
-			// for(int i=0; i<HSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
-			memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
- 			memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));
 		});
 	}).wait();
 }   

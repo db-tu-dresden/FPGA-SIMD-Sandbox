@@ -53,7 +53,6 @@
 
 #include "../config/global_settings.hpp"
 #include "kernel.hpp"
-#include "scalar_remainder.hpp"
 #include "../helper/helper_main.hpp"
 
 
@@ -189,14 +188,6 @@ int  main(int argc, char** argv){
     std::cout <<"=============================================="<<std::endl;
 	printf("\n \n ### START of Linear Probing for FPGA - SIMD Variant 5 (SoA_conflict_v1) ### \n\n");
 
-    /////////////////////////////////////////////////////////////
-    /////// declare additional variables and datastructures - only for LinearProbingFPGA_variant5()
-
-    size_t *p_h, *p_d;
-
-    /////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////
-
     // Host buffer 
     if ((arr_h = malloc_host<Type>(number_CL*multiplier, q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'arr_h'\n";
@@ -208,10 +199,6 @@ int  main(int argc, char** argv){
     }
     if ((countVec_h = malloc_host<Type>(HSIZE, q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'countVec_h'\n";
-        std::terminate();
-    }  
-    if ((p_h = malloc_host<size_t>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'p_h'\n";
         std::terminate();
     }  
 
@@ -226,10 +213,6 @@ int  main(int argc, char** argv){
     }
     if ((countVec_d = malloc_device<Type>(HSIZE, q)) == nullptr) {
         std::cerr << "ERROR: could not allocate space for 'countVec_d'\n";
-        std::terminate();
-    } 
-    if ((p_d = malloc_device<size_t>(1, q)) == nullptr) {
-        std::cerr << "ERROR: could not allocate space for 'p_d'\n";
         std::terminate();
     } 
 
@@ -262,13 +245,6 @@ int  main(int argc, char** argv){
     q.memcpy(countVec_d, countVec_h, HSIZE * sizeof(Type));
     q.wait();
 
-    // Initialize variable p for the first time.
-    // This variable does not have to be re-initialized, if LinearProbingFPGA_variant5() is called multiple times 
-    // (The content of the variable is always set to 0 when the FPGA starts)
-    p_h[0]=0;
-    q.memcpy(p_d, p_h, sizeof(size_t));
-    q.wait();
-
     // track timing information, in ms
     double pcie_time_v5=0.0;
 
@@ -280,15 +256,7 @@ int  main(int argc, char** argv){
         std::cout <<"Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, p_d, dataSize);  //difference value for size parameter compared to v1-v4
-        // Copy output device buffer to output host buffer 
-        q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(Type));
-        q.wait();  
-        q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(Type));
-        q.wait();  
-        q.memcpy(p_h, p_d, sizeof(size_t));
-        q.wait();
-        scalar_remainder_variant5(arr_h, hashVec_h, countVec_h, p_h);
+        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);  //difference value for size parameter compared to v1-v4
 
         // Re-Initialize HashMap after dummy run
         initializeHashMap(hashVec_h,countVec_h);
@@ -299,19 +267,7 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v5 = std::chrono::high_resolution_clock::now();
-        // start of algorithm
-            LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, p_d, dataSize);  //difference value for size parameter compared to v1-v4
-            // Copy output device buffer to output host buffer 
-            q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(Type));
-            q.wait();  
-            q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(Type));
-            q.wait();  
-            q.memcpy(p_h, p_d, sizeof(size_t));
-            q.wait();
-            // caluclate the remaining values on host-side
-
-            scalar_remainder_variant5(arr_h, hashVec_h, countVec_h, p_h);
-        // end of algorithm
+        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);  //difference value for size parameter compared to v1-v4
         auto end_v5 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
 
@@ -324,13 +280,13 @@ int  main(int argc, char** argv){
         std::cout << "Caught a synchronous SYCL exception: " << e.what() << "\n";
         std::terminate();
     }   
-/*
+
     // Copy output device buffer to output host buffer 
     q.memcpy(hashVec_h, hashVec_d, HSIZE * sizeof(Type));
     q.wait();  
     q.memcpy(countVec_h, countVec_d, HSIZE * sizeof(Type));
     q.wait();  
-*/
+
     /**
      * Test print to detect the following error, which has occurred irregularly in the past. 
      * Element Validation
@@ -360,12 +316,10 @@ int  main(int argc, char** argv){
     sycl::free(arr_h, q);
     sycl::free(hashVec_h, q);
     sycl::free(countVec_h, q);
-    sycl::free(p_h, q);
     
     sycl::free(arr_d, q);
     sycl::free(hashVec_d, q);
     sycl::free(countVec_d, q);   
-    sycl::free(p_d, q);
 
     // print result
     std::cout <<"Final Evaluation of the Throughput: "<<std::endl;

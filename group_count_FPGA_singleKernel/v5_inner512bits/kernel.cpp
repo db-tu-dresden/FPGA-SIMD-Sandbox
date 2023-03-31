@@ -80,7 +80,7 @@ class kernelV5;
  * @param HSIZE HashSize (corresponds to size of hashVec[] and countVec[])					// global defined, not part of paramater list anymore 
  * @param size = number_CL*16 with number_CL = number_CL_buckets * (4096/16);
  */
-void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, size_t *p_d, size_t size) {
+void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, uint32_t *countVec_d, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 //// Check global board settings (regarding DDR4 config), global parameters & calculate iterations parameter
 	static_assert(kDDRWidth % sizeof(int) == 0);
@@ -138,36 +138,42 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			device_ptr<Type> input(arr_d);
 			device_ptr<Type> hashVec_globalMem(hashVec_d);
 			device_ptr<Type> countVec_globalMem(countVec_d);
-			device_ptr<size_t> p_globalMem(p_d);
 			
 			////////////////////////////////////////////////////////////////////////////////
-			//// declare private variables for hashVec, countVec, match_32bit and the buffer
+			//// declare private variables for hashVec & countVec
 			/* The Intel oneAPI DPC++/C++ Compiler creates a kernel memory in hardware.
 			* Kernel memory is sometimes referred to as on-chip memory because it is created from
 			* memory sources (such as RAM blocks) available on the FPGA.
 			* 
 			* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
-			* more accurate with MLABs. This memory type is significantly faster than store/load operations to global memory.
+			* more accurate with M20K RAM Blocks. This memory type is significantly faster than store/load operations from/to global memory.
 			* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
 			*  
 			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
+			* Due to the fact that our HSIZE can also be significantly larger, we consciously use M20K RAM blocks instead of MLAB memory, 
+			* since the STRATIX FPGA has approx. 10000 M20K blocks - which corresponds to approx. 20MB and is therefore better suited for larger data structures.
 			*/
-			// USING local MLAB on FPGA for hashVec and countVec array
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type hashVec[HSIZE] = {};
-			[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[HSIZE] = {}; 
+			// USING M20K RAM BLOCKS on FPGA to implement hashVec and countVec (embedded memory) and initialize these with zero
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> hashVec;
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> countVec;
 
-			// USING local FPGA-RAM (result of declare these variables without additional attributes)
-			// if RAM-utilization rises above 90% while compiling, set memory attribute to intel::max_replicates(1)
-			// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type hashVec[HSIZE] = {};
-			// [[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type countVec[HSIZE] = {};
+			#pragma unroll 16		
+			for(int i=0; i<HSIZE; i++) {
+				hashVec[i]=0; 
+				countVec[i]=0;	
+			}
 
 			// create buffer array with embedded memory on FPGA as register
 			// create a buffer on FPGA to realize buffer[] which is needed to store conflicts and hash_values within the following algorithm
-			[[intel::fpga_register]] Type buffer[elements_per_inner_register] = {};	
+			[[intel::fpga_register]] std::array<Type, elements_per_inner_register> buffer;	
+			#pragma unroll
+			for(int i=0; i<elements_per_inner_register; i++) {	
+				buffer[i] = 0;
+			}
 
 			// create counting parameter p on local memory of FPGA
-			[[intel::fpga_memory("MLAB") , intel::private_copies(16)]] size_t p[1] = {};
-			p[0]=0;
+			// [[intel::fpga_register]] size_t p[1];
+			// p[0]=0;
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
 
@@ -234,19 +240,19 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					fpvec<Type, inner_regSize> negativ_no_conflicts_mask = knot(no_conflicts_mask);
 
 					// we need to store the conflicts so we can interprete them as masks. and access them.
-					// we are only interested in the enties that are not zero. That means the conflict cases.			
+					// we are only interested in the enties that are not zero. That means the conflict cases.					
 					mask_compressstoreu_epi32(buffer, negativ_no_conflicts_mask, conflicts);
 
 					size_t conflict_count = popcount_builtin(negativ_no_conflicts_mask);
 					// add at all the places where the conflict masks indicates that there is an overlap
-							// old for-loop:
-							// 	for(size_t i = 0; i < conflict_count; i++){
-							//		fpvec<Type, inner_regSize> tmp_buffer_mask = setX_singleValue<Type, inner_regSize>(buffer[i]);
-							//		input_add = mask_add_epi32<Type, inner_regSize>(input_add, tmp_buffer_mask, input_add, oneMask);
-							//	}
-					fpvec<Type, inner_regSize> tmp_buffer_mask = setX_multipleValues<Type, inner_regSize>(buffer, conflict_count);
-					input_add = mask_add_epi32<Type, inner_regSize>(input_add, oneMask, input_add, tmp_buffer_mask);
-					
+					for(size_t i = 0; i < conflict_count; i++){
+						fpvec<Type, inner_regSize> tmp_buffer_mask = setX_singleValue<Type, inner_regSize>(buffer[i]);
+						input_add = mask_add_epi32<Type, inner_regSize>(input_add, tmp_buffer_mask, input_add, oneMask);
+					}
+						// alternative calculation:
+						//fpvec<Type, inner_regSize> tmp_buffer_mask = setX_multipleValues<Type, inner_regSize>(buffer, conflict_count);
+						//input_add = mask_add_epi32<Type, inner_regSize>(input_add, oneMask, input_add, tmp_buffer_mask);
+
 					// we override the value and what to add with zero in the positions where we have a conflict.
 					// NOTE: This steps might not be necessary.
 					tmp_workingData = mask_set1(tmp_workingData, negativ_no_conflicts_mask, zero);
@@ -265,9 +271,8 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						buffer[i] = hashx(tmp_workingData.elements[i], HSIZE);
 					}
 					
-					fpvec<Type, inner_regSize> hash_map_position = mask_loadu(no_conflicts_mask, buffer, (Type)0); 	// these are the hash values
+					fpvec<Type, inner_regSize> hash_map_position = mask_loadu_from_buffer<Type, inner_regSize>(no_conflicts_mask, buffer, (Type)0); 	// these are the hash values
 
-					#pragma nounroll
 					while(mask2int(no_conflicts_mask) !=0) {		
 						// now we can gather the data from the different positions where we have no conflicts.
 						fpvec<Type, inner_regSize> hash_map_value = mask_i32gather_epi32(zeroMask, no_conflicts_mask, hash_map_position, hashVec);
@@ -290,7 +295,7 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 						if(mask2int(foundEmpty) != 0){		//B1
 							// now we have to check for conflicts to prevent two different entries to write to the same position.
-							fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position/*, match_32bit*/);
+							fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position);
 							// deactivate to reduce ressource usage, we don't need the following two lines 
 							// fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
 							// saveConflicts = register_and(saveConflicts, empty);
@@ -317,24 +322,20 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 						// we repeat this for one vector as long as their is still a value to be saved.
 					}
-					p[0] += elements_per_inner_register;
+					//p[0] += elements_per_inner_register;
 				}
 			}	
 			// #######################################
 			// #### END OF FPGA parallelized part ####
 			// #######################################
-/*
-			//scalar remainder
-			#pragma nounroll
-			while(p < dataSize){
-				// error variable currently not used
-				//int error = 0;
-				
+
+/*			//scalar remainder	!! if dataSize mod 4096 = 0 --> Algorithm leaves no rest; scalar remainder will not be entered --> we deactivate them for performance reasons
+ 			
+			while(p[0] < dataSize){
 				// get the possible possition of the element.
-				Type currentValue = input[p];
+				Type currentValue = input[p[0]];
 				Type hash_key = hashx(currentValue, HSIZE);
 
-				#pragma nounroll
 				while(1){
 					// get the value of this position
 					Type value = hashVec[hash_key];
@@ -343,13 +344,13 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					if(value == currentValue){
 						countVec[hash_key]++;
 						break;
-					
+						
 					// Check if the spot is empty
 					}else if(value == EMPTY_SPOT){
 						hashVec[hash_key] = currentValue;
 						countVec[hash_key] = 1;
 						break;
-					
+						
 					}
 					else{
 						//go to the next spot
@@ -360,16 +361,21 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						//we assume that the hash_table is big enough
 					}
 				}
-				p++;
+				p[0]++;
 			}
-*/
-			//store results back to global memory
-			// #pragma unroll
-			// for(int i=0; i<HSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
-			memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
-			memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));
-			memcpy(p_globalMem, p, sizeof(size_t));
-			
+*/		
+			// store results back to global memory
+			// memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
+			// memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));		--> will be handled as for-loop with #pragma unroll through the compiler -> not working for large HSIZE
+			// we can't use #pragma unroll, due to unknown value of HSIZE 
+			// -> High value of HSIZE in combination with pragma unroll can cause HIGH RAM UITLIZATION (~199%)
+			// Because we know, that we are working often with 16 elements per register (16x32bit=512bit), we unroll with factor 16
+			#pragma unroll 16					
+			for(int i=0; i<HSIZE; i++) {
+				hashVec_globalMem[i]=hashVec[i]; 
+				countVec_globalMem[i]=countVec[i]; 	
+			}
+
 			// multiple improvements are possible:
 			// 1.   we could increase the performance of the worst case first write.
 			// 2.   we could absorbe the scalar remainder with overflow masks

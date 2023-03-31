@@ -159,7 +159,25 @@ std::array<fpvec<T, B>, (B/sizeof(T))> cvtu32_create_writeMask_Matrix() {
 * @param startIndex : first index-position of data from where the data should be loaded
 */
 template<typename T, int B>
-fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, uint32_t* data, uint32_t startIndex) {
+fpvec<T, B> mask_loadu(fpvec<T,B>& writeMask, std::array<Type, HSIZE>& data, uint32_t startIndex) {
+	auto reg = fpvec<T,B>{};
+	#pragma unroll
+	for (int i=0; i<(B/sizeof(T)); i++) {
+		if (writeMask.elements[i] == 1) {
+			// old reg.elements[i] = data[(startIndex+i)%HSIZE];
+			reg.elements[i] = data[startIndex+i];
+		}
+	}
+	return reg;
+}
+
+/**	#5.1
+ * 
+ * Adapted version of function #5, to load from the buffer, which is used in LinearProbing_v5()
+ * The used buffer is of type: std::array<Type, elements_per_inner_register>	<-- parameter are defined in global_settings.hpp
+*/
+template<typename T, int B>
+fpvec<T, B> mask_loadu_from_buffer(fpvec<T,B>& writeMask, std::array<Type, elements_per_inner_register>& data, uint32_t startIndex) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
@@ -225,7 +243,7 @@ fpvec<T,B> mask_add_epi32(fpvec<T,B>& src, fpvec<T,B>& writeMask, fpvec<T,B>& a,
 * @param data : register-array which contains the data that should be stored
 */
 template<typename T, int B>
-void mask_storeu_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
+void mask_storeu_epi32(std::array<Type, HSIZE>& result, uint32_t startIndex, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
@@ -371,7 +389,7 @@ Type clz_onceBultin(fpvec<T,B>& src) {
 * @param startIndex : first index-position of data from where the data should be loaded
 */
 template<typename T, int B>
-fpvec<T,B> load_epi32(uint32_t* data, uint32_t startIndex) {
+fpvec<T,B> load_epi32(std::array<Type, HSIZE>& data, uint32_t startIndex) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
@@ -476,7 +494,7 @@ fpvec<T,B> mask_set1(fpvec<T,B>& src, fpvec<T,B>& writeMask, Type value) {
 * @param data : register-array which contains the data that should be stored
 */
 template<typename T, int B>
-void store_epi32(uint32_t* result, uint32_t startIndex, fpvec<T,B>& data) {
+void store_epi32(Type* result, uint32_t startIndex, fpvec<T,B>& data) {				// We use THIS function only for the SoAoV approach, to store back the vectors to the global memory
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		result[(startIndex+i)] = data.elements[i];
@@ -630,9 +648,9 @@ fpvec<T,B> conflict_epi32(fpvec<T,B>& a) {
 * @param data : 
 */
 template<typename T, int B>
-void mask_compressstoreu_epi32(Type* buffer, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
+void mask_compressstoreu_epi32(std::array<Type, elements_per_inner_register>& buffer, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
 	int buffer_position = 0;
-	#pragma unroll								// DO NOT UNROLL, because the steps are dependent on each other ?!
+	#pragma unroll							
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			buffer[buffer_position] = (Type)data.elements[i];
@@ -684,7 +702,7 @@ fpvec<T,B> setX_singleValue(T value) {
 * 
 */
 template<typename T, int B>
-fpvec<T,B> setX_multipleValues(uint32_t* buffer, size_t conflict_count) {
+fpvec<T,B> setX_multipleValues(std::array<Type, elements_per_inner_register>& buffer, size_t conflict_count) {
 	auto reg = fpvec<T,B>{};
 	for(int i=0; i<conflict_count; i++) {
 		reg.elements[(buffer[i] - 1)] += 1; 
@@ -707,7 +725,7 @@ fpvec<T,B> setX_multipleValues(uint32_t* buffer, size_t conflict_count) {
 *		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays	
 */
 template<typename T, int B>
-fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, uint32_t* data) {
+fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, std::array<Type, HSIZE>& data) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
@@ -735,15 +753,11 @@ fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>&
 template<typename T, int B>
 fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-//	Type zero = 0;
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			reg.elements[i] = a.elements[i] + b.elements[i];
 		}
-		/*else {
-			reg.elements[i] = zero;
-		}*/
 	}
 	return reg;
 }
@@ -765,7 +779,7 @@ fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) 
 *		-> we don't need an additional scale factor in our implementation, since we always count in whole elements of the registers/arrays	
 */
 template<typename T, int B>
-void mask_i32scatter_epi32(uint32_t* baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter) {
+void mask_i32scatter_epi32(std::array<Type, HSIZE>& baseStorage, fpvec<T,B>& mask_k, fpvec<T,B>& vindex, fpvec<T,B>& data_to_scatter) {
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if(mask_k.elements[i] == (Type)1) {
