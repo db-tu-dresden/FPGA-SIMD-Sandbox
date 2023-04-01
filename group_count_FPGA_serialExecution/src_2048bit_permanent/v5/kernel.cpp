@@ -180,7 +180,10 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* co
 			fpvec<Type, regSize> tmp_buffer_mask = setX_singleValue<Type, regSize>(buffer[i]);
 			input_add = mask_add_epi32<Type, regSize>(input_add, tmp_buffer_mask, input_add, oneMask);
 		}
-
+			// alternative calculation:
+			//fpvec<Type, inner_regSize> tmp_buffer_mask = setX_multipleValues<Type, regSize>(buffer, conflict_count);
+			//input_add = mask_add_epi32<Type, regSize>(input_add, oneMask, input_add, tmp_buffer_mask);
+		
 		// we override the value and what to add with zero in the positions where we have a conflict.
 		// NOTE: This steps might not be necessary.
 		input_value = mask_set1(input_value, negativ_no_conflicts_mask, zero);

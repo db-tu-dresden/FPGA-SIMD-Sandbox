@@ -735,15 +735,11 @@ fpvec<T,B> mask_i32gather_epi32(fpvec<T,B>& src, fpvec<T,B>& mask_k, fpvec<T,B>&
 template<typename T, int B>
 fpvec<T,B> maskz_add_epi32(fpvec<T,B>& writeMask, fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
-//	Type zero = 0;
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
 		if (writeMask.elements[i] == 1) {
 			reg.elements[i] = a.elements[i] + b.elements[i];
 		}
-		/*else {
-			reg.elements[i] = zero;
-		}*/
 	}
 	return reg;
 }

@@ -17,13 +17,13 @@
  * @param Type define datatype which is used within all registers
  * @param regSize define register-size (in byte), which defines the amount of data that is load within one clock cycle :: (64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;)
  */
-    //static uint64_t distinctValues = 8000;
-    static const uint64_t distinctValues = 128;
+   
+    static const uint64_t distinctValues = 8000;
 
     // change of multiplier not really necessary, but when: only in steps of 16 => e.g. 16, 32, 64 ...
     // and : multiplier should be equal with value of kValuesPerLSU in kernel.cpp
     static const int multiplier = 16;
-    static const uint64_t dataSize = multiplier*10000000;
+    static const uint64_t dataSize = multiplier*10240000;                   // 10240000*16 = 163840000 --> MOD 16 = 0; MOD 4096 = 0
     static const float scale = 1.4;
     static const uint64_t HSIZE = distinctValues*scale;
     

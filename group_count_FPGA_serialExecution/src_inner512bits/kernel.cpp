@@ -1029,6 +1029,9 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* co
 				fpvec<Type, inner_regSize> tmp_buffer_mask = setX_singleValue<Type, inner_regSize>(buffer[i]);
 				input_add = mask_add_epi32<Type, inner_regSize>(input_add, tmp_buffer_mask, input_add, oneMask);
 			}
+				// alternative calculation:
+				//fpvec<Type, inner_regSize> tmp_buffer_mask = setX_multipleValues<Type, inner_regSize>(buffer, conflict_count);
+				//input_add = mask_add_epi32<Type, inner_regSize>(input_add, oneMask, input_add, tmp_buffer_mask);
 
 			// we override the value and what to add with zero in the positions where we have a conflict.
 			// NOTE: This steps might not be necessary.
@@ -1080,12 +1083,11 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* co
 				if(mask2int(foundEmpty) != 0){		//B1
 					// now we have to check for conflicts to prevent two different entries to write to the same position.
 					fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position);
-	// deactivate to reduce ressource usage
-	//				fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
-	//				saveConflicts = register_and(saveConflicts, empty);
+					// deactivate to reduce ressource usage
+					//				fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
+					//				saveConflicts = register_and(saveConflicts, empty);
 							
 					fpvec<Type, inner_regSize> to_save_data = cmpeq_epi32_mask<Type, inner_regSize>(zeroMask, saveConflicts);
-
 
 					to_save_data = kAnd(to_save_data, foundEmpty);
 
