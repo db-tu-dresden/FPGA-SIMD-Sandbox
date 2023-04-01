@@ -166,7 +166,7 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// create buffer array with embedded memory on FPGA as register
 			// create a buffer on FPGA to realize buffer[] which is needed to store conflicts and hash_values within the following algorithm
 			[[intel::fpga_register]] std::array<Type, elements_per_inner_register> buffer;	
-			#pragma unroll
+			#pragma unroll 16
 			for(int i=0; i<elements_per_inner_register; i++) {	
 				buffer[i] = 0;
 			}
@@ -329,9 +329,9 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// #### END OF FPGA parallelized part ####
 			// #######################################
 
-/*			//scalar remainder	!! if dataSize mod 4096 = 0 --> Algorithm leaves no rest; scalar remainder will not be entered --> we deactivate them for performance reasons
- 			
-			while(p[0] < dataSize){
+			/*		
+			//scalar remainder	!! if dataSize mod 4096 = 0 --> Algorithm leaves no rest; scalar remainder will not be entered --> we deactivate them for performance reasons
+ 			while(p[0] < dataSize){
 				// get the possible possition of the element.
 				Type currentValue = input[p[0]];
 				Type hash_key = hashx(currentValue, HSIZE);
@@ -362,8 +362,8 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					}
 				}
 				p[0]++;
-			}
-*/		
+			} */
+					
 			// store results back to global memory
 			// memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
 			// memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));		--> will be handled as for-loop with #pragma unroll through the compiler -> not working for large HSIZE

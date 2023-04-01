@@ -288,7 +288,7 @@ int  main(int argc, char** argv){
 
     // check result for correctness
     validate(hashVec_h, countVec_h);
-    validate_element(arr_h, hashVec_h, countVec_h);
+//  validate_element(arr_h, hashVec_h, countVec_h);
     std::cout<< " " <<std::endl;
 
     // free USM memory

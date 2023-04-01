@@ -1,7 +1,7 @@
 
 ########################################################################
-#      Date:           Thu 23 Mar 2023 08:08:58 AM PDT
-#    Job ID:           2261277.v-qsvr-1.aidevcloud
+#      Date:           Fri 31 Mar 2023 06:04:01 AM PDT
+#    Job ID:           2268508.v-qsvr-1.aidevcloud
 #      User:           u177951
 # Resources:           cput=75:00:00,neednodes=1:fpga_compile:ppn=2,nodes=1:fpga_compile:ppn=2,walltime=23:59:00
 ########################################################################
@@ -30,20 +30,12 @@ usage: source setvars.sh [--force] [--config=file] [--help] [...]
 
 Running in FPGA Hardware compile Mode:
 icpx -fsycl -Wall  -v -fintelfpga -Xshardware -fsycl-device-code-split=off -Xssave-temps -reuse-exe=main.fpga -Xsoutput-report-folder=main.prj -Xsboard=/opt/intel/oneapi/intel_s10sx_pac:pac_s10_usm -o main.fpga kernel.cpp main.cpp ../helper/helper_kernel.cpp ../helper/helper_main.cpp lib/lib_sycl.a lib/lib_rtl.a  
-Saving target image to "/home/u177951/tmp/kernel-ba7019-dc3e37/extract/aocx.0"
+Saving target image to "/home/u177951/tmp/kernel-742d7d-20b6ab/extract/aocx.0"
 Unable to reuse any of the previous FPGA binaries.
 aoc: Compiling for FPGA. This process may take several hours to complete.  Prior to performing this compile, be sure to check the reports to ensure the design will meet your performance targets.  If the reports indicate performance targets are not being met, code edits may be required.  Please refer to the oneAPI FPGA Optimization Guide for information on performance tuning applications for FPGAs.
-aoc: Warning: A timing failure has been detected in the outputted binary. There was 1 timing violation,
-which was a Setup failure of 2ps on clock:
-u0|dcp_iopll|dcp_iopll_clk2x
-Consider doing one or more of the following:
-  - Recompiling with a different seed (using -Xsseed=<S>).
-  - Reducing the area usage of your design.
-  - If you are using a custom BSP, discuss the failure with your BSP vendor.
-failed
 
 ########################################################################
-# End of output for job 2261277.v-qsvr-1.aidevcloud
-# Date: Thu 23 Mar 2023 03:06:57 PM PDT
+# End of output for job 2268508.v-qsvr-1.aidevcloud
+# Date: Fri 31 Mar 2023 11:22:23 AM PDT
 ########################################################################
 

@@ -143,14 +143,22 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			* memory sources (such as RAM blocks) available on the FPGA.
 			* 
 			* Here we want to create the hashVec and CountVec Arrays inside the kernel with local Memory,
-			* more accurate with MLABs. This memory type is significantly faster than store/load operations to global memory.
+			* more accurate with M20K RAM Blocks. This memory type is significantly faster than store/load operations from/to global memory.
 			* With this change, we only need to write every element of both arrays once to the global memory at the end of the algorithm.
 			*  
 			* In the ideal case, the compiler creates both data structures as stall-free. But that depends on whether the algorithm allows it or not.
+			* Due to the fact that our HSIZE can also be significantly larger, we consciously use M20K RAM blocks instead of MLAB memory, 
+			* since the STRATIX FPGA has approx. 10000 M20K blocks - which corresponds to approx. 20MB and is therefore better suited for larger data structures.
 			*/
-			[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type hashVec[HSIZE] = {};
-			[[intel::fpga_memory("MLAB") , intel::numbanks(4), intel::private_copies(64)]] Type countVec[HSIZE] = {}; 
+			// USING M20K RAM BLOCKS on FPGA to implement hashVec and countVec (embedded memory) and initialize these with zero
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> hashVec;
+			[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> countVec;
 
+			#pragma unroll 16		
+			for(int i=0; i<HSIZE; i++) {
+				hashVec[i]=0; 
+				countVec[i]=0;	
+			}	
 			////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////
 
@@ -187,6 +195,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				**/ 	
 				// int p = 0;
 				// while (p < elements_per_register) {
+				#pragma nounroll
 				for(int p=0; p<elements_per_register; p++) {
 					// get single value from current dataVec register at position p
 					Type inputValue = dataVec.elements[p];
@@ -296,11 +305,17 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						 
 				}	
 			}
-			//store results back to global memory
-			// #pragma unroll
-			// for(int i=0; i<HSIZE; i++) {hashVec_globalMem[i]=hashVec[i]; countVec_globalMem[i]=countVec[i]; }
-			memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
- 			memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));
+			// store results back to global memory
+			// memcpy(hashVec_globalMem, hashVec, HSIZE * sizeof(Type));
+			// memcpy(countVec_globalMem, countVec, HSIZE * sizeof(Type));		--> will be handled as for-loop with #pragma unroll through the compiler -> not working for large HSIZE
+			// we can't use #pragma unroll, due to unknown value of HSIZE 
+			// -> High value of HSIZE in combination with pragma unroll can cause HIGH RAM UITLIZATION (~199%)
+			// Because we know, that we are working often with 16 elements per register (16x32bit=512bit), we unroll with factor 16
+			#pragma unroll 16					
+			for(int i=0; i<HSIZE; i++) {
+				hashVec_globalMem[i]=hashVec[i]; 
+				countVec_globalMem[i]=countVec[i]; 	
+			}
 		});
 	}).wait();
 }   
