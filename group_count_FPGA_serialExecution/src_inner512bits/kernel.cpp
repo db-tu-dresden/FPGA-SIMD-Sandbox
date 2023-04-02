@@ -976,7 +976,7 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* co
 
 	Type *buffer = reinterpret_cast< Type* >( _mm_malloc( elements_per_inner_register * sizeof(Type), regSize ) );
 
-	size_t p = 0;
+	// size_t p = 0;
 	
 	// AVX512-implementation of this LinearProbing-algorithm_v5 (SoA_conflict_v1) was actually using this while-loop.
 	// We replaced this solution through our for-loop for the loading cycles similar to the previous versions.
@@ -1083,9 +1083,8 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* co
 				if(mask2int(foundEmpty) != 0){		//B1
 					// now we have to check for conflicts to prevent two different entries to write to the same position.
 					fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position);
-					// deactivate to reduce ressource usage
-					//				fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
-					//				saveConflicts = register_and(saveConflicts, empty);
+					fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
+					saveConflicts = register_and<Type, inner_regSize>(saveConflicts, empty);
 							
 					fpvec<Type, inner_regSize> to_save_data = cmpeq_epi32_mask<Type, inner_regSize>(zeroMask, saveConflicts);
 
@@ -1109,13 +1108,15 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* co
 
 				// we repeat this for one vector as long as their is still a value to be saved.
 			}
-			p += elements_per_inner_register;
+			// p += elements_per_inner_register;
 		}
 	}	
 	// #######################################
 	// #### END OF FPGA parallelized part ####
 	// #######################################
 
+	/*
+	// As long as we use a dataSize mod 4096 = 0, the algorithm doesn't leave any rest; scalar remainder will not be entered --> we deactivate them for performance reasons
 	//scalar remainder
     while(p < dataSize){
         int error = 0;
@@ -1145,7 +1146,8 @@ void LinearProbingFPGA_variant5(uint32_t* input, uint32_t* hashVec, uint32_t* co
             }
         }
         p++;
-    }	
+    }*/
+
     // multiple improvements are possible:
     // 1.   we could increase the performance of the worst case first write.
     // 2.   we could absorbe the scalar remainder with overflow masks

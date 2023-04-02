@@ -256,7 +256,7 @@ int  main(int argc, char** argv){
         std::cout <<"Running on FPGA Hardware with a dataSize of " << dataSize << " values!" << std::endl;
 
         // dummy run to program FPGA, dont care first run for measurement
-        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, dataSize);  //difference value for size parameter compared to v1-v4
+        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);  //difference value for size parameter compared to v1-v4
 
         // Re-Initialize HashMap after dummy run
         initializeHashMap(hashVec_h,countVec_h);
@@ -267,7 +267,7 @@ int  main(int argc, char** argv){
 
         // measured run on FPGA
         auto begin_v5 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, dataSize);  //difference value for size parameter compared to v1-v4
+        LinearProbingFPGA_variant5(q, arr_d, hashVec_d, countVec_d, number_CL*multiplier);  //difference value for size parameter compared to v1-v4
         auto end_v5 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
 

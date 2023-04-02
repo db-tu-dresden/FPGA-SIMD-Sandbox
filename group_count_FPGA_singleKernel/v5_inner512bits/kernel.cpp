@@ -296,9 +296,8 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						if(mask2int(foundEmpty) != 0){		//B1
 							// now we have to check for conflicts to prevent two different entries to write to the same position.
 							fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position);
-							// deactivate to reduce ressource usage, we don't need the following two lines 
-							// fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
-							// saveConflicts = register_and(saveConflicts, empty);
+							fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
+							saveConflicts = register_and<Type, inner_regSize>(saveConflicts, empty);
 							
 							fpvec<Type, inner_regSize> to_save_data = cmpeq_epi32_mask<Type, inner_regSize>(zeroMask, saveConflicts);
 
@@ -330,7 +329,8 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// #######################################
 
 			/*		
-			//scalar remainder	!! if dataSize mod 4096 = 0 --> Algorithm leaves no rest; scalar remainder will not be entered --> we deactivate them for performance reasons
+			//scalar remainder	
+			// As long as we use a dataSize mod 4096 = 0, the algorithm doesn't leave any rest; scalar remainder will not be entered --> we deactivate them for performance reasons
  			while(p[0] < dataSize){
 				// get the possible possition of the element.
 				Type currentValue = input[p[0]];

@@ -789,29 +789,15 @@ fpvec<T,B> kAndn(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
-		if (a.elements[i] == 0) {
-			reg.elements[i] = 1;
-			if (reg.elements[i] == b.elements[i]) {
-				reg.elements[i] = 1;
-			} else {
-				reg.elements[i] = 0;
-			}
-		} else {
-			reg.elements[i] = 0;
-			if (reg.elements[i] == b.elements[i]) {
-				reg.elements[i] = 1;
-			} else {
-				reg.elements[i] = 0;
-			}
-		}
+			reg.elements[i] = ((~(a.elements[i]))&(b.elements[i]));
 	}
 	return reg;
 }
 
 /**	#30
 * serial primitive for Intel Intrinsic:
-* __mmask16 _mm512_kandn (__mmask16 a, __mmask16 b)
-* original description: "Compute the bitwise NOT of (16/...)-bit masks a and then AND with b, and store the result in k."
+* __mmask16 _mm512_kand (__mmask16 a, __mmask16 b)
+* original description: "Compute the bitwise AND of 16-bit masks a and b, and store the result in k."
 *
 * Note: registers a and b may only contain elements of the datatype Type (currently uint32_t) with values ONLY 1 or 0 !!
 */
@@ -820,9 +806,7 @@ fpvec<T,B> kAnd(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
-		if (a.elements[i] == b.elements[i]) {
-			reg.elements[i] = (Type)1;
-		} 
+		reg.elements[i] = ((a.elements[i])&(b.elements[i]));
 	}
 	return reg;
 }
@@ -896,20 +880,13 @@ fpvec<T,B> maskz_conflict_epi32(fpvec<T,B>& mask_k, fpvec<T,B>& a) {
 * serial primitive for Intel Intrinsic:
 * __m512i _mm512_and_epi32 (__m512i a, __m512i b)
 * original description: "Compute the bitwise AND of packed 32-bit integers in a and b, and store the results in dst."
-*
-* Note: Compute the AND (here simplified: proof of equality) of every element of two fpvec<T,B> registers.
-* @return 1, if elements at this position are equal	
-* @return 0, if elements at this position are unequal	
-* type of return-value is depending on the data type within the registers
 */
 template<typename T, int B>
 fpvec<T,B> register_and(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
 	for (int i=0; i<(B/sizeof(T)); i++) {
-		if (a.elements[i] == b.elements[i]) {
-			reg.elements[i] = (T)1;
-		} 
+		reg.elements[i] = (a.elements[i] & b.elements[i]);
 	}
 	return reg;
 }

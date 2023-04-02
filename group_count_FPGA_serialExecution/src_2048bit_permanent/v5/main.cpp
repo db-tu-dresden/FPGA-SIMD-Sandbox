@@ -432,12 +432,12 @@ int  main(int argc, char** argv){
 
         // dummy run
         initializeHashMap(hashVec,countVec);
-        LinearProbingFPGA_variant5(arr, hashVec, countVec, match_64bit, dataSize);  //difference value for size parameter compared to v1-v4
+        LinearProbingFPGA_variant5(arr, hashVec, countVec, match_64bit, number_CL*multiplier);  //difference value for size parameter compared to v1-v4
 
         // measured run
         initializeHashMap(hashVec,countVec);
         auto begin_v5 = std::chrono::high_resolution_clock::now();
-        LinearProbingFPGA_variant5(arr, hashVec, countVec, match_64bit, dataSize);  //difference value for size parameter compared to v1-v4
+        LinearProbingFPGA_variant5(arr, hashVec, countVec, match_64bit, number_CL*multiplier);  //difference value for size parameter compared to v1-v4
         auto end_v5 = std::chrono::high_resolution_clock::now();
         duration<double, std::milli> diff_v5 = end_v5 - begin_v5;
 

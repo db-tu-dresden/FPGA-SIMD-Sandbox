@@ -295,9 +295,8 @@ void LinearProbingFPGA_variant5(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 						if(mask2int(foundEmpty) != 0){		//B1
 							// now we have to check for conflicts to prevent two different entries to write to the same position.
 							fpvec<Type, inner_regSize> saveConflicts = maskz_conflict_epi32<Type, inner_regSize>(foundEmpty, hash_map_position);
-							// deactivate to reduce ressource usage, we don't need the following two lines 
-							// fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
-							// saveConflicts = register_and(saveConflicts, empty);
+							fpvec<Type, inner_regSize> empty = set1<Type, inner_regSize>(mask2int_uint32_t(foundEmpty));
+							saveConflicts = register_and<Type, inner_regSize>(saveConflicts, empty);
 							
 							fpvec<Type, inner_regSize> to_save_data = cmpeq_epi32_mask<Type, inner_regSize>(zeroMask, saveConflicts);
 
