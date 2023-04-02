@@ -16,6 +16,7 @@ group_count_FPGA_singleKernel/v2_inner512bits/main.prj/*
 group_count_FPGA_singleKernel/v3_inner512bits/main.prj/*
 group_count_FPGA_singleKernel/v4_inner512bits/main.prj/*
 group_count_FPGA_singleKernel/v5_inner512bits/main.prj/*
+group_count_FPGA_singleKernel/v5_inner512bits_scalarRemainder/main.prj/*
 
 group_count_FPGA_singleKernel/v1_2048bit_permanent/main.prj/*
 group_count_FPGA_singleKernel/v2_2048bit_permanent/main.prj/*
@@ -35,8 +36,9 @@ group_count_FPGA_singleKernel/v2/.ipynb_checkpoints/*
 group_count_FPGA_singleKernel/v3/.ipynb_checkpoints/*
 group_count_FPGA_singleKernel/v4/.ipynb_checkpoints/*
 group_count_FPGA_singleKernel/v5/.ipynb_checkpoints/*
+group_count_FPGA_singleKernel/v5_inner512bits_scalarRemainder/.ipynb_checkpoints/*
 group_count_FPGA_singleKernel/v4.tar.gz
 
-group_count_FPGA_singleKernel/v5_inner512bits_scalarRemainder/*
+
 group_count_FPGA_singleKernel/v5_inner512bits_twoKernel/*
-group_count_FPGA_singleKernel/v1_inner512bits32X/*
+group_count_FPGA_singleKernel/z_v1_inner512bits32X/*
