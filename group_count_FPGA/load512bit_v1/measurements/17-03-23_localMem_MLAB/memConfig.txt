@@ -1,0 +1,7 @@
+Used memory config for measurement runs :
+
+17-03-23_localMem_MLAB
+
+		// USING local MLAB on FPGA for hashVec and countVec array
+		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type hashVec[globalHSIZE] = {};
+		[[intel::fpga_memory("MLAB") , intel::numbanks(1) , intel::bankwidth(1024) , intel::private_copies(16)]] Type countVec[globalHSIZE] = {}; 

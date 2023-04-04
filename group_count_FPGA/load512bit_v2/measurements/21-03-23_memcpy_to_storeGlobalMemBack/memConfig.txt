@@ -1,0 +1,18 @@
+Used memory config for measurement runs :
+
+21-03-23  use memcpy to store results of hashVec and countVec back to global device memory
+
+	NEW method to store results back:
+		//store results back to global memory
+		memcpy(hashVec_globalMem, hashVec, globalHSIZE * sizeof(Type));
+ 		memcpy(countVec_globalMem, countVec, globalHSIZE * sizeof(Type));
+
+
+
+	OLD method to store results back:		
+	//store results back to global memory
+		#pragma unroll
+		for(int i=0; i<globalHSIZE; i++) {
+			hashVec_globalMem[i]=hashVec[i];
+			countVec_globalMem[i]=countVec[i];
+		}	

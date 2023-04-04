@@ -19,7 +19,7 @@ This is easily working inside Intel devCloud.
 From the login-2 node this should already work fine:
 
 ## BUILD EMULATOR-FILE:
--	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2 
+-	cd ~/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2
 -	source /data/intel_fpga/devcloudLoginToolSetup.sh
 -	qsub -l nodes=1:fpga_compile:ppn=2 -d . build_lib -l walltime=00:10:00
 -	after 2-4 minutes the lib/lib.a or lib/lib_rtl.a file is created

@@ -1,0 +1,8 @@
+Used memory config for measurement runs :
+
+18-03-23_localMem_RAM
+
+		// USING local FPGA-RAM (result of declare these variables without additional attributes)
+		// if RAM-utilization rises above 90% while compiling, set memory attribute to intel::max_replicates(1)
+		[[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type hashVec[globalHSIZE] = {};
+		[[intel::fpga_memory("BLOCK_RAM") , intel::max_replicates(2)]] Type countVec[globalHSIZE] = {};
