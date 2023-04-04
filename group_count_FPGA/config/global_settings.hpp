@@ -61,6 +61,11 @@
 	#define m_HSIZE_v (size_t) ((HSIZE + m_elements_per_vector - 1) / m_elements_per_vector)
     #define HSIZE_hashMap_v4 (size_t) (m_elements_per_vector * m_HSIZE_v)
 	#define m_HSIZE (size_t) (HSIZE)
+
+    // only for v4_2048bit
+	#define m_elements_per_vector_v4_2048bit (size_t) (elements_per_register) 			// should be equivalent to (regSize)/sizeof(Type);		
+	#define m_HSIZE_v_v4_2048bit (size_t) ((HSIZE + m_elements_per_vector_v4_2048bit - 1) / m_elements_per_vector_v4_2048bit)
+    #define HSIZE_hashMap_v4_v4_2048bit (size_t) (m_elements_per_vector_v4_2048bit * m_HSIZE_v_v4_2048bit)	
 			
 /////////////////////////////////////////////////////////////
  	
