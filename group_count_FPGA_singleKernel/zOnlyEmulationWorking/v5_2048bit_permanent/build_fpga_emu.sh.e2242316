@@ -1,8 +1,0 @@
-/data/intel_fpga/devcloudLoginToolSetup.sh: line 1054: /opt/intel/openvino/deployment_tools/../bin/setupvars.sh: No such file or directory
-In file included from kernel.cpp:19:
-In file included from ./kernel.hpp:9:
-./primitives.hpp:982:6: error: expected expression
-                                        switch ( j )
-                                        ^
-1 error generated.
-make: *** [Makefile:65: emu] Error 1

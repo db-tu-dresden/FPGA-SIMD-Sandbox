@@ -1,5 +1,0 @@
-Changes against last runs :
-
-23-03-23  	using globale #define values from global_settings.hpp
-			--> no manual changes in configured setting values necessary
-			--> all variable values (HSIZE, elements_per_register, ... ) are calculated automatically!
