@@ -66,8 +66,16 @@
 	#define m_elements_per_vector_v4_2048bit (size_t) (elements_per_register) 			// should be equivalent to (regSize)/sizeof(Type);		
 	#define m_HSIZE_v_v4_2048bit (size_t) ((HSIZE + m_elements_per_vector_v4_2048bit - 1) / m_elements_per_vector_v4_2048bit)
     #define HSIZE_hashMap_v4_v4_2048bit (size_t) (m_elements_per_vector_v4_2048bit * m_HSIZE_v_v4_2048bit)	
+
+    // define additional unroll factor vor load2048bit_virtual_work_4x16_ v1-v5
+    #define outerUnroll (int) (regSize/inner_regSize)               // should be 4  in current config
+    #define innerUnroll (int) (elements_per_inner_register)         // should be 16 in current config
 			
 /////////////////////////////////////////////////////////////
+
+
+
+
  	
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

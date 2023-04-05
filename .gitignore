@@ -19,6 +19,7 @@ group_count_FPGA/load2048bit_inner512bit_v5/main.prj/*
 group_count_FPGA/load2048bit_permanent_v1/main.prj/*
 group_count_FPGA/load2048bit_permanent_v2/main.prj/*
 group_count_FPGA/load2048bit_permanent_v3/main.prj/*
+group_count_FPGA/load2048bit_permanent_v4/main.prj/*
 group_count_FPGA/load2048bit_virtual_work_4x16_v1/main.prj/*
 group_count_FPGA/load2048bit_virtual_work_4x16_v2/main.prj/*
 group_count_FPGA/load2048bit_virtual_work_4x16_v3/main.prj/*
@@ -38,6 +39,7 @@ group_count_FPGA/load2048bit_inner512bit_v5/.ipynb_checkpoints/*
 group_count_FPGA/load2048bit_permanent_v1/.ipynb_checkpoints/*
 group_count_FPGA/load2048bit_permanent_v2/.ipynb_checkpoints/*
 group_count_FPGA/load2048bit_permanent_v3/.ipynb_checkpoints/*
+group_count_FPGA/load2048bit_permanent_v4/.ipynb_checkpoints/*
 group_count_FPGA/load2048bit_virtual_work_4x16_v1/.ipynb_checkpoints/*
 group_count_FPGA/load2048bit_virtual_work_4x16_v2/.ipynb_checkpoints/*
 group_count_FPGA/load2048bit_virtual_work_4x16_v3/.ipynb_checkpoints/*
