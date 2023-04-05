@@ -138,9 +138,13 @@ std::array<fpvec<T, B>, (B/sizeof(T))> cvtu32_create_writeMask_Matrix() {
 	#pragma unroll
 	for(Type i = 0; i < (B/sizeof(T)); i++){
 		auto tmp = fpvec<T,B>{};
+
 		#pragma unroll
-		for (int j=0; j<(B/sizeof(T)); j++) {
-			tmp.elements[j] = zero;
+		for(int offset=0; offset < outerUnroll; offset++) {
+			#pragma unroll
+			for (int j=0; j<innerUnroll; j++) {
+				tmp.elements[(offset*innerUnroll)+j] = zero;
+			}	
 		}
 		tmp.elements[i] = one;
 		result[i] = tmp;
@@ -375,13 +379,16 @@ template<typename T, int B>
 fpvec<T,B> knot(fpvec<T,B>& src) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		if (src.elements[i] == 0) {
-			reg.elements[i] = 1;
-		}
-		else {
-			reg.elements[i] = 0;
-		}
+	for(int offset=0; offset < outerUnroll; offset++) {
+		#pragma unroll
+		for (int i=0; i<innerUnroll; i++) {
+			if (src.elements[(offset*innerUnroll)+i] == 0) {
+				reg.elements[(offset*innerUnroll)+i] = 1;
+			}
+			else {
+				reg.elements[(offset*innerUnroll)+i] = 0;
+			}
+		}	
 	}
 	return reg;
 }
@@ -439,13 +446,16 @@ template<typename T, int B>
 fpvec<T,B> cmpeq_epi32_mask(fpvec<T,B>& a, fpvec<T,B>& b) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		if (a.elements[i] == b.elements[i]) {
-			reg.elements[i] = 1;
-		}
-		else {
-			reg.elements[i] = 0;
-		}
+	for(int offset=0; offset < outerUnroll; offset++) {
+		#pragma unroll
+		for (int i=0; i<innerUnroll; i++) {
+			if (a.elements[(offset*innerUnroll)+i] == b.elements[(offset*innerUnroll)+i]) {
+				reg.elements[(offset*innerUnroll)+i] = 1;
+			}
+			else {
+				reg.elements[(offset*innerUnroll)+i] = 0;
+			}
+		}	
 	}
 	return reg;
 }
@@ -459,10 +469,13 @@ template<typename T, int B>
 fpvec<T,B> permutexvar_epi32(fpvec<T,B>& idx, fpvec<T,B>& a) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		T id = idx.elements[i];
-		T value = a.elements[id];
-		reg.elements[i] = value;
+	for(int offset=0; offset < outerUnroll; offset++) {
+		#pragma unroll
+		for (int i=0; i<innerUnroll; i++) {
+			T id = idx.elements[(offset*innerUnroll)+i];
+			T value = a.elements[id];
+			reg.elements[(offset*innerUnroll)+i] = value;
+		}
 	}
 	return reg;
 }
@@ -504,11 +517,14 @@ template<typename T, int B>
 fpvec<T,B> mask_set1(fpvec<T,B>& src, fpvec<T,B>& writeMask, Type value) {
 	auto reg = fpvec<T,B>{};
 	#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		if(writeMask.elements[i] == 1) {
-			reg.elements[i] = value;
-		} else {
-			reg.elements[i] = src.elements[i];
+	for(int offset=0; offset < outerUnroll; offset++) {
+		#pragma unroll
+		for (int i=0; i<innerUnroll; i++) {
+			if(writeMask.elements[(offset*innerUnroll)+i] == 1) {
+				reg.elements[(offset*innerUnroll)+i] = value;
+			} else {
+				reg.elements[(offset*innerUnroll)+i] = src.elements[(offset*innerUnroll)+i];
+			}	
 		}		
 	}
 	return reg;
@@ -528,11 +544,13 @@ fpvec<T,B> mask_set1(fpvec<T,B>& src, fpvec<T,B>& writeMask, Type value) {
 template<typename T, int B>
 void store_epi32(Type* result, uint32_t startIndex, fpvec<T,B>& data) {				// We use THIS function only for the SoAoV approach, to store back the vectors to the global memory
 	#pragma unroll
-	for (int i=0; i<(B/sizeof(T)); i++) {
-		result[(startIndex+i)] = data.elements[i];
+	for(int offset=0; offset < outerUnroll; offset++) {
+		#pragma unroll
+		for (int i=0; i<innerUnroll; i++) {
+			result[(startIndex+((offset*innerUnroll)+i))] = data.elements[(offset*innerUnroll)+i];
+		}	
 	}
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
