@@ -12,7 +12,7 @@ template <typename T>
 class AVX512_group_count_SoA_conflict_v2 : public Scalar_group_count<T>{
     public:
         AVX512_group_count_SoA_conflict_v2(size_t HSIZE, size_t (*hash_function)(T, size_t));
-        ~AVX512_group_count_SoA_conflict_v2();
+        virtual ~AVX512_group_count_SoA_conflict_v2();
         
         void create_hash_table(T* input, size_t data_size);
         

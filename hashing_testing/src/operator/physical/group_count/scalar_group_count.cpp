@@ -19,7 +19,6 @@ Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, size_t (*hash_function)(
     elements *= bonus_scale;
     m_hash_vec = (T*) aligned_alloc(64, elements * sizeof(T));
     m_count_vec = (T*) aligned_alloc(64, elements * sizeof(T));
-
     for(size_t i = 0; i < elements; i++){
         m_hash_vec[i] = 0;
         m_count_vec[i] = 0;
@@ -29,7 +28,9 @@ Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, size_t (*hash_function)(
 template <typename T>
 Scalar_group_count<T>::~Scalar_group_count(){
     free(m_hash_vec);
+    m_hash_vec = nullptr;
     free(m_count_vec);
+    m_count_vec = nullptr;
 }
 
 template <typename T>

@@ -389,82 +389,7 @@ std::string* p1_stringify( size_t HSIZE, size_t collision_count, size_t collisio
     return new std::string(result.str());
 }
 
-//Data Generator that can create collision_groups FOR 512 bit vectors
-// this works only really iff the colision_size is bigger then the vectorsize otherwise we don't really have an overflow.
-template<typename T>
-size_t generate_data_p1_SoAoV(
-    T*& result,
-    size_t data_size,
-    size_t distinct_values,
-    size_t HSIZE,
-    size_t (*hash_function)(T, size_t),
-    size_t collision_count = 0,
-    size_t collision_size = 0,
-    size_t cluster_count = 0,
-    size_t cluster_size = 0,
-    size_t seed = 0
-){
-    const size_t elements = (512 / 8) / sizeof(T);
-    const size_t soaov_hsize = (HSIZE + elements - 1) / elements;
 
-    size_t reserved_free = 0;//cluster_count > collision_count ? cluster_count: collision_count;
-    size_t total_free = soaov_hsize * elements - distinct_values;
-    size_t distributed_free = total_free <= reserved_free ? 1 : total_free - reserved_free;
-
-    size_t mul = collision_size < 50? collision_size + 2 : 51;    // TODO: maybe use instead of plain 100 -> log(collision_size) * 50
-    size_t number_of_values = soaov_hsize * elements * mul;
-    
-    std::multimap<size_t, T> all_numbers;
-    std::vector<T> numbers;
-
-    generate_random_values(all_numbers, hash_function, number_of_values, soaov_hsize, seed, elements * 3 + 1);
-
-    size_t cluster_after_collition_length = cluster_size > collision_size ? cluster_size - collision_size : 0;
-    size_t h_pos = noise(HSIZE * distinct_values, seed + 1) % soaov_hsize;
-    size_t e_pos = 0;
-    
-
-    size_t i = 0;
-    bool CREATE_CLUSTER = i < cluster_count;
-    bool CREATE_COLLISION = i < collision_count;
-    size_t remaining_cluster_length;
-
-    while(CREATE_CLUSTER || CREATE_COLLISION){
-        remaining_cluster_length = cluster_size;
-        if(e_pos != 0 && distributed_free + e_pos >= elements && CREATE_COLLISION){
-            size_t take = elements - e_pos;
-            distributed_free -= take;
-            e_pos = 0;
-            h_pos++;
-        }
-        if(CREATE_COLLISION){
-            generate_collision_soaov<T>(&numbers, &all_numbers, soaov_hsize, h_pos, e_pos, elements, collision_size);
-            remaining_cluster_length = cluster_after_collition_length;
-        }
-        if(CREATE_CLUSTER){
-            generate_cluster_soaov<T>(&numbers, &all_numbers, soaov_hsize, h_pos, e_pos, elements, remaining_cluster_length);
-        }
-        i++;
-        CREATE_COLLISION = i < collision_count;
-        CREATE_CLUSTER = i < cluster_count;
-        
-        if(e_pos != 0 && distributed_free > 0){
-            distributed_free--;
-            e_pos = (e_pos + 1) % elements;
-            h_pos = (h_pos + (e_pos == 0)) % soaov_hsize;
-        }
-    }
-
-
-    if(numbers.size() == 0){
-        // std::cout << "NO DATA GENERATED!\n";
-        // throw std::runtime_error("no data generated");    
-        return 0;
-    }
-    generate_benchmark_data<T>(result, data_size, &numbers, seed+3);
-
-    return numbers.size();
-}
 
 template<typename T>
 size_t generate_data_p1(
@@ -473,46 +398,32 @@ size_t generate_data_p1(
     size_t distinct_values,
     size_t HSIZE,
     size_t (*hash_function)(T, size_t),
-    size_t collision_count = 0,
-    size_t collision_size = 0,
-    size_t cluster_count = 0,
-    size_t cluster_size = 0,
-    size_t seed = 0,
-    bool SoAoV = false
+    size_t collision_count,
+    size_t collision_size,
+    size_t cluster_count,
+    size_t cluster_size,
+    size_t seed
 ){
+    std::multimap<size_t, T> all_numbers;
+    std::vector<T> numbers;
 
     size_t expected_hsize = p1_parameter_gen_hsize(collision_count, collision_size, cluster_count, cluster_size);
+    
     if(expected_hsize > HSIZE || expected_hsize == 0){
         return 0; // HSIZE is to small for the given configuration to fit.
     }
     if(seed == 0){
-        srand(std::time(nullptr));
-        seed = std::rand();
+        return 0; // invalid seed
     }
 
-    if(SoAoV){
-        return generate_data_p1_SoAoV(result, data_size, distinct_values, HSIZE, hash_function, collision_count, collision_size, cluster_count, cluster_size, seed);
-    }
-
+    size_t pos = noise(HSIZE * distinct_values, seed) % HSIZE;
     size_t total_free = HSIZE - distinct_values;
     size_t reserved_free = cluster_count> collision_count ? cluster_count: collision_count;
     reserved_free += 1;
     size_t distributed_free = total_free <= reserved_free ? 1 : total_free - reserved_free ;
-
-    size_t mul = (collision_size + 1) * 2;
-    if(mul > 30){
-        mul = 30;
-    }
-
-    size_t number_of_values = (HSIZE + 1) * mul;
-    
     size_t cluster_after_collition_length = cluster_size > collision_size ? cluster_size - collision_size : 0;
-    size_t pos = noise(HSIZE * distinct_values, seed + 1) % HSIZE;
 
-    std::multimap<size_t, T> all_numbers;
-    std::vector<T> numbers;
-
-    generate_random_values(all_numbers, hash_function, number_of_values, HSIZE, seed);
+    all_number_gen<T>(all_numbers, hash_function, HSIZE, collision_size, seed+3);
 
     size_t i = 0;
     bool CREATE_CLUSTER = i < cluster_count;
@@ -554,40 +465,30 @@ size_t generate_data_p0(
     size_t data_size,
     size_t distinct_values,
     size_t (*hash_function)(T, size_t),
-    size_t collision_count = 0,
-    size_t collision_size = 0,
-    size_t seed = 0
+    size_t collision_count,
+    size_t collision_size,
+    size_t seed,
+    bool just_distinct_values = false // NOTE: this should only be used for datageneration testing
 ){
+    std::multimap<size_t, T> all_numbers;   
+    std::vector<T> numbers;
+
     size_t expected_hsize = p0_parameter_gen_hsize(collision_count, collision_size);
+
     if(expected_hsize > distinct_values){
         return 0; // HSIZE is to small for the given configuration to fit.
     }
     if(seed == 0){
-        srand(std::time(nullptr));
-        seed = std::rand();
+        return 0; // invalid seed
     }
-
-    size_t free_space = distinct_values - expected_hsize;
     
-    size_t mul = (collision_size + 1) * 2;
-    if(mul > 30){
-        mul = 30;
-    }
-    size_t number_of_values = (distinct_values + 1) * (mul + 2);
-    size_t pos = noise(distinct_values * distinct_values, seed + 1) % distinct_values;
-    size_t goal = collision_size;
-    if(goal <= 1){
-        goal = 2;
-    }
+    size_t pos = noise(distinct_values * distinct_values, seed) % distinct_values;
+    size_t free_space = distinct_values - expected_hsize;
 
-    std::multimap<size_t, T> all_numbers;
-    std::vector<T> numbers;
-
-    generate_random_values(all_numbers, hash_function, number_of_values, distinct_values, seed, goal);
+    all_number_gen<T>(all_numbers, hash_function, distinct_values, collision_size, seed +3);
 
     size_t i = 0;
     bool CREATE_COLLISION = i < collision_count;
-        
     while(CREATE_COLLISION){
         generate_collision<T>(&numbers, &all_numbers, distinct_values, pos, collision_size);
         pos = (pos + collision_size) % distinct_values;
@@ -602,73 +503,18 @@ size_t generate_data_p0(
     if(numbers.size() == 0 || numbers.size() > distinct_values){
         return 0;
     }
-    generate_benchmark_data<T>(result, data_size, &numbers, seed+3);    
-    return numbers.size();
+
+    if(just_distinct_values){
+        for(size_t i = 0; i < numbers.size(); i++){
+            result[i] = numbers[i];
+        }
+    }
+
+    generate_benchmark_data<T>(result, data_size, &numbers, seed+1 );    
+    return data_size;
 }
 
 
-
-template<typename T>
-size_t generate_data_p0_2(
-    T*& result,
-    size_t data_size,
-    size_t distinct_values,
-    size_t (*hash_function)(T, size_t),
-    size_t collision_count = 0,
-    size_t collision_size = 0,
-    size_t seed = 0
-){
-    size_t expected_hsize = p0_parameter_gen_hsize(collision_count, collision_size);
-    if(expected_hsize > distinct_values){
-        return 0; // HSIZE is to small for the given configuration to fit.
-    }
-    if(seed == 0){
-        srand(std::time(nullptr));
-        seed = std::rand();
-    }
-
-    size_t free_space = distinct_values - expected_hsize;
-    
-    size_t mul = (collision_size + 1) * 2;
-    if(mul > 30){
-        mul = 30;
-    }
-    size_t number_of_values = (distinct_values + 1) * (mul + 2);
-    size_t pos = noise(distinct_values * distinct_values, seed + 1) % distinct_values;
-    size_t goal = collision_size;
-    if(goal <= 1){
-        goal = 2;
-    }
-
-    std::multimap<size_t, T> all_numbers;
-    std::vector<T> numbers;
-
-    generate_random_values(all_numbers, hash_function, number_of_values, distinct_values, seed, goal);
-
-    size_t i = 0;
-    bool CREATE_COLLISION = i < collision_count;
-        
-    while(CREATE_COLLISION){
-        generate_collision<T>(&numbers, &all_numbers, distinct_values, pos, collision_size);
-        pos = (pos + collision_size) % distinct_values;
-        
-        i++;
-        CREATE_COLLISION = i < collision_count;
-    }
-
-    generate_cluster<T>(&numbers, &all_numbers, distinct_values, pos, free_space);
-    pos = (pos + free_space) % distinct_values;
-
-    if(numbers.size() == 0 || numbers.size() > distinct_values){
-        return 0;
-    }
-    for(size_t i = 0; i < distinct_values; i++){
-        result[i] = numbers[i];
-    }
-    return 0;
-    // generate_benchmark_data<T>(result, data_size, &numbers, seed+3);    
-    // return numbers.size();
-}
 /*
     Data generator with different options for data layout. 
     DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!

@@ -16,12 +16,19 @@ AVX512_group_count_SoAoV_v2<T>::AVX512_group_count_SoAoV_v2(size_t HSIZE, size_t
 {
     this->m_elements_per_vector = (512 / 8) / sizeof(T);
     this->m_HSIZE_v = ((HSIZE + this->m_elements_per_vector - 1) / this->m_elements_per_vector) * 16;
+    // hash_map = (__m512i *) aligned_alloc(512, this->m_HSIZE_v * sizeof(__m512i));
+    // count_map = (__m512i *) aligned_alloc(512, this->m_HSIZE_v * sizeof(__m512i));
+
+    // for(size_t i = 0; i < this->m_HSIZE_v; i++){
+    //     hash_map[i] = _mm512_set1_epi32(EMPTY_SPOT);
+    //     count_map[i] = _mm512_set1_epi32(EMPTY_SPOT);
+    // }
 }
 
 template <typename T>
 AVX512_group_count_SoAoV_v2<T>::~AVX512_group_count_SoAoV_v2(){
-    free(this->m_hash_vec);
-    free(this->m_count_vec);
+    // free(hash_map);
+    // free(count_map);
 }
 
 
@@ -37,13 +44,14 @@ void AVX512_group_count_SoAoV_v2<uint32_t>::create_hash_table(uint32_t* input, s
     
 //TODO create a stack allocated m512i array with implicit size. it should be small enough for the heap.
 // note we need 2 of these. with this we can go around 
-
+    // std::cout << "\tcreate IN\n";
     __m512i oneM512iArray = _mm512_setr_epi32 (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
     
+    // //THIS IS THE ORIGINAL
     __m512i hash_map[this->m_HSIZE_v];
     __m512i count_map[this->m_HSIZE_v];
 
-    // loading data. On the first exec this should result in only 0 vals.
+    // // loading data. On the first exec this should result in only 0 vals.
     for(size_t i = 0; i < this->m_HSIZE_v; i++){
         size_t h = i * this->m_elements_per_vector;
         hash_map[i] = _mm512_load_epi32(&this->m_hash_vec[h]);
@@ -68,6 +76,7 @@ void AVX512_group_count_SoAoV_v2<uint32_t>::create_hash_table(uint32_t* input, s
         while(1) {
             // compare vector with broadcast value against vector with following elements for equality
             __mmask16 compareRes = _mm512_cmpeq_epi32_mask(broadcastCurrentValue, hash_map[hash_key]);
+            __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(_mm512_setzero_epi32(), hash_map[hash_key]);
 
             // found match
             if (compareRes > 0) {
@@ -75,22 +84,18 @@ void AVX512_group_count_SoAoV_v2<uint32_t>::create_hash_table(uint32_t* input, s
 
                 p++;
                 break;
-            } else { // no match found
-                // deterime free position within register
-                __mmask16 checkForFreeSpace = _mm512_cmpeq_epi32_mask(_mm512_setzero_epi32(), hash_map[hash_key]);
-                if(checkForFreeSpace > 0) {                // CASE B1    
-                    uint32_t pos = __builtin_ctz(checkForFreeSpace) + 1;
-                    
-                    //store key
-                    hash_map[hash_key] = _mm512_mask_set1_epi32(hash_map[hash_key], masks[pos], inputValue);
-                    //set count to one
-                    count_map[hash_key] = _mm512_mask_set1_epi32(count_map[hash_key], masks[pos], 1);
-                    p++;
-                    break;
-                }   else    { // CASE B2
-                    hash_key = (hash_key + 1) % this->m_HSIZE_v;
-                }
+            } else if(checkForFreeSpace > 0) {                // CASE B1    
+                uint32_t pos = __builtin_ctz(checkForFreeSpace) + 1;
+                
+                //store key
+                hash_map[hash_key] = _mm512_mask_set1_epi32(hash_map[hash_key], masks[pos], inputValue);
+                //set count to one
+                count_map[hash_key] = _mm512_mask_set1_epi32(count_map[hash_key], masks[pos], 1);
+                p++;
+                break;
             }
+            // CASE B2
+            hash_key = (hash_key + 1) % this->m_HSIZE_v;
         }
     }
 
@@ -100,6 +105,7 @@ void AVX512_group_count_SoAoV_v2<uint32_t>::create_hash_table(uint32_t* input, s
         _mm512_store_epi32(&this->m_hash_vec[h], hash_map[i]);
         _mm512_store_epi32(&this->m_count_vec[h], count_map[i]);
     }
+    // std::cout << "\tcreate OUT\n";
 
 }
 
@@ -108,6 +114,12 @@ T AVX512_group_count_SoAoV_v2<T>::get(T input){
     size_t rounds = 0;
     size_t HSIZE = this->m_HSIZE;
     
+    // for(size_t i = 0; i < this->m_HSIZE_v; i++){
+    //     size_t h = i * this->m_elements_per_vector;
+    //     _mm512_store_epi32(&this->m_hash_vec[h], hash_map[i]);
+    //     _mm512_store_epi32(&this->m_count_vec[h], count_map[i]);
+    // }
+
     T hash_key = this->m_hash_function(input, HSIZE);
 
     while(rounds <= 1){

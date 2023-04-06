@@ -73,6 +73,7 @@ void next_position(size_t &pos, size_t &budget, size_t HSIZE, size_t seed){
         pos = (pos + 1) % HSIZE;
         return;
     }
+    
     size_t offset = noise(budget + pos, seed) % budget;
     budget -= offset;
     pos = (pos + 1 + offset) % HSIZE;
@@ -83,41 +84,78 @@ void next_position(size_t &pos, size_t &budget, size_t HSIZE, size_t seed){
 /// @param numbers result numbers associated to their bucket
 /// @param hash_function the hash function to create the values
 /// @param number_of_values how many values at least should be generated
-/// @param HSIZE how big the hash size is (important for the hash function)
+/// @param different_values how big the hash size is (important for the hash function)
 /// @param seed for the random number generator
-/// @param min_numbers how many numbers should be atleast in one bucket.
 template<typename T>
 void generate_random_values(
     std::multimap<size_t, T> &numbers,
     size_t (*hash_function)(T, size_t),
+    size_t different_values,
     size_t number_of_values,
-    size_t HSIZE,
-    size_t seed,
-    size_t min_numbers = 2
+    size_t seed
 ){
-    size_t number_retry = 0;
+    size_t wanted_values = numbers.size() + number_of_values;
+    size_t id = 0;
+
+    while(numbers.size() < wanted_values){
+        T num;
+        //keep generating until num is not 0
+        do{
+            num = noise(id, seed);
+            id++;
+        }while(num == 0);
+        
+        numbers.insert(std::pair<size_t, T>(hash_function(num, different_values), (T)(num)));
+    }
+}
+
+/// @brief 
+/// @tparam T 
+/// @param numbers 
+/// @param hash_function 
+/// @param different_values 
+/// @param collision_size 
+/// @param seed 
+template<typename T>
+void all_number_gen(
+    std::multimap<size_t, T> &numbers,
+    size_t (*hash_function)(T, size_t),
+    size_t different_values,
+    size_t collision_size,
+    size_t seed
+){
+    if(different_values == 0){
+        return;
+    }
+
+    size_t vals_per_bucket = collision_size + 1;
+    if(vals_per_bucket < 2){
+        vals_per_bucket = 2;
+    }
+
+    size_t mul = vals_per_bucket;
+    if(mul > 32){
+        mul = 32;
+    }
+
+    size_t number_of_values = different_values * mul;
+    
+    //kick of data generation as long as there isn't enough values per bucket
     size_t retry = 0;
-    size_t wanted_values = number_of_values;
+    size_t ENOUGH_VALS = 2;
+    const size_t max_retry = 100;
     do{
+        if(ENOUGH_VALS == 2 && retry > 10){
+            ENOUGH_VALS = enough_values_per_bucket(numbers, different_values, 1);
+        }else if(ENOUGH_VALS == 0){
+            throw std::runtime_error("bad hash function! Not all hash values where able to be generated!");
+        }else if(retry > max_retry){
+            throw std::runtime_error("generation is takeing to long. abort!");
+        }
+
+        generate_random_values(numbers, hash_function, different_values, number_of_values, seed + retry);
         retry++;
-        if(retry > 10 && !enough_values_per_bucket(numbers, HSIZE, 1)){    // second part tells us if every value got generated atleast once.
-            throw std::runtime_error("bad hash function!");
-        }else if(retry > ((min_numbers + 1) * 10) ){
-            throw std::runtime_error("generation took to long!");
-        }
-
-        while(numbers.size() < wanted_values){
-            T num;
-            do{
-                num = noise(numbers.size() + number_retry, seed);
-                number_retry += num == 0;
-            }while(num == 0);
-            
-            numbers.insert(std::pair<size_t, T>(hash_function(num, HSIZE), (T)(num)));
-        }
-        wanted_values += number_of_values;
-
-    }while(!enough_values_per_bucket(numbers, HSIZE, min_numbers));
+    }while(!enough_values_per_bucket(numbers, different_values, vals_per_bucket));
 }
 
 /// @brief generates one collision at the starting position with the given collision length. if the length is to big a neighboring bucket might get used to help fill the collision
@@ -294,9 +332,26 @@ void generate_cluster(
 /// @param seed a seed that gets used by the random number generator
 template<typename T>
 void generate_benchmark_data(T*& result, size_t data_size, std::vector<T> *numbers, size_t seed){
+    size_t count[numbers->size()];
+    size_t nr_values_per_bucket = (data_size / numbers->size()) + 1;
+
+    for(size_t i = 0; i < numbers->size(); i++){
+        count[i] = nr_values_per_bucket;
+    }
+    
     for(size_t i = 0; i < data_size; i++){
-        size_t ran_id = noise(i, seed) % numbers->size();
-        result[i] = (T)(numbers->at(ran_id));
+        size_t ran_id = noise(i, seed);
+        bool placed = false;
+
+        do{
+            ran_id %= numbers->size();
+            if(count[ran_id] > 0){
+                result[i] = (T)(numbers->at(ran_id));
+                count[ran_id]--;
+                placed = true;
+            }
+            ran_id++;
+        }while(!placed);
     }
 }
 

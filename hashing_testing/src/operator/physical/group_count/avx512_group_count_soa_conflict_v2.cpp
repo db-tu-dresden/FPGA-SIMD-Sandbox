@@ -17,8 +17,8 @@ AVX512_group_count_SoA_conflict_v2<T>::AVX512_group_count_SoA_conflict_v2(size_t
 
 template <typename T>
 AVX512_group_count_SoA_conflict_v2<T>::~AVX512_group_count_SoA_conflict_v2(){
-    free(this->m_hash_vec);
-    free(this->m_count_vec);
+    // free(this->m_hash_vec);
+    // free(this->m_count_vec);
 }
 
 

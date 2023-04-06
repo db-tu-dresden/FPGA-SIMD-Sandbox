@@ -13,7 +13,7 @@ class Scalar_group_count : public Group_count<T>{
 
     public:
         Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t), bool extend = false, int32_t bonus_scale = 1);
-        ~Scalar_group_count();
+        virtual ~Scalar_group_count();
         
         void create_hash_table(T* input, size_t dataSize);
         

@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include "datagenerator/datagen.hpp"
 #include "hash_function.hpp"
-
+#include "benchmark/table.hpp"
 
 std::chrono::high_resolution_clock::time_point time_now(){
     return std::chrono::high_resolution_clock::now();
@@ -125,13 +125,12 @@ int main(int argc, char** argv){
 
     fill_tab_table();
     HashFunction functions_to_test[] = {
-        HashFunction::MULTIPLY_PRIME,
-        HashFunction::MULITPLY_SHIFT, 
+        // HashFunction::MULTIPLY_PRIME,
+        // HashFunction::MULITPLY_SHIFT, 
         // HashFunction::MULTIPLY_ADD_SHIFT, 
         HashFunction::MODULO, 
         // HashFunction::MURMUR, 
         // HashFunction::TABULATION,
-        HashFunction::SIP_HASH,
         HashFunction::NOISE
     };
     size_t number_hash_functions = sizeof(functions_to_test) / sizeof(functions_to_test[0]);
@@ -139,8 +138,8 @@ int main(int argc, char** argv){
     size_t collision_count;
     size_t collision_size;
 
-    // collision_count = 1;
-    collision_count = 8;
+    collision_count = 1;
+    // collision_count = 8;
     // collision_count = 16;
     collision_size = distinct/collision_count;
 
@@ -162,7 +161,7 @@ int main(int argc, char** argv){
         auto time_end = time_now();
         std::cout<< "\tnano seconds per operation:\t" <<((duration_time(time_start, time_end)*100)/test_size)/100. << std::endl;
 
-        ok = generate_data_p0_2<uint32_t>(data, data_size, distinct, function, collision_count, collision_size, 1794768573511499073);
+        ok = generate_data_p0<uint32_t>(data, data_size, distinct, function, collision_count, collision_size, 1794768573511499073, true);
         double score = 0;
         for(size_t b = 0; b < all_scales_size; b++){
             size_t min = distinct;
@@ -173,7 +172,7 @@ int main(int argc, char** argv){
             HSIZE = distinct * s * bonus_scale + 0.5f;
             HSIZE = (HSIZE + elements - 1);
             HSIZE /= elements;
-            // HSIZE *= elements;
+            HSIZE *= elements;
 
 
             size_t control[HSIZE];
@@ -198,15 +197,15 @@ int main(int argc, char** argv){
             std::cout << "\tscale: "<< s << "\tHSIZE: " << HSIZE << "\tbuckets used: " << bucket << "  \t";
             std::cout << "min: " << min << "  \tmax: " << max << std::endl;
             
-            if(bucket <= 32 && bucket > 1){
-                std::cout << "\t\tbucket-info:";
-                for(size_t i = 0; i < HSIZE; i++){
-                    if(control[i] != 0){
-                        std::cout << "\t" << i << ":" << control[i];
-                    }
-                }
-                std::cout << std::endl;
-            }
+            // if(bucket <= 32 && bucket > 1){
+            //     std::cout << "\t\tbucket-info:";
+            //     for(size_t i = 0; i < HSIZE; i++){
+            //         if(control[i] != 0){
+            //             std::cout << "\t" << i << ":" << control[i];
+            //         }
+            //     }
+            //     std::cout << std::endl;
+            // }
         
         
         }

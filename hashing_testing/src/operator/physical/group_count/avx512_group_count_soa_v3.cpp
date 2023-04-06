@@ -17,8 +17,8 @@ AVX512_group_count_SoA_v3<T>::AVX512_group_count_SoA_v3(size_t HSIZE, size_t (*h
 
 template <typename T>
 AVX512_group_count_SoA_v3<T>::~AVX512_group_count_SoA_v3(){
-    free(this->m_hash_vec);
-    free(this->m_count_vec);
+    // free(this->m_hash_vec);
+    // free(this->m_count_vec);
 }
 
 
