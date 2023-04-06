@@ -1,0 +1,3220 @@
+{
+  "columns":
+  ["", "ALUTs", "FFs", "RAMs", "DSPs", "MLABs", "Details"]
+  , "debug_enabled":"true"
+  , "type":"module"
+  , "total_percent":
+  [65.4191, 34.3913, 33.147, 37.3688, 30.9201]
+  , "total":
+  [627584, 1237204, 4380, 1781, 712]
+  , "name":"Kernel System"
+  , "max_resources":
+  [1866240, 3732480, 11721, 5760, 93312]
+  , "children":
+  [
+    {
+      "name":"Static Partition"
+      , "type":"partition"
+      , "children":
+      [
+        {
+          "name":"Board interface"
+          , "type":"resource"
+          , "data":
+          [594280, 1.18264e+06, 3737, 1779, 0]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Platform interface logic."
+            }
+          ]
+        }
+      ]
+    }
+    , {
+      "name":"Global interconnect"
+      , "type":"resource"
+      , "data":
+      [13691, 19807, 78, 0, 0]
+      , "details":
+      [
+        {
+          "type":"text"
+          , "text":"Global interconnect for 1 global load and 2 global stores. Reduce number of global loads and stores to simplify global interconnect."
+        }
+        , {
+          "type":"brief"
+          , "text":"For 1 global load and 2 global stores."
+        }
+        , {
+          "type":"text"
+          , "text":"See %L for more information"
+          , "links":
+          [
+            {
+              "guide":"Best Practices Guide : Global Memory Interconnect"
+              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/hnj1476724450050.html"
+            }
+          ]
+        }
+      ]
+    }
+    , {
+      "name":"System description ROM"
+      , "type":"resource"
+      , "data":
+      [2, 71, 2, 0, 0]
+      , "details":
+      [
+        {
+          "type":"text"
+          , "text":"This read-only memory contains information for the host about the system and about each kernel in the system, including kernel names, arguments, and attributes. The system description ROM ensures that the binary image on the FPGA is compatible with the host program."
+        }
+        , {
+          "type":"brief"
+          , "text":"Contains information for the host."
+        }
+      ]
+    }
+    , {
+      "name":"kernelV4"
+      , "compute_units":1
+      , "type":"function"
+      , "total_percent":
+      [2.54941, 1.81386, 0.929221, 4.80334, 0.0347222]
+      , "total_kernel_resources":
+      [19610.5, 34682.7, 563, 1.5, 712]
+      , "details":
+      [
+        {
+          "type":"text"
+          , "text":"Number of compute units: 1"
+        }
+        , {
+          "type":"brief"
+          , "text":"1 compute unit."
+        }
+      ]
+      , "children":
+      [
+        {
+          "name":"Function overhead"
+          , "type":"resource"
+          , "data":
+          [1476.52, 1476.68, 0, 0, 6]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Kernel dispatch logic."
+            }
+            , {
+              "type":"brief"
+              , "text":"Kernel dispatch logic."
+            }
+          ]
+        }
+        , {
+          "name":"Coalesced Private Variables: \n - 'h' (kernel.cpp:281)\n - 'i' (kernel.cpp:280)"
+          , "type":"resource"
+          , "data":
+          [8, 14, 0, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":280
+              }
+            ]
+            , [
+              {
+                "filename":"kernel.cpp"
+                , "line":281
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Type: Register"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 7 bits"
+            }
+            , {
+              "type":"brief"
+              , "text":"Register,\n1 reg, 7 width"
+            }
+          ]
+        }
+        , {
+          "name":"Coalesced Private Variables: \n - 'i_localConst' (primitives.hpp:518)\n - 'i_cnt' (kernel.cpp:230)"
+          , "type":"resource"
+          , "data":
+          [40, 130, 0, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":230
+              }
+            ]
+            , [
+              {
+                "filename":"primitives.hpp"
+                , "line":518
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Type: Register"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 65 bits"
+            }
+            , {
+              "type":"brief"
+              , "text":"Register,\n1 reg, 65 width"
+            }
+          ]
+        }
+        , {
+          "name":"Private Variable: \n - 'hash_key' (kernel.cpp:241)"
+          , "type":"resource"
+          , "data":
+          [8, 64, 0, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":241
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Type: Register"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 32 bits"
+            }
+            , {
+              "type":"brief"
+              , "text":"Register,\n1 reg, 32 width"
+            }
+          ]
+        }
+        , {
+          "name":"Private Variable: \n - 'i' (kernel.cpp:159)"
+          , "type":"resource"
+          , "data":
+          [40, 128, 0, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":159
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Type: Register"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 64 bits"
+            }
+            , {
+              "type":"brief"
+              , "text":"Register,\n1 reg, 64 width"
+            }
+          ]
+        }
+        , {
+          "name":"Private Variable: \n - 'i' (kernel.cpp:280)"
+          , "type":"resource"
+          , "data":
+          [8, 128, 0, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":280
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Type: Register"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 64 bits"
+            }
+            , {
+              "type":"brief"
+              , "text":"Register,\n1 reg, 64 width"
+            }
+          ]
+        }
+        , {
+          "name":"Private Variable: \n - 'i_cnt' (kernel.cpp:230)"
+          , "type":"resource"
+          , "data":
+          [24, 64, 0, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":230
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Type: Register"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 32 bits"
+            }
+            , {
+              "type":"brief"
+              , "text":"Register,\n1 reg, 32 width"
+            }
+          ]
+        }
+        , {
+          "name":"Private Variable: \n - 'p' (kernel.cpp:239)"
+          , "type":"resource"
+          , "data":
+          [16, 74, 0, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":239
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"text"
+              , "text":"Type: Register"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 5 bits"
+            }
+            , {
+              "type":"text"
+              , "text":"1 register of width 32 bits"
+            }
+            , {
+              "type":"brief"
+              , "text":"Register,\n1 reg, 5 width,\n1 reg, 32 width"
+            }
+          ]
+        }
+        , {
+          "name":"kernel.cpp:154 (hash_map)"
+          , "type":"resource"
+          , "data":
+          [0, 0, 256, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":154
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Private memory":"Stall-free"
+              , "Requested size":"3328 bytes"
+              , "Implemented size":"4096 bytes"
+              , "Memory Usage":"256 RAMs"
+              , "Number of banks":"2 (banked on bit 8)"
+              , "Bank width":"2048 bits"
+              , "Bank depth":"8 words"
+              , "Number of replicates":"1"
+              , "Number of private copies":"1"
+              , "Additional information":
+              [
+                {
+                  "type":"text"
+                  , "text":"Shallow memory implemented in RAMs instead of MLABs because MLABs cannot be configured in true dual-port mode."
+                }
+                , {
+                  "type":"text"
+                  , "text":"RAM usage is increased from 128 RAMs to 256 RAMs because the width of individual RAM blocks in true dual-port mode is limited to 20 bits."
+                }
+                , {
+                  "type":"text"
+                  , "text":"Requested size 3328 bytes, implemented size 4096 bytes, stall-free, 2 reads and 6 writes. "
+                }
+                , {
+                  "type":"text"
+                  , "text":"Banked on bit 8 into 2 separate banks."
+                }
+                , {
+                  "type":"text"
+                  , "text":"Reducing accesses to exactly one read and one write for all on-chip memory systems may increase overall system performance."
+                }
+                , {
+                  "type":"text"
+                  , "text":"Private memory implemented in on-chip block RAM."
+                }
+              ]
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information."
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Local Memory"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"brief"
+              , "text":"Stall-free,\n3328B requested,\n4096B implemented."
+            }
+          ]
+        }
+        , {
+          "name":"kernel.cpp:155 (count_map)"
+          , "type":"resource"
+          , "data":
+          [0, 0, 256, 0, 0]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":155
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Private memory":"Stall-free"
+              , "Requested size":"3328 bytes"
+              , "Implemented size":"4096 bytes"
+              , "Memory Usage":"256 RAMs"
+              , "Number of banks":"2 (banked on bit 8)"
+              , "Bank width":"2048 bits"
+              , "Bank depth":"8 words"
+              , "Number of replicates":"1"
+              , "Number of private copies":"1"
+              , "Additional information":
+              [
+                {
+                  "type":"text"
+                  , "text":"Shallow memory implemented in RAMs instead of MLABs because MLABs cannot be configured in true dual-port mode."
+                }
+                , {
+                  "type":"text"
+                  , "text":"RAM usage is increased from 128 RAMs to 256 RAMs because the width of individual RAM blocks in true dual-port mode is limited to 20 bits."
+                }
+                , {
+                  "type":"text"
+                  , "text":"Requested size 3328 bytes, implemented size 4096 bytes, stall-free, 2 reads and 6 writes. "
+                }
+                , {
+                  "type":"text"
+                  , "text":"Banked on bit 8 into 2 separate banks."
+                }
+                , {
+                  "type":"text"
+                  , "text":"Reducing accesses to exactly one read and one write for all on-chip memory systems may increase overall system performance."
+                }
+                , {
+                  "type":"text"
+                  , "text":"Private memory implemented in on-chip block RAM."
+                }
+              ]
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information."
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Local Memory"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"brief"
+              , "text":"Stall-free,\n3328B requested,\n4096B implemented."
+            }
+          ]
+        }
+        , {
+          "name":"kernel.cpp:210 (masks._M_elems)"
+          , "type":"resource"
+          , "data":
+          [0, 0, 0, 0, 410]
+          , "debug":
+          [
+            [
+              {
+                "filename":"kernel.cpp"
+                , "line":210
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Private memory":"Stall-free"
+              , "Requested size":"1024 bytes"
+              , "Implemented size":"1024 bytes"
+              , "Memory Usage":"410 MLABs"
+              , "Number of banks":"1"
+              , "Bank width":"8192 bits"
+              , "Bank depth":"1 word"
+              , "Number of replicates":"1"
+              , "Number of private copies":"1"
+              , "Additional information":
+              [
+                {
+                  "type":"text"
+                  , "text":"Requested size 1024 bytes, implemented size 1024 bytes, stall-free, 1 read and 1 write. "
+                }
+                , {
+                  "type":"text"
+                  , "text":"Private memory implemented in on-chip block RAM."
+                }
+              ]
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information."
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Local Memory"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"brief"
+              , "text":"Stall-free,\n1024B requested,\n1024B implemented."
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B0"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"Feedback"
+              , "type":"resource"
+              , "data":
+              [8, 2, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Loop-carried dependencies"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for loop-carried dependencies. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce number and size of loop-carried variables"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"handler.hpp:1100 > kernel.cpp:134"
+                  , "type":"resource"
+                  , "data":
+                  [8, 2, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":134
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B1"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"State"
+              , "type":"resource"
+              , "data":
+              [32, 165, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Live values and control logic"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for live values and control logic. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce size of local variables"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce scope of local variables, localizing them as much as possible"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce number of nested loops"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [32, 165, 0, 0, 0]
+                }
+              ]
+            }
+            , {
+              "name":"Feedback"
+              , "type":"resource"
+              , "data":
+              [80, 73, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Loop-carried dependencies"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for loop-carried dependencies. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce number and size of loop-carried variables"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [7, 7, 0, 0, 0]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:159"
+                  , "type":"resource"
+                  , "data":
+                  [73, 66, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":159
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+            , {
+              "name":"Cluster logic"
+              , "type":"resource"
+              , "data":
+              [14, 10, 0, 0, 1]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall. This area cannot be affected directly."
+                }
+              ]
+            }
+            , {
+              "name":"Computation"
+              , "type":"resource"
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [24, 2, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":""
+                        , "line":0
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit And"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [2, 1, 0, 0, 0]
+                    }
+                    , {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":22
+                      , "data":
+                      [22, 1, 0, 0, 0]
+                    }
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:159"
+                  , "type":"resource"
+                  , "data":
+                  [279, 8, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":159
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit And"
+                      , "type":"resource"
+                      , "count":3
+                      , "data":
+                      [3, 1, 0, 0, 0]
+                    }
+                    , {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":4
+                      , "data":
+                      [3, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":9
+                      , "data":
+                      [9, 3, 0, 0, 0]
+                    }
+                    , {
+                      "name":"64-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":4
+                      , "data":
+                      [264, 4, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:166"
+                  , "type":"resource"
+                  , "data":
+                  [136, 96, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":166
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":4
+                      , "data":
+                      [136, 96, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Store uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free write to memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"154"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:167"
+                  , "type":"resource"
+                  , "data":
+                  [136, 96, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":167
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":4
+                      , "data":
+                      [136, 96, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Store uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free write to memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"155"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B10"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"State"
+              , "type":"resource"
+              , "data":
+              [3, 133, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Live values and control logic"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for live values and control logic. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce size of local variables"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce scope of local variables, localizing them as much as possible"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce number of nested loops"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [3, 67, 0, 0, 0]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [0, 66, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+            , {
+              "name":"Cluster logic"
+              , "type":"resource"
+              , "data":
+              [10, 8, 0, 0, 1]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall. This area cannot be affected directly."
+                }
+              ]
+            }
+            , {
+              "name":"Computation"
+              , "type":"resource"
+              , "children":
+              [
+                {
+                  "name":"handler.hpp:1100 > kernel.cpp:194"
+                  , "type":"resource"
+                  , "data":
+                  [34, 24, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":194
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [34, 24, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Store uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free write to memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"154"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:195"
+                  , "type":"resource"
+                  , "data":
+                  [34, 24, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":195
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [34, 24, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Store uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free write to memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"155"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:211"
+                  , "type":"resource"
+                  , "data":
+                  [34, 24, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":211
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [34, 24, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Store uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free write to memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"210"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [152, 65, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"64-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [88, 1, 0, 0, 0]
+                    }
+                    , {
+                      "name":"64-bit Select"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [64, 64, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B3"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"State"
+              , "type":"resource"
+              , "data":
+              [93, 283, 3, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Live values and control logic"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for live values and control logic. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce size of local variables"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce scope of local variables, localizing them as much as possible"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce number of nested loops"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [93, 283, 3, 0, 0]
+                }
+              ]
+            }
+            , {
+              "name":"Feedback"
+              , "type":"resource"
+              , "data":
+              [219, 153, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Loop-carried dependencies"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for loop-carried dependencies. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce number and size of loop-carried variables"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [219, 153, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+            , {
+              "name":"Cluster logic"
+              , "type":"resource"
+              , "data":
+              [330, 628, 0, 0, 32]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall. This area cannot be affected directly."
+                }
+              ]
+            }
+            , {
+              "name":"Computation"
+              , "type":"resource"
+              , "children":
+              [
+                {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [134, 66, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit And"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"65-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [68, 1, 0, 0, 0]
+                    }
+                    , {
+                      "name":"65-bit Select"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [65, 65, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:233 > \nprimitives.hpp:522"
+                  , "type":"resource"
+                  , "data":
+                  [2465, 3761, 16, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":233
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":522
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Load"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [2465, 3761, 16, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"Burst-coalesced non-aligned LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Load uses a Burst-coalesced non-aligned LSU.  Use Dynamic Profiler to determine performance impact of this LSU."
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B4"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"State"
+              , "type":"resource"
+              , "data":
+              [7, 39, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Live values and control logic"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for live values and control logic. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce size of local variables"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce scope of local variables, localizing them as much as possible"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce number of nested loops"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [7, 39, 0, 0, 0]
+                }
+              ]
+            }
+            , {
+              "name":"Cluster logic"
+              , "type":"resource"
+              , "data":
+              [10, 8, 0, 0, 1]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall. This area cannot be affected directly."
+                }
+              ]
+            }
+            , {
+              "name":"Computation"
+              , "type":"resource"
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [17, 33, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":""
+                        , "line":0
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"llvm.fpga.wg.limiter.exit"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [17, 33, 0, 0, 0]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B5"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"State"
+              , "type":"resource"
+              , "data":
+              [932, 5350, 0, 0, 70]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Live values and control logic"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for live values and control logic. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce size of local variables"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce scope of local variables, localizing them as much as possible"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce number of nested loops"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [932, 5350, 0, 0, 70]
+                }
+              ]
+            }
+            , {
+              "name":"Feedback"
+              , "type":"resource"
+              , "data":
+              [687, 1165, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Loop-carried dependencies"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for loop-carried dependencies. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce number and size of loop-carried variables"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [536, 1024, 0, 0, 0]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [65, 75, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:233 > \nprimitives.hpp:522"
+                  , "type":"resource"
+                  , "data":
+                  [40, 64, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":233
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":522
+                      }
+                    ]
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:239"
+                  , "type":"resource"
+                  , "data":
+                  [46, 2, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":239
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+            , {
+              "name":"Cluster logic"
+              , "type":"resource"
+              , "data":
+              [627, 1231, 0, 0, 62]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall. This area cannot be affected directly."
+                }
+              ]
+            }
+            , {
+              "name":"Computation"
+              , "type":"resource"
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [354, 66, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":""
+                        , "line":0
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"llvm.fpga.case"
+                      , "type":"resource"
+                      , "count":3
+                      , "data":
+                      [352, 64, 0, 0, 0]
+                    }
+                    , {
+                      "name":"llvm.fpga.fanout"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [2, 2, 0, 0, 0]
+                    }
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [1, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:239"
+                  , "type":"resource"
+                  , "data":
+                  [1, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":239
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit And"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:241 > \nhelper_kernel.cpp:12"
+                  , "type":"resource"
+                  , "data":
+                  [187, 81, 0, 1.5, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":241
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/../helper/helper_kernel.cpp"
+                        , "line":12
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"32-bit Integer Multiply"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [119, 81, 0, 1.5, 0]
+                    }
+                    , {
+                      "name":"64-bit Integer Add"
+                      , "type":"resource"
+                      , "count":4
+                      , "data":
+                      [68, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B6"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"State"
+              , "type":"resource"
+              , "data":
+              [475, 3283, 0, 0, 40]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Live values and control logic"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for live values and control logic. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce size of local variables"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce scope of local variables, localizing them as much as possible"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce number of nested loops"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [475, 3283, 0, 0, 40]
+                }
+              ]
+            }
+            , {
+              "name":"Feedback"
+              , "type":"resource"
+              , "data":
+              [234, 412, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Loop-carried dependencies"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for loop-carried dependencies. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce number and size of loop-carried variables"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [100, 265, 0, 0, 0]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [73, 139, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:239"
+                  , "type":"resource"
+                  , "data":
+                  [11, 4, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":239
+                      }
+                    ]
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:241"
+                  , "type":"resource"
+                  , "data":
+                  [32, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":241
+                      }
+                    ]
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:260"
+                  , "type":"resource"
+                  , "data":
+                  [9, 2, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":260
+                      }
+                    ]
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:262"
+                  , "type":"resource"
+                  , "data":
+                  [9, 2, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":262
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+            , {
+              "name":"Cluster logic"
+              , "type":"resource"
+              , "data":
+              [322, 622, 0, 0, 31]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall. This area cannot be affected directly."
+                }
+              ]
+            }
+            , {
+              "name":"Computation"
+              , "type":"resource"
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [25, 5, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":""
+                        , "line":0
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit And"
+                      , "type":"resource"
+                      , "count":18
+                      , "data":
+                      [18, 3, 0, 0, 0]
+                    }
+                    , {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":5
+                      , "data":
+                      [5, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"llvm.fpga.fanout"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [2, 2, 0, 0, 0]
+                    }
+                  ]
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:230"
+                  , "type":"resource"
+                  , "data":
+                  [1, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":230
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:241"
+                  , "type":"resource"
+                  , "data":
+                  [21.3333, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":241
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"32-bit Select"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [21.3333, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:247 > \nprimitives.hpp:413"
+                  , "type":"resource"
+                  , "data":
+                  [186, 8, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":247
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":413
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":16
+                      , "data":
+                      [176, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"Load"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [9, 8, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Load uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free read from memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"154"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:250 > \nprimitives.hpp:273"
+                  , "type":"resource"
+                  , "data":
+                  [14, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":250
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":273
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":14
+                      , "data":
+                      [14, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:251"
+                  , "type":"resource"
+                  , "data":
+                  [515, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":251
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [2, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"512-bit Select"
+                      , "type":"resource"
+                      , "count":4
+                      , "data":
+                      [512, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:251 > \nprimitives.hpp:224"
+                  , "type":"resource"
+                  , "data":
+                  [16, 16, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":251
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":224
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":16
+                      , "data":
+                      [16, 16, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:255 > \nprimitives.hpp:413"
+                  , "type":"resource"
+                  , "data":
+                  [177, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":255
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":413
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":16
+                      , "data":
+                      [176, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:257 > \nprimitives.hpp:273"
+                  , "type":"resource"
+                  , "data":
+                  [16.5, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":257
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":273
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [0.5, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":16
+                      , "data":
+                      [16, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:258 > \nprimitives.hpp:452"
+                  , "type":"resource"
+                  , "data":
+                  [65, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":258
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":452
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":13
+                      , "data":
+                      [13, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Select"
+                      , "type":"resource"
+                      , "count":15
+                      , "data":
+                      [52, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:260"
+                  , "type":"resource"
+                  , "data":
+                  [34, 24, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":260
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [34, 24, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Store uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free write to memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"154"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:260 > \nprimitives.hpp:478"
+                  , "type":"resource"
+                  , "data":
+                  [699, 8, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":260
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":478
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [2, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":16
+                      , "data":
+                      [176, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Select"
+                      , "type":"resource"
+                      , "count":16
+                      , "data":
+                      [512, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"Load"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [9, 8, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Load uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free read from memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"210"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:262"
+                  , "type":"resource"
+                  , "data":
+                  [34, 24, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":262
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [34, 24, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Store uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free write to memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"155"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:262 > \nprimitives.hpp:481"
+                  , "type":"resource"
+                  , "data":
+                  [538, 520, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":262
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":481
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Select"
+                      , "type":"resource"
+                      , "count":17
+                      , "data":
+                      [17, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Select"
+                      , "type":"resource"
+                      , "count":16
+                      , "data":
+                      [512, 512, 0, 0, 0]
+                    }
+                    , {
+                      "name":"Load"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [9, 8, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Load uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free read from memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"155"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:266"
+                  , "type":"resource"
+                  , "data":
+                  [21.3333, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":266
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"32-bit Select"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [21.3333, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:267"
+                  , "type":"resource"
+                  , "data":
+                  [56.8333, 1, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":267
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit Or"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [0.5, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [35, 1, 0, 0, 0]
+                    }
+                    , {
+                      "name":"32-bit Select"
+                      , "type":"resource"
+                      , "count":2
+                      , "data":
+                      [21.3333, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B8"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"State"
+              , "type":"resource"
+              , "data":
+              [23, 78, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Live values and control logic"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for live values and control logic. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce size of local variables"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce scope of local variables, localizing them as much as possible"
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"reduce number of nested loops"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"No Source Line"
+                  , "type":"resource"
+                  , "data":
+                  [23, 78, 0, 0, 0]
+                }
+              ]
+            }
+            , {
+              "name":"Feedback"
+              , "type":"resource"
+              , "data":
+              [87, 9, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Loop-carried dependencies"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for loop-carried dependencies. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce number and size of loop-carried variables"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"handler.hpp:1100 > kernel.cpp:280"
+                  , "type":"resource"
+                  , "data":
+                  [87, 9, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":280
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+            , {
+              "name":"Cluster logic"
+              , "type":"resource"
+              , "data":
+              [590, 1162, 0, 0, 58]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Logic required to efficiently support sets of operations that do not stall. This area cannot be affected directly."
+                }
+              ]
+            }
+            , {
+              "name":"Computation"
+              , "type":"resource"
+              , "children":
+              [
+                {
+                  "name":"handler.hpp:1100 > kernel.cpp:280"
+                  , "type":"resource"
+                  , "data":
+                  [3, 0, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":280
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"1-bit And"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [1, 0, 0, 0, 0]
+                    }
+                    , {
+                      "name":"7-bit Integer Compare"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [2, 0, 0, 0, 0]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:282 > \nprimitives.hpp:502"
+                  , "type":"resource"
+                  , "data":
+                  [3395, 6415, 16, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":282
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":502
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Load"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [266, 521, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Load uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free read from memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"154"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                    , {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [3129, 5894, 16, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"Burst-coalesced non-aligned LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Store uses a Burst-coalesced non-aligned LSU.  Use Dynamic Profiler to determine performance impact of this LSU."
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+                , {
+                  "name":"handler.hpp:1100 > kernel.cpp:283 > \nprimitives.hpp:502"
+                  , "type":"resource"
+                  , "data":
+                  [3396, 6415, 16, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1100
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/kernel.cpp"
+                        , "line":283
+                      }
+                      , {
+                        "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v4/./../primitives/primitives.hpp"
+                        , "line":502
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "name":"Load"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [266, 521, 0, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"text"
+                          , "text":"Load uses a Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"brief"
+                          , "text":"Pipelined never-stall LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Stall-free read from memory declared on %L."
+                          , "links":
+                          [
+                            {
+                              "filename":"kernel.cpp"
+                              , "line":"155"
+                            }
+                          ]
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"See %L for more information"
+                          , "links":
+                          [
+                            {
+                              "guide":"Best Practices Guide : Load-Store Units"
+                              , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                    , {
+                      "name":"Store"
+                      , "type":"resource"
+                      , "count":1
+                      , "data":
+                      [3130, 5894, 16, 0, 0]
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"Burst-coalesced non-aligned LSU"
+                        }
+                        , {
+                          "type":"text"
+                          , "text":"Store uses a Burst-coalesced non-aligned LSU.  Use Dynamic Profiler to determine performance impact of this LSU."
+                        }
+                      ]
+                    }
+                  ]
+                  , "replace_name":"true"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B9"
+          , "type":"basicblock"
+          , "children":
+          [
+            {
+              "name":"Feedback"
+              , "type":"resource"
+              , "data":
+              [5, 8, 0, 0, 0]
+              , "details":
+              [
+                {
+                  "type":"brief"
+                  , "text":"Loop-carried dependencies"
+                }
+                , {
+                  "type":"text"
+                  , "text":"Resources for loop-carried dependencies. To reduce this area:"
+                  , "details":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"reduce number and size of loop-carried variables"
+                    }
+                  ]
+                }
+              ]
+              , "children":
+              [
+                {
+                  "name":"handler.hpp:1104"
+                  , "type":"resource"
+                  , "data":
+                  [5, 8, 0, 0, 0]
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"/glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/bin-llvm/../include/sycl/handler.hpp"
+                        , "line":1104
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

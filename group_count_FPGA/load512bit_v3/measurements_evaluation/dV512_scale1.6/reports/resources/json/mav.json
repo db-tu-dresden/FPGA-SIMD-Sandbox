@@ -1,0 +1,5959 @@
+{
+  "nodes":
+  [
+    {
+      "type":"kernel"
+      , "id":2
+      , "name":"kernelV3"
+      , "children":
+      [
+        {
+          "type":"bb"
+          , "id":3
+          , "name":"kernelV3.B0"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"2"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":4
+          , "name":"kernelV3.B1"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":14
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"9"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":15
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"9"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":16
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":17
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":18
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":19
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":20
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":21
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":22
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":23
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":24
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":25
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":26
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":27
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":28
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":29
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":30
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":31
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":32
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":33
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":34
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":35
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":36
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":37
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":38
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":39
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":40
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":41
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":42
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":43
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":44
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":147
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":45
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":148
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"10"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":104
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":146
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"105"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":105
+              , "name":"Loop End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"15"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"15"
+              , "II":"1"
+              , "Subloops":"No"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":""
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":5
+          , "name":"kernelV3.B2"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"0"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":6
+          , "name":"kernelV3.B3"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":46
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":522
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"9"
+                  , "Latency":"837"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":106
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":166
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"7"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":107
+              , "name":"End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"851"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"851"
+              , "II":"2"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Entry to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":7
+          , "name":"kernelV3.B4"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"6"
+              , "II":"2"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Exit which branches back to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":8
+          , "name":"kernelV3.B5"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"21"
+              , "II":"1"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Entry to loop. "
+              , "Loops To":"10"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":9
+          , "name":"kernelV3.B6"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":47
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":48
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":49
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":50
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":51
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":52
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":53
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":54
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":55
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":56
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":57
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":58
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":59
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":60
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":61
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":62
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/./../primitives/primitives.hpp"
+                    , "line":398
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"3"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":63
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":258
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"21"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":64
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":258
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"countVec"
+                  , "Start Cycle":"22"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":65
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":257
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined"
+                  , "Stall-free":"No"
+                  , "Stores to":"hashVec"
+                  , "Start Cycle":"18"
+                  , "Latency":"7"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":108
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":""
+                    , "line":0
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"109"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":109
+              , "name":"Loop End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"27"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"27"
+              , "II":"23"
+              , "Subloops":"No"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Loop is pipelined with II of 23. See Loops Analysis for more information."
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":10
+          , "name":"kernelV3.B7"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"0"
+              , "II":"1"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Exit which branches back to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":11
+          , "name":"kernelV3.B8"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":66
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":67
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":68
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":69
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":70
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":71
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":72
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":73
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":74
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":75
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":76
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":77
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":78
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":79
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":80
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":81
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":82
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":83
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":84
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":85
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":86
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":87
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":88
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":89
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":90
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":91
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":92
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":93
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":94
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"46"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":95
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"49"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":96
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hashVec"
+                  , "Start Cycle":"8"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":97
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"countVec"
+                  , "Start Cycle":"11"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":98
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Burst-coalesced"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"17"
+                  , "Latency":"38"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":99
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"32 bits"
+                  , "Type":"Burst-coalesced"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"17"
+                  , "Latency":"38"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":100
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"64 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"55"
+                  , "Latency":"179"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":101
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":284
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"55"
+                  , "Latency":"129"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":102
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"64 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"55"
+                  , "Latency":"179"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":103
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":285
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"55"
+                  , "Latency":"129"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":110
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":283
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"111"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":111
+              , "name":"Loop End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"234"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"234"
+              , "II":"222"
+              , "Subloops":"No"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Loop is pipelined with II of 222. See Loops Analysis for more information."
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":12
+          , "name":"kernelV3.B9"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"0"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":13
+          , "name":"kernelV3.B10"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"8"
+            }
+          ]
+        }
+        , {
+          "type":"csr"
+          , "id":112
+          , "name":"Register Map"
+          , "debug":
+          [
+            [
+              {
+                "filename":"main.prj/ZTS8kernelV3_csr.hpp"
+                , "line":1
+              }
+            ]
+          ]
+          , "children":
+          [
+            {
+              "type":"interface"
+              , "id":113
+              , "name":"start"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":121
+                  }
+                ]
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":114
+              , "name":"done"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":121
+                  }
+                ]
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":115
+              , "name":"busy"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":121
+                  }
+                ]
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":116
+              , "name":"arg_arr_d"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":121
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV3"
+                }
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":117
+              , "name":"arg_hashVec_d"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":121
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV3"
+                }
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":118
+              , "name":"arg_countVec_d"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":121
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV3"
+                }
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":119
+              , "name":"arg_iterations"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load512bit_v3/kernel.cpp"
+                    , "line":121
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV3"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"memtype"
+          , "id":120
+          , "name":"On-chip Memory"
+          , "children":
+          [
+            {
+              "type":"memsys"
+              , "id":121
+              , "name":"hashVec"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":142
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"3276 bytes"
+                  , "Implemented size":"4096 bytes"
+                  , "Number of banks":"32"
+                  , "Bank width":"32 bits"
+                  , "Bank depth":"32 words"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"memsys"
+              , "id":282
+              , "name":"countVec"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":143
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"3276 bytes"
+                  , "Implemented size":"4096 bytes"
+                  , "Number of banks":"16"
+                  , "Bank width":"32 bits"
+                  , "Bank depth":"64 words"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    , {
+      "type":"memtype"
+      , "id":1
+      , "name":"Global Memory"
+      , "children":
+      [
+        {
+          "type":"memsys"
+          , "id":363
+          , "name":"device"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Number of banks":"4"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  , "links":
+  [
+    {
+      "from":113
+      , "to":3
+    }
+    , {
+      "from":12
+      , "to":114
+    }
+    , {
+      "from":3
+      , "to":115
+      , "reverse":2
+    }
+    , {
+      "from":116
+      , "to":106
+    }
+    , {
+      "from":117
+      , "to":110
+    }
+    , {
+      "from":118
+      , "to":110
+    }
+    , {
+      "from":119
+      , "to":13
+    }
+    , {
+      "from":121
+      , "to":51
+    }
+    , {
+      "from":121
+      , "to":49
+    }
+    , {
+      "from":121
+      , "to":47
+    }
+    , {
+      "from":121
+      , "to":53
+    }
+    , {
+      "from":121
+      , "to":55
+    }
+    , {
+      "from":121
+      , "to":57
+    }
+    , {
+      "from":121
+      , "to":59
+    }
+    , {
+      "from":121
+      , "to":61
+    }
+    , {
+      "from":121
+      , "to":96
+    }
+    , {
+      "from":121
+      , "to":66
+    }
+    , {
+      "from":16
+      , "to":121
+    }
+    , {
+      "from":18
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":68
+    }
+    , {
+      "from":20
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":70
+    }
+    , {
+      "from":22
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":72
+    }
+    , {
+      "from":24
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":74
+    }
+    , {
+      "from":26
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":76
+    }
+    , {
+      "from":28
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":78
+    }
+    , {
+      "from":30
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":80
+    }
+    , {
+      "from":32
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":82
+    }
+    , {
+      "from":34
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":84
+    }
+    , {
+      "from":36
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":86
+    }
+    , {
+      "from":38
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":88
+    }
+    , {
+      "from":40
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":90
+    }
+    , {
+      "from":42
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":92
+    }
+    , {
+      "from":44
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":94
+    }
+    , {
+      "from":14
+      , "to":121
+    }
+    , {
+      "from":121
+      , "to":52
+    }
+    , {
+      "from":121
+      , "to":50
+    }
+    , {
+      "from":121
+      , "to":48
+    }
+    , {
+      "from":121
+      , "to":54
+    }
+    , {
+      "from":121
+      , "to":56
+    }
+    , {
+      "from":121
+      , "to":58
+    }
+    , {
+      "from":121
+      , "to":60
+    }
+    , {
+      "from":121
+      , "to":62
+    }
+    , {
+      "from":65
+      , "to":121
+    }
+    , {
+      "from":282
+      , "to":63
+    }
+    , {
+      "from":282
+      , "to":97
+    }
+    , {
+      "from":17
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":67
+    }
+    , {
+      "from":19
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":69
+    }
+    , {
+      "from":21
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":71
+    }
+    , {
+      "from":23
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":73
+    }
+    , {
+      "from":25
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":75
+    }
+    , {
+      "from":27
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":77
+    }
+    , {
+      "from":29
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":79
+    }
+    , {
+      "from":31
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":81
+    }
+    , {
+      "from":33
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":83
+    }
+    , {
+      "from":35
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":85
+    }
+    , {
+      "from":37
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":87
+    }
+    , {
+      "from":39
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":89
+    }
+    , {
+      "from":41
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":91
+    }
+    , {
+      "from":43
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":93
+    }
+    , {
+      "from":45
+      , "to":282
+    }
+    , {
+      "from":282
+      , "to":95
+    }
+    , {
+      "from":15
+      , "to":282
+    }
+    , {
+      "from":64
+      , "to":282
+    }
+    , {
+      "from":105
+      , "to":104
+    }
+    , {
+      "from":3
+      , "to":104
+    }
+    , {
+      "from":16
+      , "to":105
+    }
+    , {
+      "from":17
+      , "to":105
+    }
+    , {
+      "from":18
+      , "to":105
+    }
+    , {
+      "from":19
+      , "to":105
+    }
+    , {
+      "from":20
+      , "to":105
+    }
+    , {
+      "from":21
+      , "to":105
+    }
+    , {
+      "from":22
+      , "to":105
+    }
+    , {
+      "from":23
+      , "to":105
+    }
+    , {
+      "from":24
+      , "to":105
+    }
+    , {
+      "from":25
+      , "to":105
+    }
+    , {
+      "from":26
+      , "to":105
+    }
+    , {
+      "from":27
+      , "to":105
+    }
+    , {
+      "from":28
+      , "to":105
+    }
+    , {
+      "from":29
+      , "to":105
+    }
+    , {
+      "from":30
+      , "to":105
+    }
+    , {
+      "from":31
+      , "to":105
+    }
+    , {
+      "from":32
+      , "to":105
+    }
+    , {
+      "from":33
+      , "to":105
+    }
+    , {
+      "from":34
+      , "to":105
+    }
+    , {
+      "from":35
+      , "to":105
+    }
+    , {
+      "from":36
+      , "to":105
+    }
+    , {
+      "from":37
+      , "to":105
+    }
+    , {
+      "from":38
+      , "to":105
+    }
+    , {
+      "from":39
+      , "to":105
+    }
+    , {
+      "from":40
+      , "to":105
+    }
+    , {
+      "from":41
+      , "to":105
+    }
+    , {
+      "from":42
+      , "to":105
+    }
+    , {
+      "from":43
+      , "to":105
+    }
+    , {
+      "from":44
+      , "to":105
+    }
+    , {
+      "from":45
+      , "to":105
+    }
+    , {
+      "from":7
+      , "to":5
+    }
+    , {
+      "from":7
+      , "to":106
+    }
+    , {
+      "from":13
+      , "to":106
+    }
+    , {
+      "from":46
+      , "to":107
+    }
+    , {
+      "from":10
+      , "to":7
+    }
+    , {
+      "from":10
+      , "to":8
+    }
+    , {
+      "from":107
+      , "to":8
+    }
+    , {
+      "from":109
+      , "to":108
+    }
+    , {
+      "from":8
+      , "to":108
+    }
+    , {
+      "from":55
+      , "to":109
+    }
+    , {
+      "from":56
+      , "to":109
+    }
+    , {
+      "from":57
+      , "to":109
+    }
+    , {
+      "from":58
+      , "to":109
+    }
+    , {
+      "from":59
+      , "to":109
+    }
+    , {
+      "from":60
+      , "to":109
+    }
+    , {
+      "from":61
+      , "to":109
+    }
+    , {
+      "from":62
+      , "to":109
+    }
+    , {
+      "from":54
+      , "to":109
+    }
+    , {
+      "from":53
+      , "to":109
+    }
+    , {
+      "from":52
+      , "to":109
+    }
+    , {
+      "from":51
+      , "to":109
+    }
+    , {
+      "from":50
+      , "to":109
+    }
+    , {
+      "from":49
+      , "to":109
+    }
+    , {
+      "from":47
+      , "to":109
+    }
+    , {
+      "from":48
+      , "to":109
+    }
+    , {
+      "from":64
+      , "to":109
+    }
+    , {
+      "from":65
+      , "to":109
+    }
+    , {
+      "from":109
+      , "to":10
+    }
+    , {
+      "from":111
+      , "to":110
+    }
+    , {
+      "from":5
+      , "to":110
+    }
+    , {
+      "from":100
+      , "to":111
+    }
+    , {
+      "from":101
+      , "to":111
+    }
+    , {
+      "from":102
+      , "to":111
+    }
+    , {
+      "from":103
+      , "to":111
+    }
+    , {
+      "from":66
+      , "to":111
+    }
+    , {
+      "from":67
+      , "to":111
+    }
+    , {
+      "from":68
+      , "to":111
+    }
+    , {
+      "from":69
+      , "to":111
+    }
+    , {
+      "from":70
+      , "to":111
+    }
+    , {
+      "from":71
+      , "to":111
+    }
+    , {
+      "from":72
+      , "to":111
+    }
+    , {
+      "from":73
+      , "to":111
+    }
+    , {
+      "from":74
+      , "to":111
+    }
+    , {
+      "from":75
+      , "to":111
+    }
+    , {
+      "from":76
+      , "to":111
+    }
+    , {
+      "from":77
+      , "to":111
+    }
+    , {
+      "from":78
+      , "to":111
+    }
+    , {
+      "from":79
+      , "to":111
+    }
+    , {
+      "from":80
+      , "to":111
+    }
+    , {
+      "from":81
+      , "to":111
+    }
+    , {
+      "from":82
+      , "to":111
+    }
+    , {
+      "from":83
+      , "to":111
+    }
+    , {
+      "from":84
+      , "to":111
+    }
+    , {
+      "from":85
+      , "to":111
+    }
+    , {
+      "from":86
+      , "to":111
+    }
+    , {
+      "from":87
+      , "to":111
+    }
+    , {
+      "from":88
+      , "to":111
+    }
+    , {
+      "from":89
+      , "to":111
+    }
+    , {
+      "from":90
+      , "to":111
+    }
+    , {
+      "from":91
+      , "to":111
+    }
+    , {
+      "from":92
+      , "to":111
+    }
+    , {
+      "from":93
+      , "to":111
+    }
+    , {
+      "from":94
+      , "to":111
+    }
+    , {
+      "from":95
+      , "to":111
+    }
+    , {
+      "from":96
+      , "to":111
+    }
+    , {
+      "from":97
+      , "to":111
+    }
+    , {
+      "from":98
+      , "to":111
+    }
+    , {
+      "from":99
+      , "to":111
+    }
+    , {
+      "from":111
+      , "to":12
+    }
+    , {
+      "from":105
+      , "to":13
+    }
+    , {
+      "from":104
+      , "to":14
+    }
+    , {
+      "from":104
+      , "to":15
+    }
+    , {
+      "from":14
+      , "to":16
+    }
+    , {
+      "from":15
+      , "to":17
+    }
+    , {
+      "from":14
+      , "to":18
+    }
+    , {
+      "from":15
+      , "to":19
+    }
+    , {
+      "from":14
+      , "to":20
+    }
+    , {
+      "from":15
+      , "to":21
+    }
+    , {
+      "from":14
+      , "to":22
+    }
+    , {
+      "from":15
+      , "to":23
+    }
+    , {
+      "from":14
+      , "to":24
+    }
+    , {
+      "from":15
+      , "to":25
+    }
+    , {
+      "from":14
+      , "to":26
+    }
+    , {
+      "from":15
+      , "to":27
+    }
+    , {
+      "from":14
+      , "to":28
+    }
+    , {
+      "from":15
+      , "to":29
+    }
+    , {
+      "from":14
+      , "to":30
+    }
+    , {
+      "from":15
+      , "to":31
+    }
+    , {
+      "from":14
+      , "to":32
+    }
+    , {
+      "from":15
+      , "to":33
+    }
+    , {
+      "from":14
+      , "to":34
+    }
+    , {
+      "from":15
+      , "to":35
+    }
+    , {
+      "from":14
+      , "to":36
+    }
+    , {
+      "from":15
+      , "to":37
+    }
+    , {
+      "from":14
+      , "to":38
+    }
+    , {
+      "from":15
+      , "to":39
+    }
+    , {
+      "from":14
+      , "to":40
+    }
+    , {
+      "from":15
+      , "to":41
+    }
+    , {
+      "from":14
+      , "to":42
+    }
+    , {
+      "from":15
+      , "to":43
+    }
+    , {
+      "from":14
+      , "to":44
+    }
+    , {
+      "from":15
+      , "to":45
+    }
+    , {
+      "from":106
+      , "to":46
+    }
+    , {
+      "from":108
+      , "to":47
+    }
+    , {
+      "from":108
+      , "to":48
+    }
+    , {
+      "from":108
+      , "to":49
+    }
+    , {
+      "from":108
+      , "to":50
+    }
+    , {
+      "from":108
+      , "to":51
+    }
+    , {
+      "from":108
+      , "to":52
+    }
+    , {
+      "from":108
+      , "to":53
+    }
+    , {
+      "from":108
+      , "to":54
+    }
+    , {
+      "from":108
+      , "to":55
+    }
+    , {
+      "from":108
+      , "to":56
+    }
+    , {
+      "from":108
+      , "to":57
+    }
+    , {
+      "from":108
+      , "to":58
+    }
+    , {
+      "from":108
+      , "to":59
+    }
+    , {
+      "from":108
+      , "to":60
+    }
+    , {
+      "from":108
+      , "to":61
+    }
+    , {
+      "from":108
+      , "to":62
+    }
+    , {
+      "from":55
+      , "to":63
+    }
+    , {
+      "from":56
+      , "to":63
+    }
+    , {
+      "from":57
+      , "to":63
+    }
+    , {
+      "from":58
+      , "to":63
+    }
+    , {
+      "from":59
+      , "to":63
+    }
+    , {
+      "from":60
+      , "to":63
+    }
+    , {
+      "from":61
+      , "to":63
+    }
+    , {
+      "from":62
+      , "to":63
+    }
+    , {
+      "from":54
+      , "to":63
+    }
+    , {
+      "from":53
+      , "to":63
+    }
+    , {
+      "from":52
+      , "to":63
+    }
+    , {
+      "from":51
+      , "to":63
+    }
+    , {
+      "from":50
+      , "to":63
+    }
+    , {
+      "from":49
+      , "to":63
+    }
+    , {
+      "from":47
+      , "to":63
+    }
+    , {
+      "from":48
+      , "to":63
+    }
+    , {
+      "from":63
+      , "to":64
+    }
+    , {
+      "from":55
+      , "to":65
+    }
+    , {
+      "from":56
+      , "to":65
+    }
+    , {
+      "from":57
+      , "to":65
+    }
+    , {
+      "from":58
+      , "to":65
+    }
+    , {
+      "from":59
+      , "to":65
+    }
+    , {
+      "from":60
+      , "to":65
+    }
+    , {
+      "from":61
+      , "to":65
+    }
+    , {
+      "from":62
+      , "to":65
+    }
+    , {
+      "from":54
+      , "to":65
+    }
+    , {
+      "from":53
+      , "to":65
+    }
+    , {
+      "from":52
+      , "to":65
+    }
+    , {
+      "from":51
+      , "to":65
+    }
+    , {
+      "from":50
+      , "to":65
+    }
+    , {
+      "from":49
+      , "to":65
+    }
+    , {
+      "from":47
+      , "to":65
+    }
+    , {
+      "from":48
+      , "to":65
+    }
+    , {
+      "from":110
+      , "to":66
+    }
+    , {
+      "from":110
+      , "to":67
+    }
+    , {
+      "from":110
+      , "to":68
+    }
+    , {
+      "from":110
+      , "to":69
+    }
+    , {
+      "from":110
+      , "to":70
+    }
+    , {
+      "from":110
+      , "to":71
+    }
+    , {
+      "from":110
+      , "to":72
+    }
+    , {
+      "from":110
+      , "to":73
+    }
+    , {
+      "from":110
+      , "to":74
+    }
+    , {
+      "from":110
+      , "to":75
+    }
+    , {
+      "from":110
+      , "to":76
+    }
+    , {
+      "from":110
+      , "to":77
+    }
+    , {
+      "from":110
+      , "to":78
+    }
+    , {
+      "from":110
+      , "to":79
+    }
+    , {
+      "from":110
+      , "to":80
+    }
+    , {
+      "from":110
+      , "to":81
+    }
+    , {
+      "from":110
+      , "to":82
+    }
+    , {
+      "from":110
+      , "to":83
+    }
+    , {
+      "from":110
+      , "to":84
+    }
+    , {
+      "from":110
+      , "to":85
+    }
+    , {
+      "from":110
+      , "to":86
+    }
+    , {
+      "from":110
+      , "to":87
+    }
+    , {
+      "from":110
+      , "to":88
+    }
+    , {
+      "from":110
+      , "to":89
+    }
+    , {
+      "from":110
+      , "to":90
+    }
+    , {
+      "from":110
+      , "to":91
+    }
+    , {
+      "from":110
+      , "to":92
+    }
+    , {
+      "from":110
+      , "to":93
+    }
+    , {
+      "from":110
+      , "to":94
+    }
+    , {
+      "from":110
+      , "to":95
+    }
+    , {
+      "from":110
+      , "to":96
+    }
+    , {
+      "from":110
+      , "to":97
+    }
+    , {
+      "from":96
+      , "to":98
+    }
+    , {
+      "from":97
+      , "to":98
+    }
+    , {
+      "from":96
+      , "to":99
+    }
+    , {
+      "from":97
+      , "to":99
+    }
+    , {
+      "from":66
+      , "to":100
+    }
+    , {
+      "from":67
+      , "to":100
+    }
+    , {
+      "from":68
+      , "to":100
+    }
+    , {
+      "from":69
+      , "to":100
+    }
+    , {
+      "from":70
+      , "to":100
+    }
+    , {
+      "from":71
+      , "to":100
+    }
+    , {
+      "from":72
+      , "to":100
+    }
+    , {
+      "from":73
+      , "to":100
+    }
+    , {
+      "from":74
+      , "to":100
+    }
+    , {
+      "from":75
+      , "to":100
+    }
+    , {
+      "from":76
+      , "to":100
+    }
+    , {
+      "from":77
+      , "to":100
+    }
+    , {
+      "from":78
+      , "to":100
+    }
+    , {
+      "from":79
+      , "to":100
+    }
+    , {
+      "from":80
+      , "to":100
+    }
+    , {
+      "from":81
+      , "to":100
+    }
+    , {
+      "from":82
+      , "to":100
+    }
+    , {
+      "from":83
+      , "to":100
+    }
+    , {
+      "from":84
+      , "to":100
+    }
+    , {
+      "from":85
+      , "to":100
+    }
+    , {
+      "from":86
+      , "to":100
+    }
+    , {
+      "from":87
+      , "to":100
+    }
+    , {
+      "from":88
+      , "to":100
+    }
+    , {
+      "from":89
+      , "to":100
+    }
+    , {
+      "from":90
+      , "to":100
+    }
+    , {
+      "from":91
+      , "to":100
+    }
+    , {
+      "from":92
+      , "to":100
+    }
+    , {
+      "from":93
+      , "to":100
+    }
+    , {
+      "from":94
+      , "to":100
+    }
+    , {
+      "from":95
+      , "to":100
+    }
+    , {
+      "from":98
+      , "to":100
+    }
+    , {
+      "from":66
+      , "to":101
+    }
+    , {
+      "from":67
+      , "to":101
+    }
+    , {
+      "from":68
+      , "to":101
+    }
+    , {
+      "from":69
+      , "to":101
+    }
+    , {
+      "from":70
+      , "to":101
+    }
+    , {
+      "from":71
+      , "to":101
+    }
+    , {
+      "from":72
+      , "to":101
+    }
+    , {
+      "from":73
+      , "to":101
+    }
+    , {
+      "from":74
+      , "to":101
+    }
+    , {
+      "from":75
+      , "to":101
+    }
+    , {
+      "from":76
+      , "to":101
+    }
+    , {
+      "from":77
+      , "to":101
+    }
+    , {
+      "from":78
+      , "to":101
+    }
+    , {
+      "from":79
+      , "to":101
+    }
+    , {
+      "from":80
+      , "to":101
+    }
+    , {
+      "from":81
+      , "to":101
+    }
+    , {
+      "from":82
+      , "to":101
+    }
+    , {
+      "from":83
+      , "to":101
+    }
+    , {
+      "from":84
+      , "to":101
+    }
+    , {
+      "from":85
+      , "to":101
+    }
+    , {
+      "from":86
+      , "to":101
+    }
+    , {
+      "from":87
+      , "to":101
+    }
+    , {
+      "from":88
+      , "to":101
+    }
+    , {
+      "from":89
+      , "to":101
+    }
+    , {
+      "from":90
+      , "to":101
+    }
+    , {
+      "from":91
+      , "to":101
+    }
+    , {
+      "from":92
+      , "to":101
+    }
+    , {
+      "from":93
+      , "to":101
+    }
+    , {
+      "from":94
+      , "to":101
+    }
+    , {
+      "from":95
+      , "to":101
+    }
+    , {
+      "from":98
+      , "to":101
+    }
+    , {
+      "from":66
+      , "to":102
+    }
+    , {
+      "from":67
+      , "to":102
+    }
+    , {
+      "from":68
+      , "to":102
+    }
+    , {
+      "from":69
+      , "to":102
+    }
+    , {
+      "from":70
+      , "to":102
+    }
+    , {
+      "from":71
+      , "to":102
+    }
+    , {
+      "from":72
+      , "to":102
+    }
+    , {
+      "from":73
+      , "to":102
+    }
+    , {
+      "from":74
+      , "to":102
+    }
+    , {
+      "from":75
+      , "to":102
+    }
+    , {
+      "from":76
+      , "to":102
+    }
+    , {
+      "from":77
+      , "to":102
+    }
+    , {
+      "from":78
+      , "to":102
+    }
+    , {
+      "from":79
+      , "to":102
+    }
+    , {
+      "from":80
+      , "to":102
+    }
+    , {
+      "from":81
+      , "to":102
+    }
+    , {
+      "from":82
+      , "to":102
+    }
+    , {
+      "from":83
+      , "to":102
+    }
+    , {
+      "from":84
+      , "to":102
+    }
+    , {
+      "from":85
+      , "to":102
+    }
+    , {
+      "from":86
+      , "to":102
+    }
+    , {
+      "from":87
+      , "to":102
+    }
+    , {
+      "from":88
+      , "to":102
+    }
+    , {
+      "from":89
+      , "to":102
+    }
+    , {
+      "from":90
+      , "to":102
+    }
+    , {
+      "from":91
+      , "to":102
+    }
+    , {
+      "from":92
+      , "to":102
+    }
+    , {
+      "from":93
+      , "to":102
+    }
+    , {
+      "from":94
+      , "to":102
+    }
+    , {
+      "from":95
+      , "to":102
+    }
+    , {
+      "from":99
+      , "to":102
+    }
+    , {
+      "from":66
+      , "to":103
+    }
+    , {
+      "from":67
+      , "to":103
+    }
+    , {
+      "from":68
+      , "to":103
+    }
+    , {
+      "from":69
+      , "to":103
+    }
+    , {
+      "from":70
+      , "to":103
+    }
+    , {
+      "from":71
+      , "to":103
+    }
+    , {
+      "from":72
+      , "to":103
+    }
+    , {
+      "from":73
+      , "to":103
+    }
+    , {
+      "from":74
+      , "to":103
+    }
+    , {
+      "from":75
+      , "to":103
+    }
+    , {
+      "from":76
+      , "to":103
+    }
+    , {
+      "from":77
+      , "to":103
+    }
+    , {
+      "from":78
+      , "to":103
+    }
+    , {
+      "from":79
+      , "to":103
+    }
+    , {
+      "from":80
+      , "to":103
+    }
+    , {
+      "from":81
+      , "to":103
+    }
+    , {
+      "from":82
+      , "to":103
+    }
+    , {
+      "from":83
+      , "to":103
+    }
+    , {
+      "from":84
+      , "to":103
+    }
+    , {
+      "from":85
+      , "to":103
+    }
+    , {
+      "from":86
+      , "to":103
+    }
+    , {
+      "from":87
+      , "to":103
+    }
+    , {
+      "from":88
+      , "to":103
+    }
+    , {
+      "from":89
+      , "to":103
+    }
+    , {
+      "from":90
+      , "to":103
+    }
+    , {
+      "from":91
+      , "to":103
+    }
+    , {
+      "from":92
+      , "to":103
+    }
+    , {
+      "from":93
+      , "to":103
+    }
+    , {
+      "from":94
+      , "to":103
+    }
+    , {
+      "from":95
+      , "to":103
+    }
+    , {
+      "from":99
+      , "to":103
+    }
+    , {
+      "from":363
+      , "to":46
+    }
+    , {
+      "from":98
+      , "to":363
+    }
+    , {
+      "from":99
+      , "to":363
+    }
+    , {
+      "from":100
+      , "to":363
+    }
+    , {
+      "from":101
+      , "to":363
+    }
+    , {
+      "from":102
+      , "to":363
+    }
+    , {
+      "from":103
+      , "to":363
+    }
+  ]
+}
