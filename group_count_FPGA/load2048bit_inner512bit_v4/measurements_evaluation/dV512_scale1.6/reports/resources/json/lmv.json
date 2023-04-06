@@ -1,0 +1,1534 @@
+{
+  "nodes":
+  [
+    {
+      "type":"kernel"
+      , "id":2
+      , "name":"kernelV4"
+      , "children":
+      [
+        {
+          "type":"inst"
+          , "id":16
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":171
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"hash_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":17
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"count_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":18
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":171
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"hash_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":19
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"count_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":20
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":171
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"hash_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":21
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"count_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":22
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":171
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"hash_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":23
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"2048 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"count_map"
+              , "Start Cycle":"8"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":28
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":247
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"8192 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"workingData"
+              , "Start Cycle":"850"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":29
+          , "name":"Load"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":259
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Loads from":"workingData"
+              , "Start Cycle":"4"
+              , "Latency":"4"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":30
+          , "name":"Load"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                , "line":413
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Loads from":"hash_map"
+              , "Start Cycle":"5"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":31
+          , "name":"Load"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                , "line":478
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Loads from":"masks._M_elems"
+              , "Start Cycle":"6"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":32
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":289
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"hash_map"
+              , "Start Cycle":"7"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":33
+          , "name":"Load"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                , "line":481
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Loads from":"count_map"
+              , "Start Cycle":"9"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":34
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":291
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"count_map"
+              , "Start Cycle":"11"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":35
+          , "name":"Load"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                , "line":502
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Loads from":"hash_map"
+              , "Start Cycle":"4"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":36
+          , "name":"Load"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                , "line":502
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Loads from":"count_map"
+              , "Start Cycle":"4"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":39
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":199
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"hash_map"
+              , "Start Cycle":"3"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":40
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":200
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"512 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"count_map"
+              , "Start Cycle":"3"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"inst"
+          , "id":41
+          , "name":"Store"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                , "line":216
+              }
+            ]
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Width":"8192 bits"
+              , "Type":"Pipelined never-stall"
+              , "Stall-free":"Yes"
+              , "Stores to":"masks._M_elems"
+              , "Start Cycle":"1"
+              , "Latency":"1"
+              , "Reference":
+              [
+                {
+                  "type":"text"
+                  , "text":"See %L for more information"
+                  , "links":
+                  [
+                    {
+                      "guide":"Best Practices Guide : Load-Store Units"
+                      , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"memtype"
+          , "id":62
+          , "name":"On-chip Memory"
+          , "children":
+          [
+            {
+              "type":"memsys"
+              , "id":63
+              , "name":"hash_map"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":159
+                  }
+                ]
+              ]
+              , "children":
+              [
+                {
+                  "type":"bank"
+                  , "id":64
+                  , "name":"Bank 0"
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"kernel.cpp"
+                        , "line":159
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "type":"port"
+                      , "id":66
+                      , "name":"RW"
+                    }
+                    , {
+                      "type":"port"
+                      , "id":70
+                      , "name":"W"
+                    }
+                  ]
+                  , "details":
+                  [
+                    {
+                      "type":"table"
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"2 total ports/bank\n0 read ports/bank\n1 write ports/bank"
+                        }
+                      ]
+                      , "Total number of ports per bank":"2"
+                      , "Number of read ports per bank":"0"
+                      , "Number of write ports per bank":"1"
+                      , "Number of shared ports per bank":"1"
+                      , "Total replication":"1"
+                    }
+                  ]
+                }
+                , {
+                  "type":"bank"
+                  , "id":65
+                  , "name":"Bank 1"
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"kernel.cpp"
+                        , "line":159
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "type":"port"
+                      , "id":68
+                      , "name":"RW"
+                    }
+                    , {
+                      "type":"port"
+                      , "id":72
+                      , "name":"W"
+                    }
+                  ]
+                  , "details":
+                  [
+                    {
+                      "type":"table"
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"2 total ports/bank\n0 read ports/bank\n1 write ports/bank"
+                        }
+                      ]
+                      , "Total number of ports per bank":"2"
+                      , "Number of read ports per bank":"0"
+                      , "Number of write ports per bank":"1"
+                      , "Number of shared ports per bank":"1"
+                      , "Total replication":"1"
+                    }
+                  ]
+                }
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"3328 bytes"
+                  , "Implemented size":"4096 bytes"
+                  , "Number of banks":"2"
+                  , "Bank width":"2048 bits"
+                  , "Bank depth":"8 words"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"memsys"
+              , "id":74
+              , "name":"count_map"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":160
+                  }
+                ]
+              ]
+              , "children":
+              [
+                {
+                  "type":"bank"
+                  , "id":75
+                  , "name":"Bank 0"
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"kernel.cpp"
+                        , "line":160
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "type":"port"
+                      , "id":77
+                      , "name":"RW"
+                    }
+                    , {
+                      "type":"port"
+                      , "id":81
+                      , "name":"W"
+                    }
+                  ]
+                  , "details":
+                  [
+                    {
+                      "type":"table"
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"2 total ports/bank\n0 read ports/bank\n1 write ports/bank"
+                        }
+                      ]
+                      , "Total number of ports per bank":"2"
+                      , "Number of read ports per bank":"0"
+                      , "Number of write ports per bank":"1"
+                      , "Number of shared ports per bank":"1"
+                      , "Total replication":"1"
+                    }
+                  ]
+                }
+                , {
+                  "type":"bank"
+                  , "id":76
+                  , "name":"Bank 1"
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"kernel.cpp"
+                        , "line":160
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "type":"port"
+                      , "id":79
+                      , "name":"RW"
+                    }
+                    , {
+                      "type":"port"
+                      , "id":83
+                      , "name":"W"
+                    }
+                  ]
+                  , "details":
+                  [
+                    {
+                      "type":"table"
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"2 total ports/bank\n0 read ports/bank\n1 write ports/bank"
+                        }
+                      ]
+                      , "Total number of ports per bank":"2"
+                      , "Number of read ports per bank":"0"
+                      , "Number of write ports per bank":"1"
+                      , "Number of shared ports per bank":"1"
+                      , "Total replication":"1"
+                    }
+                  ]
+                }
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"3328 bytes"
+                  , "Implemented size":"4096 bytes"
+                  , "Number of banks":"2"
+                  , "Bank width":"2048 bits"
+                  , "Bank depth":"8 words"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"memsys"
+              , "id":85
+              , "name":"masks._M_elems"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":215
+                  }
+                ]
+              ]
+              , "children":
+              [
+                {
+                  "type":"bank"
+                  , "id":86
+                  , "name":"Bank 0"
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"kernel.cpp"
+                        , "line":215
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "type":"port"
+                      , "id":87
+                      , "name":"R"
+                    }
+                    , {
+                      "type":"port"
+                      , "id":88
+                      , "name":"W"
+                    }
+                  ]
+                  , "details":
+                  [
+                    {
+                      "type":"table"
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"2 total ports/bank\n1 read ports/bank\n1 write ports/bank"
+                        }
+                      ]
+                      , "Total number of ports per bank":"2"
+                      , "Number of read ports per bank":"1"
+                      , "Number of write ports per bank":"1"
+                      , "Total replication":"1"
+                    }
+                  ]
+                }
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"1024 bytes"
+                  , "Implemented size":"1024 bytes"
+                  , "Number of banks":"1"
+                  , "Bank width":"8192 bits"
+                  , "Bank depth":"1 word"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"memsys"
+              , "id":89
+              , "name":"workingData"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":247
+                  }
+                ]
+              ]
+              , "children":
+              [
+                {
+                  "type":"bank"
+                  , "id":90
+                  , "name":"Bank 0"
+                  , "debug":
+                  [
+                    [
+                      {
+                        "filename":"kernel.cpp"
+                        , "line":247
+                      }
+                    ]
+                  ]
+                  , "children":
+                  [
+                    {
+                      "type":"port"
+                      , "id":91
+                      , "name":"R"
+                    }
+                    , {
+                      "type":"port"
+                      , "id":92
+                      , "name":"W"
+                    }
+                  ]
+                  , "details":
+                  [
+                    {
+                      "type":"table"
+                      , "details":
+                      [
+                        {
+                          "type":"brief"
+                          , "text":"2 total ports/bank\n1 read ports/bank\n1 write ports/bank"
+                        }
+                      ]
+                      , "Total number of ports per bank":"2"
+                      , "Number of read ports per bank":"1"
+                      , "Number of write ports per bank":"1"
+                      , "Total replication":"6"
+                    }
+                  ]
+                }
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"1024 bytes"
+                  , "Implemented size":"1024 bytes"
+                  , "Number of banks":"1"
+                  , "Bank width":"8192 bits"
+                  , "Bank depth":"1 word"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"6"
+                  , "Additional Information":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"For each replicate, 6 private copies were created to enable simultaneous execution of 6 loop iterations defined at  (%L)"
+                      , "links":
+                      [
+                        {
+                          "filename":"kernel.cpp"
+                          , "line":"236"
+                        }
+                      ]
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"You can reduce the number of copies of this memory by limiting the concurrency of its loop; see the OpenCL Programming Guide for details."
+                    }
+                  ]
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":67
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":69
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":71
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":73
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":78
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":80
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":82
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+        , {
+          "type":"arb"
+          , "id":84
+          , "name":"SHARE"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Additional Information":"Mutually exclusive accesses, no stalls"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  , "links":
+  [
+    {
+      "from":67
+      , "to":35
+    }
+    , {
+      "from":67
+      , "to":30
+    }
+    , {
+      "from":20
+      , "to":67
+    }
+    , {
+      "from":67
+      , "to":66
+    }
+    , {
+      "from":66
+      , "to":67
+    }
+    , {
+      "from":69
+      , "to":35
+    }
+    , {
+      "from":69
+      , "to":30
+    }
+    , {
+      "from":22
+      , "to":69
+    }
+    , {
+      "from":69
+      , "to":68
+    }
+    , {
+      "from":68
+      , "to":69
+    }
+    , {
+      "from":16
+      , "to":71
+    }
+    , {
+      "from":39
+      , "to":71
+    }
+    , {
+      "from":32
+      , "to":71
+    }
+    , {
+      "from":71
+      , "to":70
+    }
+    , {
+      "from":18
+      , "to":73
+    }
+    , {
+      "from":32
+      , "to":73
+    }
+    , {
+      "from":73
+      , "to":72
+    }
+    , {
+      "from":78
+      , "to":36
+    }
+    , {
+      "from":78
+      , "to":33
+    }
+    , {
+      "from":21
+      , "to":78
+    }
+    , {
+      "from":78
+      , "to":77
+    }
+    , {
+      "from":77
+      , "to":78
+    }
+    , {
+      "from":80
+      , "to":36
+    }
+    , {
+      "from":80
+      , "to":33
+    }
+    , {
+      "from":23
+      , "to":80
+    }
+    , {
+      "from":80
+      , "to":79
+    }
+    , {
+      "from":79
+      , "to":80
+    }
+    , {
+      "from":17
+      , "to":82
+    }
+    , {
+      "from":40
+      , "to":82
+    }
+    , {
+      "from":34
+      , "to":82
+    }
+    , {
+      "from":82
+      , "to":81
+    }
+    , {
+      "from":19
+      , "to":84
+    }
+    , {
+      "from":34
+      , "to":84
+    }
+    , {
+      "from":84
+      , "to":83
+    }
+    , {
+      "from":87
+      , "to":31
+    }
+    , {
+      "from":41
+      , "to":88
+    }
+    , {
+      "from":91
+      , "to":29
+    }
+    , {
+      "from":28
+      , "to":92
+    }
+  ]
+}

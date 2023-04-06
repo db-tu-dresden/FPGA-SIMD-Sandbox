@@ -1,0 +1,2274 @@
+{
+  "nodes":
+  [
+    {
+      "type":"kernel"
+      , "id":2
+      , "name":"kernelV4"
+      , "children":
+      [
+        {
+          "type":"bb"
+          , "id":3
+          , "name":"kernelV4.B0"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"2"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":4
+          , "name":"kernelV4.B1"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":16
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":171
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hash_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":17
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":172
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"count_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":18
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":171
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hash_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":19
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":172
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"count_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":20
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":171
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hash_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":21
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":172
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"count_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":22
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":171
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hash_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":23
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":172
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"2048 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"count_map"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":42
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":164
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"43"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":43
+              , "name":"Loop End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"13"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"13"
+              , "II":"1"
+              , "Subloops":"No"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":""
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":5
+          , "name":"kernelV4.B2"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"0"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":6
+          , "name":"kernelV4.B3"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":24
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":547
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"9"
+                  , "Latency":"839"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":25
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":547
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"9"
+                  , "Latency":"839"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":26
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":547
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"9"
+                  , "Latency":"839"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":27
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":547
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"9"
+                  , "Latency":"839"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":28
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":247
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"8192 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"workingData"
+                  , "Start Cycle":"850"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":44
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":236
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"7"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":45
+              , "name":"End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"855"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"855"
+              , "II":"2"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Entry to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":7
+          , "name":"kernelV4.B4"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"0"
+              , "II":"2"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Exit which branches back to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":8
+          , "name":"kernelV4.B5"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":29
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":259
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"workingData"
+                  , "Start Cycle":"4"
+                  , "Latency":"4"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":46
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":257
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"9"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":47
+              , "name":"End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"14"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"14"
+              , "II":"2"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Entry to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":9
+          , "name":"kernelV4.B6"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"6"
+              , "II":"2"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Exit which branches back to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":10
+          , "name":"kernelV4.B7"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"19"
+              , "II":"1"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Entry to loop. "
+              , "Loops To":"12"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":11
+          , "name":"kernelV4.B8"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":30
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":413
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hash_map"
+                  , "Start Cycle":"5"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":31
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":478
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"masks._M_elems"
+                  , "Start Cycle":"6"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":32
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":289
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hash_map"
+                  , "Start Cycle":"7"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":33
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":481
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"count_map"
+                  , "Start Cycle":"9"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":34
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":291
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"count_map"
+                  , "Start Cycle":"11"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":48
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":""
+                    , "line":0
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"49"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":49
+              , "name":"Loop End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"16"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"16"
+              , "II":"3"
+              , "Subloops":"No"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Loop is pipelined with II of 3. See Loops Analysis for more information."
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":12
+          , "name":"kernelV4.B9"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"0"
+              , "II":"1"
+              , "Subloops":"Yes"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":"Exit which branches back to loop. "
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":13
+          , "name":"kernelV4.B10"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":35
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":502
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"hash_map"
+                  , "Start Cycle":"4"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":36
+              , "name":"Load"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":502
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Loads from":"count_map"
+                  , "Start Cycle":"4"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":37
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":502
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"10"
+                  , "Latency":"2"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":38
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/./../primitives/primitives.hpp"
+                    , "line":502
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Burst-coalesced non-aligned"
+                  , "Stall-free":"No"
+                  , "Start Cycle":"10"
+                  , "Latency":"2"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":50
+              , "name":"Loop Input"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":313
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                  , "Loops To":"51"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":51
+              , "name":"Loop End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"12"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"12"
+              , "II":"1"
+              , "Subloops":"No"
+              , "Pipelined":"Yes"
+              , "Fmax Bottlenecks":"No"
+              , "Loop Info":""
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":14
+          , "name":"kernelV4.B11"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"0"
+            }
+          ]
+        }
+        , {
+          "type":"bb"
+          , "id":15
+          , "name":"kernelV4.B12"
+          , "children":
+          [
+            {
+              "type":"inst"
+              , "id":39
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":199
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"hash_map"
+                  , "Start Cycle":"3"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":40
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":200
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"512 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"count_map"
+                  , "Start Cycle":"3"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":41
+              , "name":"Store"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":216
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Width":"8192 bits"
+                  , "Type":"Pipelined never-stall"
+                  , "Stall-free":"Yes"
+                  , "Stores to":"masks._M_elems"
+                  , "Start Cycle":"1"
+                  , "Latency":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Load-Store Units"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/yeo1491314105959.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":52
+              , "name":"Begin"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"0"
+                  , "Latency":"1"
+                }
+              ]
+            }
+            , {
+              "type":"inst"
+              , "id":53
+              , "name":"End"
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Start Cycle":"8"
+                  , "Latency":"1"
+                }
+              ]
+            }
+          ]
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Latency":"8"
+            }
+          ]
+        }
+        , {
+          "type":"csr"
+          , "id":54
+          , "name":"Register Map"
+          , "debug":
+          [
+            [
+              {
+                "filename":"main.prj/ZTS8kernelV4_csr.hpp"
+                , "line":1
+              }
+            ]
+          ]
+          , "children":
+          [
+            {
+              "type":"interface"
+              , "id":55
+              , "name":"start"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":129
+                  }
+                ]
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":56
+              , "name":"done"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":129
+                  }
+                ]
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":57
+              , "name":"busy"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":129
+                  }
+                ]
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":58
+              , "name":"arg_arr_d"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":129
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV4"
+                }
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":59
+              , "name":"arg_hashVec_d"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":129
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV4"
+                }
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":60
+              , "name":"arg_countVec_d"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":129
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV4"
+                }
+              ]
+            }
+            , {
+              "type":"interface"
+              , "id":61
+              , "name":"arg_iterations"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v4/kernel.cpp"
+                    , "line":129
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Stable":"No"
+                  , "Width":"64 bits"
+                  , "Kernel":"ZTS8kernelV4"
+                }
+              ]
+            }
+          ]
+        }
+        , {
+          "type":"memtype"
+          , "id":62
+          , "name":"On-chip Memory"
+          , "children":
+          [
+            {
+              "type":"memsys"
+              , "id":63
+              , "name":"hash_map"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":159
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"3328 bytes"
+                  , "Implemented size":"4096 bytes"
+                  , "Number of banks":"2"
+                  , "Bank width":"2048 bits"
+                  , "Bank depth":"8 words"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"memsys"
+              , "id":74
+              , "name":"count_map"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":160
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"3328 bytes"
+                  , "Implemented size":"4096 bytes"
+                  , "Number of banks":"2"
+                  , "Bank width":"2048 bits"
+                  , "Bank depth":"8 words"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"memsys"
+              , "id":85
+              , "name":"masks._M_elems"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":215
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"1024 bytes"
+                  , "Implemented size":"1024 bytes"
+                  , "Number of banks":"1"
+                  , "Bank width":"8192 bits"
+                  , "Bank depth":"1 word"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"1"
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            , {
+              "type":"memsys"
+              , "id":89
+              , "name":"workingData"
+              , "debug":
+              [
+                [
+                  {
+                    "filename":"kernel.cpp"
+                    , "line":247
+                  }
+                ]
+              ]
+              , "details":
+              [
+                {
+                  "type":"table"
+                  , "Requested size":"1024 bytes"
+                  , "Implemented size":"1024 bytes"
+                  , "Number of banks":"1"
+                  , "Bank width":"8192 bits"
+                  , "Bank depth":"1 word"
+                  , "Number of replicates":"1"
+                  , "Number of private copies":"6"
+                  , "Additional Information":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"For each replicate, 6 private copies were created to enable simultaneous execution of 6 loop iterations defined at  (%L)"
+                      , "links":
+                      [
+                        {
+                          "filename":"kernel.cpp"
+                          , "line":"236"
+                        }
+                      ]
+                    }
+                    , {
+                      "type":"text"
+                      , "text":"You can reduce the number of copies of this memory by limiting the concurrency of its loop; see the OpenCL Programming Guide for details."
+                    }
+                  ]
+                  , "Reference":
+                  [
+                    {
+                      "type":"text"
+                      , "text":"See %L for more information"
+                      , "links":
+                      [
+                        {
+                          "guide":"Best Practices Guide : Local Memory"
+                          , "link":"file:////glob/development-tools/versions/oneapi/2023.0.1/oneapi/compiler/2023.0.0/linux/lib/oclfpga/aoc_help_pages/chn1469549457114.html"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    , {
+      "type":"memtype"
+      , "id":1
+      , "name":"Global Memory"
+      , "children":
+      [
+        {
+          "type":"memsys"
+          , "id":93
+          , "name":"device"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Number of banks":"4"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  , "links":
+  [
+    {
+      "from":55
+      , "to":3
+    }
+    , {
+      "from":14
+      , "to":56
+    }
+    , {
+      "from":3
+      , "to":57
+      , "reverse":2
+    }
+    , {
+      "from":58
+      , "to":44
+    }
+    , {
+      "from":59
+      , "to":50
+    }
+    , {
+      "from":60
+      , "to":50
+    }
+    , {
+      "from":61
+      , "to":52
+    }
+    , {
+      "from":63
+      , "to":35
+    }
+    , {
+      "from":63
+      , "to":30
+    }
+    , {
+      "from":20
+      , "to":63
+    }
+    , {
+      "from":22
+      , "to":63
+    }
+    , {
+      "from":16
+      , "to":63
+    }
+    , {
+      "from":39
+      , "to":63
+    }
+    , {
+      "from":32
+      , "to":63
+    }
+    , {
+      "from":18
+      , "to":63
+    }
+    , {
+      "from":74
+      , "to":36
+    }
+    , {
+      "from":74
+      , "to":33
+    }
+    , {
+      "from":21
+      , "to":74
+    }
+    , {
+      "from":23
+      , "to":74
+    }
+    , {
+      "from":17
+      , "to":74
+    }
+    , {
+      "from":40
+      , "to":74
+    }
+    , {
+      "from":34
+      , "to":74
+    }
+    , {
+      "from":19
+      , "to":74
+    }
+    , {
+      "from":85
+      , "to":31
+    }
+    , {
+      "from":41
+      , "to":85
+    }
+    , {
+      "from":89
+      , "to":29
+    }
+    , {
+      "from":28
+      , "to":89
+    }
+    , {
+      "from":43
+      , "to":42
+    }
+    , {
+      "from":3
+      , "to":42
+    }
+    , {
+      "from":16
+      , "to":43
+    }
+    , {
+      "from":17
+      , "to":43
+    }
+    , {
+      "from":18
+      , "to":43
+    }
+    , {
+      "from":19
+      , "to":43
+    }
+    , {
+      "from":20
+      , "to":43
+    }
+    , {
+      "from":21
+      , "to":43
+    }
+    , {
+      "from":22
+      , "to":43
+    }
+    , {
+      "from":23
+      , "to":43
+    }
+    , {
+      "from":7
+      , "to":5
+    }
+    , {
+      "from":7
+      , "to":44
+    }
+    , {
+      "from":53
+      , "to":44
+    }
+    , {
+      "from":24
+      , "to":45
+    }
+    , {
+      "from":25
+      , "to":45
+    }
+    , {
+      "from":26
+      , "to":45
+    }
+    , {
+      "from":27
+      , "to":45
+    }
+    , {
+      "from":28
+      , "to":45
+    }
+    , {
+      "from":9
+      , "to":7
+    }
+    , {
+      "from":9
+      , "to":46
+    }
+    , {
+      "from":45
+      , "to":46
+    }
+    , {
+      "from":29
+      , "to":47
+    }
+    , {
+      "from":12
+      , "to":9
+    }
+    , {
+      "from":12
+      , "to":10
+    }
+    , {
+      "from":47
+      , "to":10
+    }
+    , {
+      "from":49
+      , "to":48
+    }
+    , {
+      "from":10
+      , "to":48
+    }
+    , {
+      "from":32
+      , "to":49
+    }
+    , {
+      "from":34
+      , "to":49
+    }
+    , {
+      "from":49
+      , "to":12
+    }
+    , {
+      "from":51
+      , "to":50
+    }
+    , {
+      "from":5
+      , "to":50
+    }
+    , {
+      "from":35
+      , "to":51
+    }
+    , {
+      "from":36
+      , "to":51
+    }
+    , {
+      "from":37
+      , "to":51
+    }
+    , {
+      "from":38
+      , "to":51
+    }
+    , {
+      "from":51
+      , "to":14
+    }
+    , {
+      "from":43
+      , "to":52
+    }
+    , {
+      "from":39
+      , "to":53
+    }
+    , {
+      "from":40
+      , "to":53
+    }
+    , {
+      "from":41
+      , "to":53
+    }
+    , {
+      "from":42
+      , "to":16
+    }
+    , {
+      "from":42
+      , "to":17
+    }
+    , {
+      "from":42
+      , "to":18
+    }
+    , {
+      "from":42
+      , "to":19
+    }
+    , {
+      "from":42
+      , "to":20
+    }
+    , {
+      "from":42
+      , "to":21
+    }
+    , {
+      "from":42
+      , "to":22
+    }
+    , {
+      "from":42
+      , "to":23
+    }
+    , {
+      "from":44
+      , "to":24
+    }
+    , {
+      "from":44
+      , "to":25
+    }
+    , {
+      "from":44
+      , "to":26
+    }
+    , {
+      "from":44
+      , "to":27
+    }
+    , {
+      "from":24
+      , "to":28
+    }
+    , {
+      "from":25
+      , "to":28
+    }
+    , {
+      "from":26
+      , "to":28
+    }
+    , {
+      "from":27
+      , "to":28
+    }
+    , {
+      "from":46
+      , "to":29
+    }
+    , {
+      "from":48
+      , "to":30
+    }
+    , {
+      "from":30
+      , "to":31
+    }
+    , {
+      "from":30
+      , "to":32
+    }
+    , {
+      "from":31
+      , "to":32
+    }
+    , {
+      "from":30
+      , "to":33
+    }
+    , {
+      "from":31
+      , "to":33
+    }
+    , {
+      "from":30
+      , "to":34
+    }
+    , {
+      "from":33
+      , "to":34
+    }
+    , {
+      "from":31
+      , "to":34
+    }
+    , {
+      "from":50
+      , "to":35
+    }
+    , {
+      "from":50
+      , "to":36
+    }
+    , {
+      "from":35
+      , "to":37
+    }
+    , {
+      "from":36
+      , "to":37
+    }
+    , {
+      "from":35
+      , "to":38
+    }
+    , {
+      "from":36
+      , "to":38
+    }
+    , {
+      "from":52
+      , "to":39
+    }
+    , {
+      "from":52
+      , "to":40
+    }
+    , {
+      "from":52
+      , "to":41
+    }
+    , {
+      "from":93
+      , "to":24
+    }
+    , {
+      "from":93
+      , "to":25
+    }
+    , {
+      "from":93
+      , "to":26
+    }
+    , {
+      "from":93
+      , "to":27
+    }
+    , {
+      "from":37
+      , "to":93
+    }
+    , {
+      "from":38
+      , "to":93
+    }
+  ]
+}

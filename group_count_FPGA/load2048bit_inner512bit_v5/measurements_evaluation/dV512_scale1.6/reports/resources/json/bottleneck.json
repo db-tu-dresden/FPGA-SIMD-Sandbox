@@ -1,0 +1,2771 @@
+{
+  "bottlenecks":
+  [
+    {
+      "name":"'i'"
+      , "id":3691
+      , "src":"1136"
+      , "dst":"1314"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"16X Partially unrolled kernelV5.B1"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"'i'"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"154"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"154"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"'i'"
+          , "id":1136
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV5.B1"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":154
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1287
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":154
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1314
+          , "end":"4.00"
+          , "parent":"_ZTS8kernelV5.B1"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":154
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1136
+          , "to":1287
+        }
+        , {
+          "from":1287
+          , "to":1314
+        }
+        , {
+          "from":1136
+          , "to":1314
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"'i'"
+      , "id":3692
+      , "src":"2709"
+      , "dst":"2797"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"kernelV5.B7"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"'i'"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"241"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"432.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"241"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"241"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"227"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"'i'"
+          , "id":2709
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV5.B7"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":227
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":2710
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":227
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":2775
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":241
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":2776
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":241
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":2797
+          , "end":"5.00"
+          , "parent":"_ZTS8kernelV5.B7"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":241
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":2709
+          , "to":2710
+        }
+        , {
+          "from":2710
+          , "to":2776
+        }
+        , {
+          "from":2776
+          , "to":2797
+        }
+        , {
+          "from":2709
+          , "to":2797
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"countVec"
+      , "id":3693
+      , "src":"250"
+      , "dst":"975"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"kernelV5.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"countVec"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"151"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Trunc(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Trunc(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"countVec"
+          , "id":250
+          , "start":"31.00"
+          , "parent":"_ZTS8kernelV5.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":734
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Trunc"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Trunc"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":3111
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":3112
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":3113
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":3114
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":814
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":820
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":826
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":830
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":834
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":838
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":842
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":846
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":888
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":898
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":902
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":906
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":910
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":914
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":918
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":922
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":926
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":930
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":934
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":938
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":944
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":947
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":950
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":952
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":954
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":956
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":958
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":960
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":962
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":965
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":968
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":971
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":975
+          , "end":"274.00"
+          , "parent":"_ZTS8kernelV5.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":250
+          , "to":734
+        }
+        , {
+          "from":3111
+          , "to":3112
+        }
+        , {
+          "from":3112
+          , "to":3113
+        }
+        , {
+          "from":3113
+          , "to":3114
+        }
+        , {
+          "from":814
+          , "to":820
+        }
+        , {
+          "from":820
+          , "to":826
+        }
+        , {
+          "from":826
+          , "to":830
+        }
+        , {
+          "from":830
+          , "to":834
+        }
+        , {
+          "from":834
+          , "to":838
+        }
+        , {
+          "from":838
+          , "to":842
+        }
+        , {
+          "from":842
+          , "to":846
+        }
+        , {
+          "from":846
+          , "to":888
+        }
+        , {
+          "from":888
+          , "to":898
+        }
+        , {
+          "from":898
+          , "to":902
+        }
+        , {
+          "from":902
+          , "to":906
+        }
+        , {
+          "from":906
+          , "to":910
+        }
+        , {
+          "from":910
+          , "to":914
+        }
+        , {
+          "from":914
+          , "to":918
+        }
+        , {
+          "from":918
+          , "to":922
+        }
+        , {
+          "from":922
+          , "to":926
+        }
+        , {
+          "from":926
+          , "to":930
+        }
+        , {
+          "from":930
+          , "to":934
+        }
+        , {
+          "from":934
+          , "to":938
+        }
+        , {
+          "from":938
+          , "to":944
+        }
+        , {
+          "from":944
+          , "to":947
+        }
+        , {
+          "from":947
+          , "to":950
+        }
+        , {
+          "from":950
+          , "to":952
+        }
+        , {
+          "from":952
+          , "to":954
+        }
+        , {
+          "from":954
+          , "to":956
+        }
+        , {
+          "from":956
+          , "to":958
+        }
+        , {
+          "from":958
+          , "to":960
+        }
+        , {
+          "from":960
+          , "to":962
+        }
+        , {
+          "from":962
+          , "to":965
+        }
+        , {
+          "from":965
+          , "to":968
+        }
+        , {
+          "from":968
+          , "to":971
+        }
+        , {
+          "from":971
+          , "to":975
+        }
+        , {
+          "from":250
+          , "to":975
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"hashVec"
+      , "id":3694
+      , "src":"249"
+      , "dst":"974"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"kernelV5.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"hashVec"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"150"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"744"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                  , "line":"798"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"hashVec"
+          , "id":249
+          , "start":"15.00"
+          , "parent":"_ZTS8kernelV5.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":532
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":533
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":531
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":534
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":535
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":536
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":537
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":538
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":546
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":542
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":543
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":544
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":545
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":539
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":540
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":541
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":744
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":970
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":974
+          , "end":"172.00"
+          , "parent":"_ZTS8kernelV5.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/./../primitives/primitives.hpp"
+                , "line":798
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":249
+          , "to":532
+        }
+        , {
+          "from":249
+          , "to":533
+        }
+        , {
+          "from":249
+          , "to":531
+        }
+        , {
+          "from":249
+          , "to":534
+        }
+        , {
+          "from":249
+          , "to":535
+        }
+        , {
+          "from":249
+          , "to":536
+        }
+        , {
+          "from":249
+          , "to":537
+        }
+        , {
+          "from":249
+          , "to":538
+        }
+        , {
+          "from":249
+          , "to":546
+        }
+        , {
+          "from":249
+          , "to":542
+        }
+        , {
+          "from":249
+          , "to":543
+        }
+        , {
+          "from":249
+          , "to":544
+        }
+        , {
+          "from":249
+          , "to":545
+        }
+        , {
+          "from":249
+          , "to":539
+        }
+        , {
+          "from":249
+          , "to":540
+        }
+        , {
+          "from":249
+          , "to":541
+        }
+        , {
+          "from":532
+          , "to":970
+        }
+        , {
+          "from":533
+          , "to":970
+        }
+        , {
+          "from":531
+          , "to":970
+        }
+        , {
+          "from":534
+          , "to":970
+        }
+        , {
+          "from":535
+          , "to":970
+        }
+        , {
+          "from":536
+          , "to":970
+        }
+        , {
+          "from":537
+          , "to":970
+        }
+        , {
+          "from":538
+          , "to":970
+        }
+        , {
+          "from":546
+          , "to":970
+        }
+        , {
+          "from":542
+          , "to":970
+        }
+        , {
+          "from":543
+          , "to":970
+        }
+        , {
+          "from":544
+          , "to":970
+        }
+        , {
+          "from":545
+          , "to":970
+        }
+        , {
+          "from":539
+          , "to":970
+        }
+        , {
+          "from":540
+          , "to":970
+        }
+        , {
+          "from":541
+          , "to":970
+        }
+        , {
+          "from":970
+          , "to":974
+        }
+        , {
+          "from":249
+          , "to":974
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":3695
+      , "src":"984"
+      , "dst":"1098"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV5.B9"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"368"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"369"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"368"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"368"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"369"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"369"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":984
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":3479
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":3482
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1092
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1093
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1094
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1096
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1098
+          , "end":"246.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1092
+          , "to":1094
+        }
+        , {
+          "from":1093
+          , "to":1096
+        }
+        , {
+          "from":1094
+          , "to":1098
+        }
+        , {
+          "from":984
+          , "to":1098
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":3696
+      , "src":"983"
+      , "dst":"1099"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV5.B9"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"368"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"368"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":983
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1092
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1095
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1099
+          , "end":"239.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":368
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1092
+          , "to":1095
+        }
+        , {
+          "from":983
+          , "to":1092
+        }
+        , {
+          "from":1095
+          , "to":1099
+        }
+        , {
+          "from":983
+          , "to":1099
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":3697
+      , "src":"986"
+      , "dst":"1100"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV5.B9"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"369"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"369"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":986
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1093
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1096
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1100
+          , "end":"246.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1093
+          , "to":1096
+        }
+        , {
+          "from":986
+          , "to":1093
+        }
+        , {
+          "from":1096
+          , "to":1100
+        }
+        , {
+          "from":986
+          , "to":1100
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":3698
+      , "src":"985"
+      , "dst":"1101"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV5.B9"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"369"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                  , "line":"369"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":985
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1093
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1097
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1101
+          , "end":"239.00"
+          , "parent":"_ZTS8kernelV5.B9"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v5/kernel.cpp"
+                , "line":369
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1093
+          , "to":1097
+        }
+        , {
+          "from":985
+          , "to":1093
+        }
+        , {
+          "from":1097
+          , "to":1101
+        }
+        , {
+          "from":985
+          , "to":1101
+          , "reverse":1
+        }
+      ]
+    }
+  ]
+}

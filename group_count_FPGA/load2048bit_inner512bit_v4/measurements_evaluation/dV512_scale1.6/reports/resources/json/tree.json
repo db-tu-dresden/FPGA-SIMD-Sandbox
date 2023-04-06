@@ -1,0 +1,150 @@
+{
+  "nodes":
+  [
+    {
+      "name":"kernelV4"
+      , "id":1
+      , "type":"kernel"
+      , "children":
+      [
+        {
+          "name":"kernelV4.B0"
+          , "id":2
+          , "type":"bb"
+        }
+        , {
+          "name":"16X Partially unrolled kernelV4.B1"
+          , "id":3
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 0"
+              , "id":16
+              , "type":"cluster"
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B2"
+          , "id":4
+          , "type":"bb"
+        }
+        , {
+          "name":"kernelV4.B3"
+          , "id":5
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 1"
+              , "id":17
+              , "type":"cluster"
+            }
+            , {
+              "name":"Cluster 2"
+              , "id":23
+              , "type":"cluster"
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B4"
+          , "id":6
+          , "type":"bb"
+        }
+        , {
+          "name":"kernelV4.B5"
+          , "id":7
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 3"
+              , "id":29
+              , "type":"cluster"
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B6"
+          , "id":8
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 4"
+              , "id":34
+              , "type":"cluster"
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B7"
+          , "id":9
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 5"
+              , "id":48
+              , "type":"cluster"
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B8"
+          , "id":10
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 6"
+              , "id":76
+              , "type":"cluster"
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B9"
+          , "id":11
+          , "type":"bb"
+        }
+        , {
+          "name":"kernelV4.B10"
+          , "id":12
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 7"
+              , "id":81
+              , "type":"cluster"
+            }
+          ]
+        }
+        , {
+          "name":"kernelV4.B11"
+          , "id":13
+          , "type":"bb"
+        }
+        , {
+          "name":"kernelV4.B12"
+          , "id":14
+          , "type":"bb"
+          , "children":
+          [
+            {
+              "name":"Cluster 8"
+              , "id":85
+              , "type":"cluster"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  , "links":
+  [
+  ]
+}

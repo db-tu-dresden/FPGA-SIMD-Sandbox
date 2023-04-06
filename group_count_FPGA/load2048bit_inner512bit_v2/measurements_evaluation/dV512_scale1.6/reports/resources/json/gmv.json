@@ -1,0 +1,700 @@
+{
+  "nodes":
+  [
+    {
+      "name":"device"
+      , "id":1635
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Interleaving":"Yes"
+          , "Interleave Size":"4096 bytes"
+          , "Channels":"4 channels"
+          , "Maximum bandwidth the BSP can deliver":"76800.00 MB/s<br><small><i> Note: Realistic maximum bandwidth is about 90% of the above due to loss from interconnect and memory controller.</i></small>"
+          , "Channel device Width (bits)":"512, 512, 512, 512"
+        }
+      ]
+      , "type":"memsys"
+      , "children":
+      [
+        {
+          "name":"device"
+          , "id":1637
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Data Width":"512"
+              , "Address Width":"33"
+              , "Latency":"1500"
+              , "ReadWrite Mode":"Read/Write"
+              , "Maximum Burst":"16"
+              , "Wait Request":"0"
+              , "Start Address":"0x1000000000000"
+            }
+          ]
+          , "type":"bb"
+        }
+        , {
+          "name":"device"
+          , "id":1638
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Data Width":"512"
+              , "Address Width":"33"
+              , "Latency":"1500"
+              , "ReadWrite Mode":"Read/Write"
+              , "Maximum Burst":"16"
+              , "Wait Request":"0"
+              , "Start Address":"0x1000200000000"
+            }
+          ]
+          , "type":"bb"
+        }
+        , {
+          "name":"device"
+          , "id":1639
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Data Width":"512"
+              , "Address Width":"33"
+              , "Latency":"1500"
+              , "ReadWrite Mode":"Read/Write"
+              , "Maximum Burst":"16"
+              , "Wait Request":"0"
+              , "Start Address":"0x1000400000000"
+            }
+          ]
+          , "type":"bb"
+        }
+        , {
+          "name":"device"
+          , "id":1640
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Data Width":"512"
+              , "Address Width":"33"
+              , "Latency":"1500"
+              , "ReadWrite Mode":"Read/Write"
+              , "Maximum Burst":"16"
+              , "Wait Request":"0"
+              , "Start Address":"0x1000600000000"
+            }
+          ]
+          , "type":"bb"
+        }
+      ]
+    }
+    , {
+      "name":"Memory Controller"
+      , "id":1636
+      , "parent":"1635"
+      , "bw":"76800.00"
+      , "num_channels":"4"
+      , "interleave":"1"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Maximum bandwidth the BSP can deliver":"76800.00 MB/s<br><small><i> Note: Realistic maximum bandwidth is about 90% of the above due to loss from interconnect and memory controller.</i></small>"
+        }
+      ]
+      , "type":"bb"
+    }
+    , {
+      "name":"Global Memory Interconnect"
+      , "id":1641
+      , "parent":"1635"
+      , "type":"bb"
+      , "children":
+      [
+        {
+          "name":"SHARE"
+          , "id":1642
+          , "type":"arb"
+        }
+        , {
+          "name":"Write Interconnect"
+          , "id":1645
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Name":"device"
+              , "Interconnect Style":"ring"
+              , "Writes":"6"
+              , "User specified force-single-store-ring flag":"False"
+              , "Store Rings":"4"
+            }
+          ]
+          , "type":"bb"
+        }
+        , {
+          "name":"Read Interconnect"
+          , "id":1643
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Name":"device"
+              , "Interconnect Style":"ring"
+              , "Reads":"4"
+            }
+          ]
+          , "type":"bb"
+        }
+        , {
+          "name":"Read Interconnect Router"
+          , "id":1644
+          , "details":
+          [
+            {
+              "type":"table"
+              , "User specified num-reorder flag":"Unset"
+            }
+          ]
+          , "type":"memsys"
+          , "children":
+          [
+            {
+              "name":"Bus 0"
+              , "id":1658
+              , "type":"memsys"
+            }
+            , {
+              "name":"Bus 1"
+              , "id":1659
+              , "type":"memsys"
+            }
+            , {
+              "name":"Bus 2"
+              , "id":1660
+              , "type":"memsys"
+            }
+            , {
+              "name":"Bus 3"
+              , "id":1661
+              , "type":"memsys"
+            }
+          ]
+        }
+      ]
+    }
+    , {
+      "name":"Global Memory Loads"
+      , "id":1646
+      , "parent":"1635"
+      , "type":"bb"
+      , "children":
+      [
+        {
+          "name":"LD"
+          , "id":1647
+          , "kwidth":"512"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"9"
+              , "Latency":"887 cycles"
+              , "Width":"512 bits"
+              , "device Width":"512 bits"
+              , "Uses Caching":"No"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":1648
+          , "kwidth":"512"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"9"
+              , "Latency":"887 cycles"
+              , "Width":"512 bits"
+              , "device Width":"512 bits"
+              , "Uses Caching":"No"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":1649
+          , "kwidth":"512"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"9"
+              , "Latency":"887 cycles"
+              , "Width":"512 bits"
+              , "device Width":"512 bits"
+              , "Uses Caching":"No"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":1650
+          , "kwidth":"512"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"9"
+              , "Latency":"887 cycles"
+              , "Width":"512 bits"
+              , "device Width":"512 bits"
+              , "Uses Caching":"No"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+    }
+    , {
+      "name":"Global Memory Stores"
+      , "id":1651
+      , "parent":"1635"
+      , "type":"bb"
+      , "children":
+      [
+        {
+          "name":"ST"
+          , "id":1652
+          , "kwidth":"32"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"17"
+              , "Latency":"42 cycles"
+              , "Width":"32 bits"
+              , "device Width":"512 bits"
+              , "Uses Write Ack":"Yes"
+              , "LSU Style":"BURST-COALESCED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/kernel.cpp"
+                , "line":320
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1653
+          , "kwidth":"32"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"17"
+              , "Latency":"42 cycles"
+              , "Width":"32 bits"
+              , "device Width":"512 bits"
+              , "Uses Write Ack":"Yes"
+              , "LSU Style":"BURST-COALESCED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/kernel.cpp"
+                , "line":321
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1654
+          , "kwidth":"64"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"59"
+              , "Latency":"186 cycles"
+              , "Width":"64 bits"
+              , "device Width":"512 bits"
+              , "Uses Write Ack":"Yes"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/kernel.cpp"
+                , "line":320
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1655
+          , "kwidth":"512"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"59"
+              , "Latency":"179 cycles"
+              , "Width":"512 bits"
+              , "device Width":"512 bits"
+              , "Uses Write Ack":"Yes"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/kernel.cpp"
+                , "line":320
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1656
+          , "kwidth":"64"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"59"
+              , "Latency":"186 cycles"
+              , "Width":"64 bits"
+              , "device Width":"512 bits"
+              , "Uses Write Ack":"Yes"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/kernel.cpp"
+                , "line":321
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1657
+          , "kwidth":"512"
+          , "mwidth":"512"
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Start Cycle":"59"
+              , "Latency":"179 cycles"
+              , "Width":"512 bits"
+              , "device Width":"512 bits"
+              , "Uses Write Ack":"Yes"
+              , "LSU Style":"BURST-NON-ALIGNED"
+              , "Kernel":"kernelV2"
+            }
+          ]
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_inner512bit_v2/kernel.cpp"
+                , "line":321
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+    }
+    , {
+      "name":"host"
+      , "id":1662
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Interleaving":"No"
+          , "Channels":"1 channel"
+          , "Maximum bandwidth the BSP can deliver":"30000.00 MB/s<br><small><i> Note: Realistic maximum bandwidth is about 90% of the above due to loss from interconnect and memory controller.</i></small>"
+          , "Channel host Width (bits)":"512"
+        }
+      ]
+      , "type":"memsys"
+      , "children":
+      [
+        {
+          "name":"host"
+          , "id":1664
+          , "details":
+          [
+            {
+              "type":"table"
+              , "Data Width":"512"
+              , "Address Width":"48"
+              , "Latency":"800"
+              , "ReadWrite Mode":"Read/Write"
+              , "Maximum Burst":"16"
+              , "Wait Request":"0"
+              , "Start Address":"0x0"
+            }
+          ]
+          , "type":"bb"
+        }
+      ]
+    }
+    , {
+      "name":"Memory Controller"
+      , "id":1663
+      , "parent":"1662"
+      , "bw":"30000.00"
+      , "num_channels":"1"
+      , "interleave":"0"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Maximum bandwidth the BSP can deliver":"30000.00 MB/s<br><small><i> Note: Realistic maximum bandwidth is about 90% of the above due to loss from interconnect and memory controller.</i></small>"
+        }
+      ]
+      , "type":"bb"
+    }
+    , {
+      "name":"Global Memory Interconnect"
+      , "id":1665
+      , "parent":"1662"
+      , "type":"bb"
+      , "children":
+      [
+        {
+          "name":"SHARE"
+          , "id":1666
+          , "type":"arb"
+        }
+      ]
+    }
+  ]
+  , "links":
+  [
+    {
+      "from":1637
+      , "to":1636
+    }
+    , {
+      "from":1636
+      , "to":1637
+    }
+    , {
+      "from":1638
+      , "to":1636
+    }
+    , {
+      "from":1636
+      , "to":1638
+    }
+    , {
+      "from":1639
+      , "to":1636
+    }
+    , {
+      "from":1636
+      , "to":1639
+    }
+    , {
+      "from":1640
+      , "to":1636
+    }
+    , {
+      "from":1636
+      , "to":1640
+    }
+    , {
+      "from":1643
+      , "to":1642
+    }
+    , {
+      "from":1645
+      , "to":1642
+    }
+    , {
+      "from":1642
+      , "to":1636
+    }
+    , {
+      "from":1647
+      , "to":1643
+    }
+    , {
+      "from":1648
+      , "to":1643
+    }
+    , {
+      "from":1649
+      , "to":1643
+    }
+    , {
+      "from":1650
+      , "to":1643
+    }
+    , {
+      "from":1652
+      , "to":1645
+    }
+    , {
+      "from":1653
+      , "to":1645
+    }
+    , {
+      "from":1654
+      , "to":1645
+    }
+    , {
+      "from":1655
+      , "to":1645
+    }
+    , {
+      "from":1656
+      , "to":1645
+    }
+    , {
+      "from":1657
+      , "to":1645
+    }
+    , {
+      "from":1636
+      , "to":1658
+    }
+    , {
+      "from":1636
+      , "to":1659
+    }
+    , {
+      "from":1636
+      , "to":1660
+    }
+    , {
+      "from":1636
+      , "to":1661
+    }
+    , {
+      "from":1658
+      , "to":1647
+      , "reverse":1
+    }
+    , {
+      "from":1659
+      , "to":1648
+      , "reverse":1
+    }
+    , {
+      "from":1660
+      , "to":1649
+      , "reverse":1
+    }
+    , {
+      "from":1661
+      , "to":1650
+      , "reverse":1
+    }
+    , {
+      "from":1664
+      , "to":1663
+    }
+    , {
+      "from":1663
+      , "to":1664
+    }
+    , {
+      "from":1666
+      , "to":1663
+    }
+  ]
+}

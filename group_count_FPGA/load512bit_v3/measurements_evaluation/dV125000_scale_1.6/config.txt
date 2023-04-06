@@ -17,7 +17,7 @@
 
 
 
-	#define distinctValues (uint64_t) 512
+	#define distinctValues (uint64_t) 125000
 
     #define multiplier (int) 16
     #define dataSize (uint64_t) (multiplier*10240000)               // 10240000*16 = 163840000 --> MOD 16 = 0; MOD 4096 = 0
