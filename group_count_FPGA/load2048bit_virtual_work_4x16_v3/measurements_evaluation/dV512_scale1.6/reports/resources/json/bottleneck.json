@@ -1,0 +1,5674 @@
+{
+  "bottlenecks":
+  [
+    {
+      "name":"'i'"
+      , "id":1944
+      , "src":"1458"
+      , "dst":"1636"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"16X Partially unrolled kernelV3.B1"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"'i'"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"151"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"151"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"'i'"
+          , "id":1458
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV3.B1"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":151
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1609
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":151
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1636
+          , "end":"4.00"
+          , "parent":"_ZTS8kernelV3.B1"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":151
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1458
+          , "to":1609
+        }
+        , {
+          "from":1609
+          , "to":1636
+        }
+        , {
+          "from":1458
+          , "to":1636
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Feedback"
+      , "id":1945
+      , "src":"1647"
+      , "dst":"1666"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"kernelV3.B3"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Loop: ":"_ZTS8kernelV3.B3"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Feedback"
+          , "id":1647
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV3.B3"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1648
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1650
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1668
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1669
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1666
+          , "end":"4.00"
+          , "parent":"_ZTS8kernelV3.B3"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1647
+          , "to":1648
+        }
+        , {
+          "from":1650
+          , "to":1650
+        }
+        , {
+          "from":1650
+          , "to":1668
+        }
+        , {
+          "from":1648
+          , "to":1666
+        }
+        , {
+          "from":1650
+          , "to":1666
+        }
+        , {
+          "from":1647
+          , "to":1666
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"'k'"
+      , "id":1946
+      , "src":"1694"
+      , "dst":"1734"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"kernelV3.B5"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"'k'"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"200"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"200"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"'k'"
+          , "id":1694
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV3.B5"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":200
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1733
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":200
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1734
+          , "end":"4.00"
+          , "parent":"_ZTS8kernelV3.B5"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":200
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1694
+          , "to":1733
+        }
+        , {
+          "from":1733
+          , "to":1734
+        }
+        , {
+          "from":1694
+          , "to":1734
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"hashVec"
+      , "id":1947
+      , "src":"199"
+      , "dst":"1319"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"kernelV3.B6"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"hashVec"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"147"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"And(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"302"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"221"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"495"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"278"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"278"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Zext(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"278"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Compare(%L)"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Ptr. Comp.(%L)"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"hashVec"
+          , "id":199
+          , "start":"2.00"
+          , "parent":"_ZTS8kernelV3.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":278
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":265
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Compare"
+          , "id":393
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":584
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":221
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":714
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":770
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":793
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":810
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":822
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":830
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":839
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":848
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":857
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":866
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":873
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":880
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":888
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":302
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":897
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":906
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":915
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":923
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":933
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":945
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":954
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":966
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":974
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":981
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":989
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":996
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1004
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1011
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1019
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1027
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1035
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1042
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1051
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1058
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1067
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1074
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1081
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1088
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1096
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1105
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1113
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1121
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1129
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1137
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1145
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1154
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1162
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1170
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1179
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1187
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1196
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1204
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1212
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1220
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1229
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1238
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1247
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1256
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1265
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1274
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1283
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"And"
+          , "id":1304
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1307
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1308
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1310
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1311
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1312
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1313
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":495
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1314
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":278
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Zext"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":278
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Ptr. Comp."
+          , "id":1315
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1317
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":278
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1319
+          , "end":"43.00"
+          , "parent":"_ZTS8kernelV3.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":278
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":199
+          , "to":265
+        }
+        , {
+          "from":265
+          , "to":393
+        }
+        , {
+          "from":393
+          , "to":584
+        }
+        , {
+          "from":584
+          , "to":714
+        }
+        , {
+          "from":714
+          , "to":770
+        }
+        , {
+          "from":770
+          , "to":793
+        }
+        , {
+          "from":793
+          , "to":810
+        }
+        , {
+          "from":810
+          , "to":822
+        }
+        , {
+          "from":822
+          , "to":830
+        }
+        , {
+          "from":830
+          , "to":839
+        }
+        , {
+          "from":839
+          , "to":848
+        }
+        , {
+          "from":848
+          , "to":857
+        }
+        , {
+          "from":857
+          , "to":866
+        }
+        , {
+          "from":866
+          , "to":873
+        }
+        , {
+          "from":873
+          , "to":880
+        }
+        , {
+          "from":880
+          , "to":888
+        }
+        , {
+          "from":888
+          , "to":897
+        }
+        , {
+          "from":897
+          , "to":906
+        }
+        , {
+          "from":906
+          , "to":915
+        }
+        , {
+          "from":915
+          , "to":923
+        }
+        , {
+          "from":923
+          , "to":933
+        }
+        , {
+          "from":933
+          , "to":945
+        }
+        , {
+          "from":945
+          , "to":954
+        }
+        , {
+          "from":954
+          , "to":966
+        }
+        , {
+          "from":966
+          , "to":974
+        }
+        , {
+          "from":974
+          , "to":981
+        }
+        , {
+          "from":981
+          , "to":989
+        }
+        , {
+          "from":989
+          , "to":996
+        }
+        , {
+          "from":996
+          , "to":1004
+        }
+        , {
+          "from":1004
+          , "to":1011
+        }
+        , {
+          "from":1011
+          , "to":1019
+        }
+        , {
+          "from":1019
+          , "to":1027
+        }
+        , {
+          "from":1027
+          , "to":1035
+        }
+        , {
+          "from":1035
+          , "to":1042
+        }
+        , {
+          "from":1042
+          , "to":1051
+        }
+        , {
+          "from":1051
+          , "to":1058
+        }
+        , {
+          "from":1058
+          , "to":1067
+        }
+        , {
+          "from":1067
+          , "to":1074
+        }
+        , {
+          "from":1074
+          , "to":1081
+        }
+        , {
+          "from":1081
+          , "to":1088
+        }
+        , {
+          "from":1088
+          , "to":1096
+        }
+        , {
+          "from":1096
+          , "to":1105
+        }
+        , {
+          "from":1105
+          , "to":1113
+        }
+        , {
+          "from":1113
+          , "to":1121
+        }
+        , {
+          "from":1121
+          , "to":1129
+        }
+        , {
+          "from":1129
+          , "to":1137
+        }
+        , {
+          "from":1137
+          , "to":1145
+        }
+        , {
+          "from":1145
+          , "to":1154
+        }
+        , {
+          "from":1154
+          , "to":1162
+        }
+        , {
+          "from":1162
+          , "to":1170
+        }
+        , {
+          "from":1170
+          , "to":1179
+        }
+        , {
+          "from":1179
+          , "to":1187
+        }
+        , {
+          "from":1187
+          , "to":1196
+        }
+        , {
+          "from":1196
+          , "to":1204
+        }
+        , {
+          "from":1204
+          , "to":1212
+        }
+        , {
+          "from":1212
+          , "to":1220
+        }
+        , {
+          "from":1220
+          , "to":1229
+        }
+        , {
+          "from":1229
+          , "to":1238
+        }
+        , {
+          "from":1238
+          , "to":1247
+        }
+        , {
+          "from":1247
+          , "to":1256
+        }
+        , {
+          "from":1256
+          , "to":1265
+        }
+        , {
+          "from":1265
+          , "to":1274
+        }
+        , {
+          "from":1274
+          , "to":1283
+        }
+        , {
+          "from":1283
+          , "to":1304
+        }
+        , {
+          "from":1304
+          , "to":1307
+        }
+        , {
+          "from":1307
+          , "to":1308
+        }
+        , {
+          "from":1308
+          , "to":1310
+        }
+        , {
+          "from":1310
+          , "to":1311
+        }
+        , {
+          "from":1311
+          , "to":1312
+        }
+        , {
+          "from":1312
+          , "to":1313
+        }
+        , {
+          "from":1313
+          , "to":1314
+        }
+        , {
+          "from":1314
+          , "to":1315
+        }
+        , {
+          "from":1315
+          , "to":1317
+        }
+        , {
+          "from":1317
+          , "to":1319
+        }
+        , {
+          "from":199
+          , "to":1319
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"countVec"
+      , "id":1948
+      , "src":"200"
+      , "dst":"1318"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"kernelV3.B6"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"countVec"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"148"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"434"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"595"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"595"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"595"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                  , "line":"595"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"279"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"279"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"countVec"
+          , "id":200
+          , "start":"34.00"
+          , "parent":"_ZTS8kernelV3.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":279
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":1775
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":279
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":344
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":345
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":346
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":347
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":265
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":329
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1777
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":279
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":381
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":382
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":383
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":384
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":385
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":386
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":333
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":334
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":335
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":340
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":341
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":342
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":343
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":375
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":376
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":377
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":378
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":379
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":380
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":352
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":353
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":354
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":355
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":387
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":388
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":389
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":390
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":391
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":360
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":361
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":362
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":363
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":364
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":365
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":366
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":367
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":368
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":336
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":337
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":338
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":339
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":369
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":370
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":371
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":372
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":373
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":374
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":348
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":349
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":350
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":351
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":19
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":595
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":20
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":595
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":17
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":595
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":18
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":595
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":356
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":357
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":358
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":359
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":330
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":331
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":332
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/./../primitives/primitives_virtual_work_4x16.hpp"
+                , "line":434
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1318
+          , "end":"43.00"
+          , "parent":"_ZTS8kernelV3.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":279
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":200
+          , "to":1775
+        }
+        , {
+          "from":1775
+          , "to":344
+        }
+        , {
+          "from":1775
+          , "to":345
+        }
+        , {
+          "from":1775
+          , "to":346
+        }
+        , {
+          "from":1775
+          , "to":347
+        }
+        , {
+          "from":1775
+          , "to":265
+        }
+        , {
+          "from":1775
+          , "to":329
+        }
+        , {
+          "from":1775
+          , "to":1777
+        }
+        , {
+          "from":1775
+          , "to":381
+        }
+        , {
+          "from":1775
+          , "to":382
+        }
+        , {
+          "from":1775
+          , "to":383
+        }
+        , {
+          "from":1775
+          , "to":384
+        }
+        , {
+          "from":1775
+          , "to":385
+        }
+        , {
+          "from":1775
+          , "to":386
+        }
+        , {
+          "from":1775
+          , "to":333
+        }
+        , {
+          "from":1775
+          , "to":334
+        }
+        , {
+          "from":1775
+          , "to":335
+        }
+        , {
+          "from":1775
+          , "to":340
+        }
+        , {
+          "from":1775
+          , "to":341
+        }
+        , {
+          "from":1775
+          , "to":342
+        }
+        , {
+          "from":1775
+          , "to":343
+        }
+        , {
+          "from":1775
+          , "to":375
+        }
+        , {
+          "from":1775
+          , "to":376
+        }
+        , {
+          "from":1775
+          , "to":377
+        }
+        , {
+          "from":1775
+          , "to":378
+        }
+        , {
+          "from":1775
+          , "to":379
+        }
+        , {
+          "from":1775
+          , "to":380
+        }
+        , {
+          "from":1775
+          , "to":352
+        }
+        , {
+          "from":1775
+          , "to":353
+        }
+        , {
+          "from":1775
+          , "to":354
+        }
+        , {
+          "from":1775
+          , "to":355
+        }
+        , {
+          "from":1775
+          , "to":387
+        }
+        , {
+          "from":1775
+          , "to":388
+        }
+        , {
+          "from":1775
+          , "to":389
+        }
+        , {
+          "from":1775
+          , "to":390
+        }
+        , {
+          "from":1775
+          , "to":391
+        }
+        , {
+          "from":1775
+          , "to":360
+        }
+        , {
+          "from":1775
+          , "to":361
+        }
+        , {
+          "from":1775
+          , "to":362
+        }
+        , {
+          "from":1775
+          , "to":363
+        }
+        , {
+          "from":1775
+          , "to":364
+        }
+        , {
+          "from":1775
+          , "to":365
+        }
+        , {
+          "from":1775
+          , "to":366
+        }
+        , {
+          "from":1775
+          , "to":367
+        }
+        , {
+          "from":1775
+          , "to":368
+        }
+        , {
+          "from":1775
+          , "to":336
+        }
+        , {
+          "from":1775
+          , "to":337
+        }
+        , {
+          "from":1775
+          , "to":338
+        }
+        , {
+          "from":1775
+          , "to":339
+        }
+        , {
+          "from":1775
+          , "to":369
+        }
+        , {
+          "from":1775
+          , "to":370
+        }
+        , {
+          "from":1775
+          , "to":371
+        }
+        , {
+          "from":1775
+          , "to":372
+        }
+        , {
+          "from":1775
+          , "to":373
+        }
+        , {
+          "from":1775
+          , "to":374
+        }
+        , {
+          "from":1775
+          , "to":348
+        }
+        , {
+          "from":1775
+          , "to":349
+        }
+        , {
+          "from":1775
+          , "to":350
+        }
+        , {
+          "from":1775
+          , "to":351
+        }
+        , {
+          "from":1775
+          , "to":19
+        }
+        , {
+          "from":1775
+          , "to":20
+        }
+        , {
+          "from":1775
+          , "to":17
+        }
+        , {
+          "from":1775
+          , "to":18
+        }
+        , {
+          "from":1775
+          , "to":356
+        }
+        , {
+          "from":1775
+          , "to":357
+        }
+        , {
+          "from":1775
+          , "to":358
+        }
+        , {
+          "from":1775
+          , "to":359
+        }
+        , {
+          "from":1775
+          , "to":330
+        }
+        , {
+          "from":1775
+          , "to":331
+        }
+        , {
+          "from":1775
+          , "to":332
+        }
+        , {
+          "from":344
+          , "to":1318
+        }
+        , {
+          "from":345
+          , "to":1318
+        }
+        , {
+          "from":346
+          , "to":1318
+        }
+        , {
+          "from":347
+          , "to":1318
+        }
+        , {
+          "from":265
+          , "to":1318
+        }
+        , {
+          "from":329
+          , "to":1318
+        }
+        , {
+          "from":1777
+          , "to":1318
+        }
+        , {
+          "from":381
+          , "to":1318
+        }
+        , {
+          "from":382
+          , "to":1318
+        }
+        , {
+          "from":383
+          , "to":1318
+        }
+        , {
+          "from":384
+          , "to":1318
+        }
+        , {
+          "from":385
+          , "to":1318
+        }
+        , {
+          "from":386
+          , "to":1318
+        }
+        , {
+          "from":333
+          , "to":1318
+        }
+        , {
+          "from":334
+          , "to":1318
+        }
+        , {
+          "from":335
+          , "to":1318
+        }
+        , {
+          "from":340
+          , "to":1318
+        }
+        , {
+          "from":341
+          , "to":1318
+        }
+        , {
+          "from":342
+          , "to":1318
+        }
+        , {
+          "from":343
+          , "to":1318
+        }
+        , {
+          "from":375
+          , "to":1318
+        }
+        , {
+          "from":376
+          , "to":1318
+        }
+        , {
+          "from":377
+          , "to":1318
+        }
+        , {
+          "from":378
+          , "to":1318
+        }
+        , {
+          "from":379
+          , "to":1318
+        }
+        , {
+          "from":380
+          , "to":1318
+        }
+        , {
+          "from":352
+          , "to":1318
+        }
+        , {
+          "from":353
+          , "to":1318
+        }
+        , {
+          "from":354
+          , "to":1318
+        }
+        , {
+          "from":355
+          , "to":1318
+        }
+        , {
+          "from":387
+          , "to":1318
+        }
+        , {
+          "from":388
+          , "to":1318
+        }
+        , {
+          "from":389
+          , "to":1318
+        }
+        , {
+          "from":390
+          , "to":1318
+        }
+        , {
+          "from":391
+          , "to":1318
+        }
+        , {
+          "from":360
+          , "to":1318
+        }
+        , {
+          "from":361
+          , "to":1318
+        }
+        , {
+          "from":362
+          , "to":1318
+        }
+        , {
+          "from":363
+          , "to":1318
+        }
+        , {
+          "from":364
+          , "to":1318
+        }
+        , {
+          "from":365
+          , "to":1318
+        }
+        , {
+          "from":366
+          , "to":1318
+        }
+        , {
+          "from":367
+          , "to":1318
+        }
+        , {
+          "from":368
+          , "to":1318
+        }
+        , {
+          "from":336
+          , "to":1318
+        }
+        , {
+          "from":337
+          , "to":1318
+        }
+        , {
+          "from":338
+          , "to":1318
+        }
+        , {
+          "from":339
+          , "to":1318
+        }
+        , {
+          "from":369
+          , "to":1318
+        }
+        , {
+          "from":370
+          , "to":1318
+        }
+        , {
+          "from":371
+          , "to":1318
+        }
+        , {
+          "from":372
+          , "to":1318
+        }
+        , {
+          "from":373
+          , "to":1318
+        }
+        , {
+          "from":374
+          , "to":1318
+        }
+        , {
+          "from":348
+          , "to":1318
+        }
+        , {
+          "from":349
+          , "to":1318
+        }
+        , {
+          "from":350
+          , "to":1318
+        }
+        , {
+          "from":351
+          , "to":1318
+        }
+        , {
+          "from":19
+          , "to":1318
+        }
+        , {
+          "from":20
+          , "to":1318
+        }
+        , {
+          "from":17
+          , "to":1318
+        }
+        , {
+          "from":18
+          , "to":1318
+        }
+        , {
+          "from":356
+          , "to":1318
+        }
+        , {
+          "from":357
+          , "to":1318
+        }
+        , {
+          "from":358
+          , "to":1318
+        }
+        , {
+          "from":359
+          , "to":1318
+        }
+        , {
+          "from":330
+          , "to":1318
+        }
+        , {
+          "from":331
+          , "to":1318
+        }
+        , {
+          "from":332
+          , "to":1318
+        }
+        , {
+          "from":200
+          , "to":1318
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1949
+      , "src":"1325"
+      , "dst":"1439"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV3.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"307"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"308"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"307"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"307"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"308"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"308"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1325
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1780
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1783
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1433
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1434
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1435
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1437
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1439
+          , "end":"246.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1433
+          , "to":1435
+        }
+        , {
+          "from":1434
+          , "to":1437
+        }
+        , {
+          "from":1435
+          , "to":1439
+        }
+        , {
+          "from":1325
+          , "to":1439
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1950
+      , "src":"1324"
+      , "dst":"1440"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV3.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"307"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"307"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1324
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1433
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1436
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1440
+          , "end":"239.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":307
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1433
+          , "to":1436
+        }
+        , {
+          "from":1324
+          , "to":1433
+        }
+        , {
+          "from":1436
+          , "to":1440
+        }
+        , {
+          "from":1324
+          , "to":1440
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1951
+      , "src":"1327"
+      , "dst":"1441"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV3.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"308"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"308"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1327
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1434
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1437
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1441
+          , "end":"246.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1434
+          , "to":1437
+        }
+        , {
+          "from":1327
+          , "to":1434
+        }
+        , {
+          "from":1437
+          , "to":1441
+        }
+        , {
+          "from":1327
+          , "to":1441
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1952
+      , "src":"1326"
+      , "dst":"1442"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV3.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"308"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                  , "line":"308"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1326
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1434
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1438
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1442
+          , "end":"239.00"
+          , "parent":"_ZTS8kernelV3.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_virtual_work_4x16_v3/kernel.cpp"
+                , "line":308
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1434
+          , "to":1438
+        }
+        , {
+          "from":1326
+          , "to":1434
+        }
+        , {
+          "from":1438
+          , "to":1442
+        }
+        , {
+          "from":1326
+          , "to":1442
+          , "reverse":1
+        }
+      ]
+    }
+  ]
+}
