@@ -1,0 +1,5674 @@
+{
+  "bottlenecks":
+  [
+    {
+      "name":"'i'"
+      , "id":1956
+      , "src":"1470"
+      , "dst":"1648"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"16X Partially unrolled kernelV2.B1"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"'i'"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"151"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"151"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"'i'"
+          , "id":1470
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV2.B1"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":151
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1621
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":151
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1648
+          , "end":"4.00"
+          , "parent":"_ZTS8kernelV2.B1"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":151
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1470
+          , "to":1621
+        }
+        , {
+          "from":1621
+          , "to":1648
+        }
+        , {
+          "from":1470
+          , "to":1648
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Feedback"
+      , "id":1957
+      , "src":"1659"
+      , "dst":"1678"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"kernelV2.B3"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Loop: ":"_ZTS8kernelV2.B3"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"172"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Feedback"
+          , "id":1659
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV2.B3"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1660
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1662
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1680
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1681
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1678
+          , "end":"4.00"
+          , "parent":"_ZTS8kernelV2.B3"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":172
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1659
+          , "to":1660
+        }
+        , {
+          "from":1662
+          , "to":1662
+        }
+        , {
+          "from":1662
+          , "to":1680
+        }
+        , {
+          "from":1660
+          , "to":1678
+        }
+        , {
+          "from":1662
+          , "to":1678
+        }
+        , {
+          "from":1659
+          , "to":1678
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"'p'"
+      , "id":1958
+      , "src":"1706"
+      , "dst":"1746"
+      , "type":"fMAX/II"
+      , "brief":"Data dependency"
+      , "loop":"kernelV2.B5"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"'p'"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"192"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Data dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"192"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"'p'"
+          , "id":1706
+          , "start":"4.00"
+          , "parent":"_ZTS8kernelV2.B5"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":192
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1745
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":192
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1746
+          , "end":"4.00"
+          , "parent":"_ZTS8kernelV2.B5"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":192
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1706
+          , "to":1745
+        }
+        , {
+          "from":1745
+          , "to":1746
+        }
+        , {
+          "from":1706
+          , "to":1746
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"hashVec"
+      , "id":1959
+      , "src":"199"
+      , "dst":"1331"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"kernelV2.B6"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"hashVec"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"147"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"And(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"273"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"273"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"273"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"273"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"273"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"273"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"273"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"203"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Select(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"452"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"+(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"281"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"281"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Zext(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"281"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Compare(%L)"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Ptr. Comp.(%L)"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"hashVec"
+          , "id":199
+          , "start":"2.00"
+          , "parent":"_ZTS8kernelV2.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":281
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":265
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Compare"
+          , "id":393
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":584
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":203
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":714
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":273
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":776
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":273
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":809
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":273
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":828
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":273
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":836
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":273
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":844
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":273
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":853
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":273
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":862
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":871
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":880
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":889
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":897
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":906
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":915
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":927
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":937
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":948
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":956
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":963
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":970
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":978
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":986
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":993
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1001
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1008
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1016
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1023
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1031
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1039
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1047
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1054
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1063
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1070
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1079
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1086
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1093
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1100
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1108
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1117
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1125
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1133
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1141
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1149
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1157
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1166
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1174
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1182
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1191
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1199
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1208
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1216
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1224
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1232
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1241
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1250
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1259
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1268
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1277
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1286
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1295
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"And"
+          , "id":1316
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1319
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1320
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1322
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1323
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1324
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Select"
+          , "id":1325
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":452
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"+"
+          , "id":1326
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":281
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Zext"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":281
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Ptr. Comp."
+          , "id":1327
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1329
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":281
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1331
+          , "end":"43.00"
+          , "parent":"_ZTS8kernelV2.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":281
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":199
+          , "to":265
+        }
+        , {
+          "from":265
+          , "to":393
+        }
+        , {
+          "from":393
+          , "to":584
+        }
+        , {
+          "from":584
+          , "to":714
+        }
+        , {
+          "from":714
+          , "to":776
+        }
+        , {
+          "from":776
+          , "to":809
+        }
+        , {
+          "from":809
+          , "to":828
+        }
+        , {
+          "from":828
+          , "to":836
+        }
+        , {
+          "from":836
+          , "to":844
+        }
+        , {
+          "from":844
+          , "to":853
+        }
+        , {
+          "from":853
+          , "to":862
+        }
+        , {
+          "from":862
+          , "to":871
+        }
+        , {
+          "from":871
+          , "to":880
+        }
+        , {
+          "from":880
+          , "to":889
+        }
+        , {
+          "from":889
+          , "to":897
+        }
+        , {
+          "from":897
+          , "to":906
+        }
+        , {
+          "from":906
+          , "to":915
+        }
+        , {
+          "from":915
+          , "to":927
+        }
+        , {
+          "from":927
+          , "to":937
+        }
+        , {
+          "from":937
+          , "to":948
+        }
+        , {
+          "from":948
+          , "to":956
+        }
+        , {
+          "from":956
+          , "to":963
+        }
+        , {
+          "from":963
+          , "to":970
+        }
+        , {
+          "from":970
+          , "to":978
+        }
+        , {
+          "from":978
+          , "to":986
+        }
+        , {
+          "from":986
+          , "to":993
+        }
+        , {
+          "from":993
+          , "to":1001
+        }
+        , {
+          "from":1001
+          , "to":1008
+        }
+        , {
+          "from":1008
+          , "to":1016
+        }
+        , {
+          "from":1016
+          , "to":1023
+        }
+        , {
+          "from":1023
+          , "to":1031
+        }
+        , {
+          "from":1031
+          , "to":1039
+        }
+        , {
+          "from":1039
+          , "to":1047
+        }
+        , {
+          "from":1047
+          , "to":1054
+        }
+        , {
+          "from":1054
+          , "to":1063
+        }
+        , {
+          "from":1063
+          , "to":1070
+        }
+        , {
+          "from":1070
+          , "to":1079
+        }
+        , {
+          "from":1079
+          , "to":1086
+        }
+        , {
+          "from":1086
+          , "to":1093
+        }
+        , {
+          "from":1093
+          , "to":1100
+        }
+        , {
+          "from":1100
+          , "to":1108
+        }
+        , {
+          "from":1108
+          , "to":1117
+        }
+        , {
+          "from":1117
+          , "to":1125
+        }
+        , {
+          "from":1125
+          , "to":1133
+        }
+        , {
+          "from":1133
+          , "to":1141
+        }
+        , {
+          "from":1141
+          , "to":1149
+        }
+        , {
+          "from":1149
+          , "to":1157
+        }
+        , {
+          "from":1157
+          , "to":1166
+        }
+        , {
+          "from":1166
+          , "to":1174
+        }
+        , {
+          "from":1174
+          , "to":1182
+        }
+        , {
+          "from":1182
+          , "to":1191
+        }
+        , {
+          "from":1191
+          , "to":1199
+        }
+        , {
+          "from":1199
+          , "to":1208
+        }
+        , {
+          "from":1208
+          , "to":1216
+        }
+        , {
+          "from":1216
+          , "to":1224
+        }
+        , {
+          "from":1224
+          , "to":1232
+        }
+        , {
+          "from":1232
+          , "to":1241
+        }
+        , {
+          "from":1241
+          , "to":1250
+        }
+        , {
+          "from":1250
+          , "to":1259
+        }
+        , {
+          "from":1259
+          , "to":1268
+        }
+        , {
+          "from":1268
+          , "to":1277
+        }
+        , {
+          "from":1277
+          , "to":1286
+        }
+        , {
+          "from":1286
+          , "to":1295
+        }
+        , {
+          "from":1295
+          , "to":1316
+        }
+        , {
+          "from":1316
+          , "to":1319
+        }
+        , {
+          "from":1319
+          , "to":1320
+        }
+        , {
+          "from":1320
+          , "to":1322
+        }
+        , {
+          "from":1322
+          , "to":1323
+        }
+        , {
+          "from":1323
+          , "to":1324
+        }
+        , {
+          "from":1324
+          , "to":1325
+        }
+        , {
+          "from":1325
+          , "to":1326
+        }
+        , {
+          "from":1326
+          , "to":1327
+        }
+        , {
+          "from":1327
+          , "to":1329
+        }
+        , {
+          "from":1329
+          , "to":1331
+        }
+        , {
+          "from":199
+          , "to":1331
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"countVec"
+      , "id":1960
+      , "src":"200"
+      , "dst":"1330"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"kernelV2.B6"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"countVec"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"148"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"398"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"547"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"547"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"547"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                  , "line":"547"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"LD(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"282"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"282"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"countVec"
+          , "id":200
+          , "start":"34.00"
+          , "parent":"_ZTS8kernelV2.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":282
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":1787
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":282
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":350
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":351
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":352
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":353
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":18
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":19
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":20
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":265
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":17
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":547
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":390
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":391
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1789
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":282
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":346
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":347
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":348
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":349
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":335
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":336
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":337
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":378
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":379
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":380
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":381
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":382
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":383
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":354
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":355
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":356
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":357
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":372
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":373
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":374
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":375
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":376
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":377
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":338
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":339
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":340
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":341
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":329
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":330
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":331
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":342
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":343
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":344
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":345
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":362
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":363
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":364
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":365
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":366
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":332
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":333
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":334
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":384
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":385
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":386
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":387
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":388
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":389
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":358
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":359
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":360
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":361
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":367
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":368
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":369
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":370
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"LD"
+          , "id":371
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/./../primitives/primitives.hpp"
+                , "line":398
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1330
+          , "end":"43.00"
+          , "parent":"_ZTS8kernelV2.B6"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":282
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":200
+          , "to":1787
+        }
+        , {
+          "from":1787
+          , "to":350
+        }
+        , {
+          "from":1787
+          , "to":351
+        }
+        , {
+          "from":1787
+          , "to":352
+        }
+        , {
+          "from":1787
+          , "to":353
+        }
+        , {
+          "from":1787
+          , "to":18
+        }
+        , {
+          "from":1787
+          , "to":19
+        }
+        , {
+          "from":1787
+          , "to":20
+        }
+        , {
+          "from":1787
+          , "to":265
+        }
+        , {
+          "from":1787
+          , "to":17
+        }
+        , {
+          "from":1787
+          , "to":390
+        }
+        , {
+          "from":1787
+          , "to":391
+        }
+        , {
+          "from":1787
+          , "to":1789
+        }
+        , {
+          "from":1787
+          , "to":346
+        }
+        , {
+          "from":1787
+          , "to":347
+        }
+        , {
+          "from":1787
+          , "to":348
+        }
+        , {
+          "from":1787
+          , "to":349
+        }
+        , {
+          "from":1787
+          , "to":335
+        }
+        , {
+          "from":1787
+          , "to":336
+        }
+        , {
+          "from":1787
+          , "to":337
+        }
+        , {
+          "from":1787
+          , "to":378
+        }
+        , {
+          "from":1787
+          , "to":379
+        }
+        , {
+          "from":1787
+          , "to":380
+        }
+        , {
+          "from":1787
+          , "to":381
+        }
+        , {
+          "from":1787
+          , "to":382
+        }
+        , {
+          "from":1787
+          , "to":383
+        }
+        , {
+          "from":1787
+          , "to":354
+        }
+        , {
+          "from":1787
+          , "to":355
+        }
+        , {
+          "from":1787
+          , "to":356
+        }
+        , {
+          "from":1787
+          , "to":357
+        }
+        , {
+          "from":1787
+          , "to":372
+        }
+        , {
+          "from":1787
+          , "to":373
+        }
+        , {
+          "from":1787
+          , "to":374
+        }
+        , {
+          "from":1787
+          , "to":375
+        }
+        , {
+          "from":1787
+          , "to":376
+        }
+        , {
+          "from":1787
+          , "to":377
+        }
+        , {
+          "from":1787
+          , "to":338
+        }
+        , {
+          "from":1787
+          , "to":339
+        }
+        , {
+          "from":1787
+          , "to":340
+        }
+        , {
+          "from":1787
+          , "to":341
+        }
+        , {
+          "from":1787
+          , "to":329
+        }
+        , {
+          "from":1787
+          , "to":330
+        }
+        , {
+          "from":1787
+          , "to":331
+        }
+        , {
+          "from":1787
+          , "to":342
+        }
+        , {
+          "from":1787
+          , "to":343
+        }
+        , {
+          "from":1787
+          , "to":344
+        }
+        , {
+          "from":1787
+          , "to":345
+        }
+        , {
+          "from":1787
+          , "to":362
+        }
+        , {
+          "from":1787
+          , "to":363
+        }
+        , {
+          "from":1787
+          , "to":364
+        }
+        , {
+          "from":1787
+          , "to":365
+        }
+        , {
+          "from":1787
+          , "to":366
+        }
+        , {
+          "from":1787
+          , "to":332
+        }
+        , {
+          "from":1787
+          , "to":333
+        }
+        , {
+          "from":1787
+          , "to":334
+        }
+        , {
+          "from":1787
+          , "to":384
+        }
+        , {
+          "from":1787
+          , "to":385
+        }
+        , {
+          "from":1787
+          , "to":386
+        }
+        , {
+          "from":1787
+          , "to":387
+        }
+        , {
+          "from":1787
+          , "to":388
+        }
+        , {
+          "from":1787
+          , "to":389
+        }
+        , {
+          "from":1787
+          , "to":358
+        }
+        , {
+          "from":1787
+          , "to":359
+        }
+        , {
+          "from":1787
+          , "to":360
+        }
+        , {
+          "from":1787
+          , "to":361
+        }
+        , {
+          "from":1787
+          , "to":367
+        }
+        , {
+          "from":1787
+          , "to":368
+        }
+        , {
+          "from":1787
+          , "to":369
+        }
+        , {
+          "from":1787
+          , "to":370
+        }
+        , {
+          "from":1787
+          , "to":371
+        }
+        , {
+          "from":350
+          , "to":1330
+        }
+        , {
+          "from":351
+          , "to":1330
+        }
+        , {
+          "from":352
+          , "to":1330
+        }
+        , {
+          "from":353
+          , "to":1330
+        }
+        , {
+          "from":18
+          , "to":1330
+        }
+        , {
+          "from":19
+          , "to":1330
+        }
+        , {
+          "from":20
+          , "to":1330
+        }
+        , {
+          "from":265
+          , "to":1330
+        }
+        , {
+          "from":17
+          , "to":1330
+        }
+        , {
+          "from":390
+          , "to":1330
+        }
+        , {
+          "from":391
+          , "to":1330
+        }
+        , {
+          "from":1789
+          , "to":1330
+        }
+        , {
+          "from":346
+          , "to":1330
+        }
+        , {
+          "from":347
+          , "to":1330
+        }
+        , {
+          "from":348
+          , "to":1330
+        }
+        , {
+          "from":349
+          , "to":1330
+        }
+        , {
+          "from":335
+          , "to":1330
+        }
+        , {
+          "from":336
+          , "to":1330
+        }
+        , {
+          "from":337
+          , "to":1330
+        }
+        , {
+          "from":378
+          , "to":1330
+        }
+        , {
+          "from":379
+          , "to":1330
+        }
+        , {
+          "from":380
+          , "to":1330
+        }
+        , {
+          "from":381
+          , "to":1330
+        }
+        , {
+          "from":382
+          , "to":1330
+        }
+        , {
+          "from":383
+          , "to":1330
+        }
+        , {
+          "from":354
+          , "to":1330
+        }
+        , {
+          "from":355
+          , "to":1330
+        }
+        , {
+          "from":356
+          , "to":1330
+        }
+        , {
+          "from":357
+          , "to":1330
+        }
+        , {
+          "from":372
+          , "to":1330
+        }
+        , {
+          "from":373
+          , "to":1330
+        }
+        , {
+          "from":374
+          , "to":1330
+        }
+        , {
+          "from":375
+          , "to":1330
+        }
+        , {
+          "from":376
+          , "to":1330
+        }
+        , {
+          "from":377
+          , "to":1330
+        }
+        , {
+          "from":338
+          , "to":1330
+        }
+        , {
+          "from":339
+          , "to":1330
+        }
+        , {
+          "from":340
+          , "to":1330
+        }
+        , {
+          "from":341
+          , "to":1330
+        }
+        , {
+          "from":329
+          , "to":1330
+        }
+        , {
+          "from":330
+          , "to":1330
+        }
+        , {
+          "from":331
+          , "to":1330
+        }
+        , {
+          "from":342
+          , "to":1330
+        }
+        , {
+          "from":343
+          , "to":1330
+        }
+        , {
+          "from":344
+          , "to":1330
+        }
+        , {
+          "from":345
+          , "to":1330
+        }
+        , {
+          "from":362
+          , "to":1330
+        }
+        , {
+          "from":363
+          , "to":1330
+        }
+        , {
+          "from":364
+          , "to":1330
+        }
+        , {
+          "from":365
+          , "to":1330
+        }
+        , {
+          "from":366
+          , "to":1330
+        }
+        , {
+          "from":332
+          , "to":1330
+        }
+        , {
+          "from":333
+          , "to":1330
+        }
+        , {
+          "from":334
+          , "to":1330
+        }
+        , {
+          "from":384
+          , "to":1330
+        }
+        , {
+          "from":385
+          , "to":1330
+        }
+        , {
+          "from":386
+          , "to":1330
+        }
+        , {
+          "from":387
+          , "to":1330
+        }
+        , {
+          "from":388
+          , "to":1330
+        }
+        , {
+          "from":389
+          , "to":1330
+        }
+        , {
+          "from":358
+          , "to":1330
+        }
+        , {
+          "from":359
+          , "to":1330
+        }
+        , {
+          "from":360
+          , "to":1330
+        }
+        , {
+          "from":361
+          , "to":1330
+        }
+        , {
+          "from":367
+          , "to":1330
+        }
+        , {
+          "from":368
+          , "to":1330
+        }
+        , {
+          "from":369
+          , "to":1330
+        }
+        , {
+          "from":370
+          , "to":1330
+        }
+        , {
+          "from":371
+          , "to":1330
+        }
+        , {
+          "from":200
+          , "to":1330
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1961
+      , "src":"1337"
+      , "dst":"1451"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV2.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"309"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"Or(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"310"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"309"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"309"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"310"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"310"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1337
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1792
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Or"
+          , "id":1795
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1445
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1446
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1447
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1449
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1451
+          , "end":"246.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1445
+          , "to":1447
+        }
+        , {
+          "from":1446
+          , "to":1449
+        }
+        , {
+          "from":1447
+          , "to":1451
+        }
+        , {
+          "from":1337
+          , "to":1451
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1962
+      , "src":"1336"
+      , "dst":"1452"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV2.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"309"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"309"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1336
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1445
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1448
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1452
+          , "end":"239.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":309
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1445
+          , "to":1448
+        }
+        , {
+          "from":1336
+          , "to":1445
+        }
+        , {
+          "from":1448
+          , "to":1452
+        }
+        , {
+          "from":1336
+          , "to":1452
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1963
+      , "src":"1339"
+      , "dst":"1453"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV2.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"310"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"310"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1339
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1446
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1449
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1453
+          , "end":"246.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1446
+          , "to":1449
+        }
+        , {
+          "from":1339
+          , "to":1446
+        }
+        , {
+          "from":1449
+          , "to":1453
+        }
+        , {
+          "from":1339
+          , "to":1453
+          , "reverse":1
+        }
+      ]
+    }
+    , {
+      "name":"Global variable"
+      , "id":1964
+      , "src":"1338"
+      , "dst":"1454"
+      , "type":"fMAX/II"
+      , "brief":"Memory dependency"
+      , "loop":"16X Partially unrolled kernelV2.B8"
+      , "details":
+      [
+        {
+          "type":"table"
+          , "Variable on critical loop carried feedback path: ":"Global variable"
+          , "Declared at: ":
+          [
+            {
+              "type":"text"
+              , "text":"%L"
+              , "links":
+              [
+                {
+                  "filename":"Unknown location"
+                  , "line":"0"
+                }
+              ]
+            }
+          ]
+          , "Dependency: ":"Memory dependency"
+          , "Estimated fmax reduced to: ":"480.0"
+          , "Loop feedback path that raised II and/or lowered fMAX: ":
+          [
+            {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"310"
+                }
+              ]
+            }
+            , {
+              "type":"text"
+              , "text":"ST(%L)"
+              , "links":
+              [
+                {
+                  "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                  , "line":"310"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      , "nodes":
+      [
+        {
+          "name":"Global variable"
+          , "id":1338
+          , "start":"12.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1446
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"ST"
+          , "id":1450
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+        , {
+          "name":"Feedback"
+          , "id":1454
+          , "end":"239.00"
+          , "parent":"_ZTS8kernelV2.B8"
+          , "debug":
+          [
+            [
+              {
+                "filename":"/home/u177951/FPGA-SIMD-Sandbox/group_count_FPGA/load2048bit_permanent_v2/kernel.cpp"
+                , "line":310
+              }
+            ]
+          ]
+          , "type":"inst"
+        }
+      ]
+      , "links":
+      [
+        {
+          "from":1446
+          , "to":1450
+        }
+        , {
+          "from":1338
+          , "to":1446
+        }
+        , {
+          "from":1450
+          , "to":1454
+        }
+        , {
+          "from":1338
+          , "to":1454
+          , "reverse":1
+        }
+      ]
+    }
+  ]
+}
