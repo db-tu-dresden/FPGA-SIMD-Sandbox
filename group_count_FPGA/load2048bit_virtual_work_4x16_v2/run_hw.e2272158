@@ -1,3 +1,0 @@
-/data/intel_fpga/devcloudLoginToolSetup.sh: line 1054: /opt/intel/openvino/deployment_tools/../bin/setupvars.sh: No such file or directory
-Error opening AFC: resource busy
-Warning allocation with 2M pages failed, using 4K pages instead
