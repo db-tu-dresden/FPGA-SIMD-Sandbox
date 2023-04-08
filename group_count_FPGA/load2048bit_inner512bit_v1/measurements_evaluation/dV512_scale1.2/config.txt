@@ -1,0 +1,25 @@
+	// USING M20K RAM BLOCKS on FPGA to implement hashVec and countVec (embedded memory) and initialize these with zero
+	[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> hashVec;
+	[[intel::fpga_memory("BLOCK_RAM")]] std::array<Type, HSIZE> countVec;
+
+	#pragma unroll 16		
+	for(int i=0; i<HSIZE; i++) {
+		hashVec[i]=0; 
+		countVec[i]=0;	
+	}
+
+
+	#pragma unroll 16					
+	for(int i=0; i<HSIZE; i++) {
+		hashVec_globalMem[i]=hashVec[i]; 
+		countVec_globalMem[i]=countVec[i]; 	
+	}
+
+
+
+	#define distinctValues (uint64_t) 512
+
+    #define multiplier (int) 16
+    #define dataSize (uint64_t) (multiplier*10240000)               // 10240000*16 = 163840000 --> MOD 16 = 0; MOD 4096 = 0
+    #define scale (float) (1.2)
+    #define HSIZE (uint64_t) (distinctValues*scale)
