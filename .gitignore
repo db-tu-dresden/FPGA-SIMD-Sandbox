@@ -5,8 +5,6 @@ group_count_AVX512/CMakeFiles/*
 
 group_count_AVX512/CMakeCache.txt
 
-group_count_FPGA_noConflict/*
-
 group_count_FPGA/load512bit_v1/main.prj/*
 group_count_FPGA/load512bit_v2/main.prj/*
 group_count_FPGA/load512bit_v3/main.prj/*
