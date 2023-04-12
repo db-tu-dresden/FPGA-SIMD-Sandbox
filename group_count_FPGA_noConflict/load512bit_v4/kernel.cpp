@@ -236,7 +236,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 				// iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 				// @param p current element of input data array 	
 				// int p = 0;
-				#pragma unroll 4
+				#pragma nounroll
 				for(int p=0; p<elements_per_inner_register; p++) {
 					Type inputValue = dataVec.elements[p];
 					Type hash_key = hashx(inputValue,m_HSIZE_v);

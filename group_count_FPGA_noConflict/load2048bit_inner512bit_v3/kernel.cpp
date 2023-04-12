@@ -207,7 +207,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					// 		old: fpvec<Type, regSize> iValues = dataVec;
 					// 		commented out, since unnecessary double assignment; direct assignment on line 176
 
-					#pragma unroll 4
+					#pragma nounroll
 					for(int k=0; k<elements_per_inner_register; k++) {
 
 						// broadcast single value from input at postion i into a new SIMD register

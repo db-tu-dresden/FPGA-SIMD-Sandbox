@@ -229,7 +229,7 @@ int  main(int argc, char** argv){
     size_t distinct_values = distinctValues;    
     uint64_t seed = 13;
     size_t (*functionPtr)(Type,size_t);
-    functionPtr=&hashx_forNoConflicts;
+    functionPtr=&hashx_duplicate;
     generate_data_p0<Type>(arr_h, data_size, distinct_values, functionPtr, 0 , 0 , seed);    
     // generateData<Type>(arr_h);    
     std::cout <<"Generation of initial data done."<< std::endl;  

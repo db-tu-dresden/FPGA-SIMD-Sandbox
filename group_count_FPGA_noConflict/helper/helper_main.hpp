@@ -5,7 +5,7 @@
 
 using namespace std;
 
-size_t hashx_forNoConflicts(uint32_t key, size_t selectable_HSIZE);
+size_t hashx_duplicate(Type key, size_t selectable_HSIZE);
 void initializeHashMap(uint32_t* hashVec, uint32_t* countVec);
 void validate(uint32_t* hashVec, uint32_t* countVec);
 void validate_element(uint32_t *data, uint32_t*hashVec, uint32_t* countVec);

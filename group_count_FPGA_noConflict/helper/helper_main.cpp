@@ -21,7 +21,7 @@ using namespace std;
 
 // simple multiplicative hashing function
 // we use our hash function from helper_kernel.hpp, but here we use it for the data generation without data conflicts in generate_data_p0()
-size_t hashx_forNoConflicts(uint32_t key, size_t selectable_HSIZE) {
+size_t hashx_duplicate(Type key, size_t selectable_HSIZE) {
     return ((unsigned long)((unsigned int)1300000077*key)* selectable_HSIZE)>>32;
 }
 

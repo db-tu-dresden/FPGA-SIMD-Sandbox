@@ -210,7 +210,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 					// @param p current element of input data array	
 					// int p = 0;
 					// while (p < elements_per_inner_register) {
-					#pragma unroll 2
+					#pragma nounroll
 					for(int p=0; p<elements_per_inner_register; p++) {
 						// get single value from current dataVec register at position p
 						Type inputValue = tmp_workingData.elements[p];

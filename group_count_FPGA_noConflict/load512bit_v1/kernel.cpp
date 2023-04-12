@@ -174,7 +174,7 @@ void LinearProbingFPGA_variant1(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 				// iterate over input data / always step by step through the currently 16 (or #elements_per_inner_register) loaded elements
 				// @param p current element of input data array 	
-				#pragma unroll 2
+				#pragma nounroll
 				for(int p=0; p<elements_per_inner_register; p++) {
 
 					// get single value from current dataVec register at position p

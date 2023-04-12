@@ -177,7 +177,7 @@ void LinearProbingFPGA_variant3(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 
 				// int p = 0;
 				// while (p < elements_per_inner_register) {
-				#pragma unroll 4
+				#pragma nounroll
 				for(int k=0; k<elements_per_inner_register; k++) {
 
 					// broadcast single value from input at postion i into a new SIMD register
