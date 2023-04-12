@@ -1,7 +1,8 @@
 example_code_AggSUM/main.prj/*
 group_count_AVX512/CMakeFiles/*
 
-
+group_count_FPGA/load2048bit_permanent_v2NoStore/*
+group_count_FPGA/load2048bit_permanent_v4NoStore/*
 
 group_count_AVX512/CMakeCache.txt
 
