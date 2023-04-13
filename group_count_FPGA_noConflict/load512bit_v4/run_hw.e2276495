@@ -1,3 +1,0 @@
-/data/intel_fpga/devcloudLoginToolSetup.sh: line 1054: /opt/intel/openvino/deployment_tools/../bin/setupvars.sh: No such file or directory
-free(): invalid pointer
-/var/spool/torque/mom_priv/jobs/2276495.v-qsvr-1.aidevcloud.SC: line 34: 12604 Aborted                 ./main.fpga
