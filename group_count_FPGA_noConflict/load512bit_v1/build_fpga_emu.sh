@@ -14,7 +14,6 @@ tools_setup -t S10OAPI
 
 export PATH=/glob/intel-python/python2/bin:$PATH
 
-
 cd ~/FPGA-SIMD-Sandbox/group_count_FPGA_noConflict/load512bit_v1
 
 make emu

@@ -230,7 +230,7 @@ int  main(int argc, char** argv){
     uint64_t seed = 13;
     size_t (*functionPtr)(Type,size_t);
     functionPtr=&hashx_duplicate;
-    generate_data_p0<Type>(arr_h, data_size, distinct_values, functionPtr, 0 , 0 , seed);     
+    generate_data_p0<Type>(arr_h, data_size, distinct_values, functionPtr, 0 , 0 , seed);    
     // generateData<Type>(arr_h);    
     std::cout <<"Generation of initial data done."<< std::endl; 
 
@@ -294,7 +294,7 @@ int  main(int argc, char** argv){
 
     // check result for correctness
     validate(hashVec_h, countVec_h);
-//  validate_element(arr_h, hashVec_h, countVec_h);
+    // validate_element(arr_h, hashVec_h, countVec_h);
     std::cout<< " " <<std::endl;
 
     // free USM memory

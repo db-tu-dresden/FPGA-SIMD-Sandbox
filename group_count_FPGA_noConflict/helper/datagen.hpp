@@ -21,7 +21,6 @@
 #include <tuple>
 #include <utility>
 
-#include <sstream>
 #include <string>
 
 #include "datagen_help.hpp"
@@ -32,6 +31,8 @@ using namespace std;
 // todo with one big cluster where we just place the data in a hashmap the same size of distinct data (so we just create collisions on the smallest size)
 // todo cluster leaks into collisions!
 
+// delete functions p1_stringify_number(), p1_stringify() and #include <sstream>
+// reason: <sstream> requires GLIBCXX_3.4.26 , which leads to further incompatibilities in the DevCloud
 
 /*
     Density sets the information about the data layout between the values.
@@ -323,90 +324,6 @@ size_t p1_parameter_gen_hsize(size_t collision_count, size_t collisions = 0, siz
 size_t p0_parameter_gen_hsize(size_t collision_count, size_t collisions = 0){
     return collision_count * collisions;
 }
-
-std::string* p1_stringify_number(size_t max_val, size_t val){
-    val--;
-    max_val--;
-    size_t m = max_val;
-    size_t c = 0;
-    while(m > 0){
-        m /= 26;
-        c++;
-    }
-    std::stringstream result;
-    // bool first = true;
-    for(size_t i = 0; i < c; i++){
-        if(i==0){
-            result << (char)('A' + (val%26));
-        }else{
-            result << (char)('a' + (val%26));
-        }
-            val /= 26;
-    }
-    return new std::string(result.str());
-}
-
-
-std::string* p1_stringify( size_t HSIZE_DATAGEN, size_t collision_count, size_t collisions, size_t cluster, size_t cluster_lenght){
-    int64_t table [HSIZE_DATAGEN];
-    int64_t col_a = 0;
-    int64_t clu_a = 0;
-    size_t h_val = 1;
-    size_t pos = 0;
-
-
-    if(p1_parameter_gen_hsize(collision_count, collisions, cluster, cluster_lenght) > HSIZE_DATAGEN){
-        return new std::string("");
-    }
-
-    for(size_t i = 0; i < HSIZE_DATAGEN; i++){
-        table[i] = 0;
-    }
-
-    for(; col_a < collision_count; col_a++, clu_a++){
-        int64_t i = 0;
-        for( ; i < collisions; i++){
-            table[i + pos] = h_val;
-        }
-        pos += collisions;
-        h_val++;
-        for(; i < cluster_lenght && clu_a < cluster;  i++){
-            table[pos] = h_val;
-            pos++;
-            h_val++;
-        }
-        pos++;
-    }
-
-    for(; clu_a < cluster; clu_a++){
-        for(int64_t i = 0; i < cluster_lenght && clu_a < cluster;  i++){
-            table[pos] = h_val;
-            pos++;
-            h_val++;
-        }
-        pos++;
-    }
-
-    std::stringstream result;
-    result << h_val << ":";
-    for(size_t i = 0; i < HSIZE_DATAGEN; i++){
-        if(table[i] == 0){
-            if((i+1) < HSIZE_DATAGEN && table[i+1] != 0){
-                result << "_";
-            }else{
-                break;
-            }
-        }else{
-            std::string *helper;
-            helper = p1_stringify_number(h_val, table[i]) ;
-            result << *helper;
-            delete helper; 
-        }
-    }
-    return new std::string(result.str());
-}
-
-
 
 template<typename T>
 size_t generate_data_p1(

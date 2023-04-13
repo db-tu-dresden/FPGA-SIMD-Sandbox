@@ -3,6 +3,8 @@ group_count_AVX512/CMakeFiles/*
 
 group_count_FPGA/load2048bit_permanent_v2NoStore/*
 group_count_FPGA/load2048bit_permanent_v4NoStore/*
+group_count_FPGA_noConflict/load512bit_v1_6416/*
+group_count_FPGA_noConflict/load512bit_v1_6432/*
 
 group_count_AVX512/CMakeCache.txt
 
@@ -34,6 +36,15 @@ group_count_FPGA_noConflict/load2048bit_inner512bit_v1/main.prj/*
 group_count_FPGA_noConflict/load2048bit_inner512bit_v2/main.prj/*
 group_count_FPGA_noConflict/load2048bit_inner512bit_v3/main.prj/*
 group_count_FPGA_noConflict/load2048bit_inner512bit_v4/main.prj/*
+group_count_FPGA_noConflict/load2048bit_permanent_v1/main.prj/*
+group_count_FPGA_noConflict/load2048bit_permanent_v2/main.prj/*
+group_count_FPGA_noConflict/load2048bit_permanent_v3/main.prj/*
+group_count_FPGA_noConflict/load2048bit_permanent_v4/main.prj/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v1/main.prj/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v2/main.prj/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v3/main.prj/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v4/main.prj/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v5/main.prj/*
 
 group_count_FPGA/load512bit_v1/.ipynb_checkpoints/*
 group_count_FPGA/load512bit_v2/.ipynb_checkpoints/*
@@ -63,6 +74,15 @@ group_count_FPGA_noConflict/load2048bit_inner512bit_v1/.ipynb_checkpoints/*
 group_count_FPGA_noConflict/load2048bit_inner512bit_v2/.ipynb_checkpoints/*
 group_count_FPGA_noConflict/load2048bit_inner512bit_v3/.ipynb_checkpoints/*
 group_count_FPGA_noConflict/load2048bit_inner512bit_v4/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_permanent_v1/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_permanent_v2/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_permanent_v3/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_permanent_v4/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v1/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v2/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v3/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v4/.ipynb_checkpoints/*
+group_count_FPGA_noConflict/load2048bit_virtual_work_4x16_v5/.ipynb_checkpoints/*
 
 old_projects/group_count_FPGA_5kernel/main.prj/*
 old_projects/load2048bit_inner512bit_v1_32X/main.prj/*

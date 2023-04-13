@@ -232,7 +232,7 @@ int  main(int argc, char** argv){
     functionPtr=&hashx_duplicate;
     generate_data_p0<Type>(arr_h, data_size, distinct_values, functionPtr, 0 , 0 , seed);    
     // generateData<Type>(arr_h);    
-    std::cout <<"Generation of initial data done."<< std::endl;  
+    std::cout <<"Generation of initial data done."<< std::endl; 
 
     // Copy input host buffer to input device buffer
     q.memcpy(arr_d, arr_h, number_CL*multiplier * sizeof(Type));

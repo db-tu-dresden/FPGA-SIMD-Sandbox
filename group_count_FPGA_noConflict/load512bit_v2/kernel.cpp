@@ -257,7 +257,7 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 							fpvec<Type, inner_regSize> checkForFreeSpace = mask_cmpeq_epi32_mask(overflow_and_cutlow_mask, zeroMask,nextElements);
 // Type innerMask = mask2int(checkForFreeSpace);
 // if(innerMask != 0) {                // CASE B1    
-								//this does not calculate the correct position. we should rather look at trailing zeros.
+								//compute position of the emtpy slot 
 								Type pos = ctz_onceBultin(checkForFreeSpace);
 
 								hashVec[aligned_start+pos] = (uint32_t)inputValue;
