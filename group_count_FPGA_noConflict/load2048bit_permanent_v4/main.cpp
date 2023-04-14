@@ -226,7 +226,7 @@ int  main(int argc, char** argv){
     // For this we use generate_data_p0 to create an input array with zero conflicts!
     // Due to this manipulated data, we can ignore the while(1) loop inside the kernel.cpp
     size_t data_size = dataSize;
-    size_t distinct_values = distinctValues;    
+    size_t distinct_values = m_HSIZE_v_v4_2048bit;              // ! We are not allowed to use =distinctValues here, due to the special structure of v4 we have to use =m_HSIZE_v_v4_2048bit.
     uint64_t seed = 13;
     size_t (*functionPtr)(Type,size_t);
     functionPtr=&hashx_duplicate;
@@ -294,7 +294,7 @@ int  main(int argc, char** argv){
 
     // check result for correctness
     validate(hashVec_h, countVec_h);
-//  validate_element(arr_h, hashVec_h, countVec_h);
+    // validate_element(arr_h, hashVec_h, countVec_h);
     std::cout<< " " <<std::endl;
 
     // free USM memory
