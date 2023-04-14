@@ -187,7 +187,7 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			Type oferflowUnsigned = (m_HSIZE_v_v4_2048bit * m_elements_per_vector_v4_2048bit) - HSIZE;
 			if (oferflowUnsigned > 0) {
 				overflow_correction_mask = createOverflowCorrectionMask<Type, regSize>(oferflowUnsigned);
-				value_bigger_distinctValues = (Type)(distinctValues+7); 	
+				value_bigger_distinctValues = (Type)(distinctValues+7); 									// uint_max=
 				value_bigger_distinctValues_mask = set1<Type, regSize>(value_bigger_distinctValues);
 
 				hash_map[m_HSIZE_v_v4_2048bit-1] = mask_set1(value_bigger_distinctValues_mask, overflow_correction_mask, zero);
