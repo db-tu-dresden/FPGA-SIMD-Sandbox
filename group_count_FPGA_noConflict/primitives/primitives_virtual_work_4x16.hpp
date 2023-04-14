@@ -267,7 +267,7 @@ fpvec<T,B> mask_add_epi32(fpvec<T,B>& src, fpvec<T,B>& writeMask, fpvec<T,B>& a,
 */
 template<typename T, int B>
 void mask_storeu_epi32(std::array<Type, HSIZE>& result, uint32_t startIndex, fpvec<T,B>& writeMask, fpvec<T,B>& data) {
-	#pragma unroll
+	#pragma unroll 2
 	for(int offset=0; offset < outerUnroll; offset++) {
 		#pragma unroll
 		for (int i=0; i<innerUnroll; i++) {
