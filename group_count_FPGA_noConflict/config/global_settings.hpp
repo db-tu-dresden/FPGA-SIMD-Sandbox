@@ -18,7 +18,7 @@
  * @param regSize define register-size (in byte), which defines the amount of data that is load within one clock cycle :: (64=512bit; 128=1024bit; 192=1536bit; 256=2048bit;)
  */
     //define distinctValues (uint64_t) 8000
-    #define distinctValues (uint64_t) 64000
+    #define distinctValues (uint64_t) 128
 
     // change of multiplier not really necessary, but when: only in steps of 16 => e.g. 16, 32, 64 ...
     // and : multiplier should be equal with value of kValuesPerLSU in kernel.cpp
