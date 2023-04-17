@@ -19,8 +19,8 @@
 
 #include "global_settings.hpp"
 #include "LinearProbing_avx512.hpp"
-#include "LinearProbing_scalar.hpp"
 #include "helper.hpp"
+#include "datagen.hpp"
 
 using namespace std::chrono;
 
@@ -69,8 +69,18 @@ int  main(int argc, char** argv){
     } else {
         cout << "Memory not allocated!" << endl;
     }
-    generateData(arr, distinctValues, dataSize);     
-    cout <<"Generation of initial data done."<<endl; 
+
+    // Init input buffer with data, that contains NO conflicts!
+    // For this we use generate_data_p0 to create an input array with zero conflicts!
+    // Due to this manipulated data, we can ignore the while(1) loop inside the kernel.cpp
+    size_t data_size = dataSize;
+    size_t distinct_values = distinctValues;    
+    uint64_t seed = 13;
+    size_t (*functionPtr)(Type,size_t);
+    functionPtr=&hashx_duplicate;
+    generate_data_p0<Type>(arr, data_size, distinct_values, functionPtr, 0 , 0 , seed);    
+    // generateData<Type>(arr);    
+    std::cout <<"Generation of initial data done."<< std::endl; 
 
     /**
      * allocate memory for hash array
@@ -88,36 +98,13 @@ int  main(int argc, char** argv){
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// scalar version
-    initializeHashMap(hashVec,countVec,HSIZE);
-    cout <<"=============================="<<endl;
-    cout <<"Linear Probing - scalar:"<<endl;
-    auto begin = chrono::high_resolution_clock::now();
-    LinearProbingScalar(arr, dataSize, hashVec, countVec, HSIZE);
-    auto end = std::chrono::high_resolution_clock::now();
-    // new time calculation
-    duration<double, std::milli> diff_scal = end - begin;
-    cout<<"Elapsed time for LinearProbing algorithm - scalar version: "<<(diff_scal.count()) << " ms."<<endl;
-
-    // old time calculation
-    // auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-    // auto mis = (dataSize/1000000)/((double)duration/(double)((uint64_t)1*(uint64_t)1000000000));
-    
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
-    cout <<"=============================="<<endl;
-    cout<<endl;
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
 // SIMD AVX512 - v1 (SoA)
     initializeHashMap(hashVec,countVec,HSIZE);
     cout <<"=============================="<<endl;
     cout <<"Linear Probing - SIMD Variant 1:"<<endl;
-    begin = chrono::high_resolution_clock::now();
+    auto begin = chrono::high_resolution_clock::now();
     LinearProbingAVX512Variant1(arr, dataSize, hashVec, countVec, HSIZE);
-    end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
     duration<double, std::milli> diff_v1 = end - begin;
     cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 1: "<<(diff_v1.count()) << " ms."<<endl;
     validate(dataSize, hashVec,countVec, HSIZE);
@@ -178,6 +165,13 @@ int  main(int argc, char** argv){
     const size_t m_elements_per_vector = (512 / 8) / sizeof(uint32_t);
     const size_t m_HSIZE_v = (HSIZE + m_elements_per_vector - 1) / m_elements_per_vector;
     const size_t HSIZE_v4 = m_HSIZE_v * m_elements_per_vector;
+
+    // re-initialize input arr_v4
+    distinct_values = m_HSIZE_v;              // ! We are not allowed to use =distinctValues here, due to the special structure of v4 we have to use =m_HSIZE_v.   
+    generate_data_p0<Type>(arr, data_size, distinct_values, functionPtr, 0 , 0 , seed);    
+    // generateData<Type>(arr_v4);    
+    std::cout <<"Generation of initial data done."<< std::endl; 
+
     // allocate big enough hashVec and countVec
     uint32_t *hashVec_v4, *countVec_v4; 
     hashVec_v4 = (uint32_t *) aligned_alloc(64, HSIZE_v4 * sizeof (uint32_t));
@@ -187,6 +181,7 @@ int  main(int argc, char** argv){
     } else {
         cout << "HashTable for v4 not allocated" << endl;
     }
+
     // begin with execution of algorithm
     initializeHashMap(hashVec_v4,countVec_v4,HSIZE_v4);
     cout <<"=============================="<<endl;
@@ -196,55 +191,16 @@ int  main(int argc, char** argv){
     end = std::chrono::high_resolution_clock::now();
     duration<double, std::milli> diff_v4 = end - begin;
     cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 4 (SoAoV_v1): "<<(diff_v4.count()) << " ms."<<endl;
-    validate(dataSize, hashVec_v4,countVec_v4, HSIZE_v4);
+    validate(dataSize, hashVec_v4, countVec_v4, HSIZE_v4);
     validate_element(arr, dataSize, hashVec_v4, countVec_v4, HSIZE_v4);
     cout <<"=============================="<<endl;
     cout<<endl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-// SIMD AVX512 - v5 (SoA_conflict_v1)
-    initializeHashMap(hashVec,countVec,HSIZE);
-    cout <<"=============================="<<endl;
-    cout <<"Linear Probing - SIMD Variant 5:"<<endl;
-    begin = chrono::high_resolution_clock::now();
-    LinearProbingAVX512Variant5(arr, dataSize, hashVec, countVec, HSIZE);
-    end = std::chrono::high_resolution_clock::now();
-    duration<double, std::milli> diff_v5 = end - begin;
-    cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 5 (SoA_conflict_v1): "<<(diff_v5.count()) << " ms."<<endl;
-    validate(dataSize, hashVec,countVec, HSIZE);
-    validate_element(arr, dataSize, hashVec, countVec, HSIZE);
-    cout <<"=============================="<<endl;
-    cout<<endl;
-///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-
-
-    /*
-    //__m512i a = _mm512_setzero_epi32();
-    //__m512i b = _mm512_setzero_epi32();
-    //__m512i b = _mm512_setr_epi32 (0,0,0,0,12,12,12,12,12,12,12,12,12,12,12,12);
-    __m512i b = _mm512_setr_epi32 (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-    __m512i a = _mm512_setr_epi32 (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
-    
-    //b[0] = (uint32_t)12;
-    __mmask16 mask = _mm512_cmpeq_epi32_mask(a,b);
-    //__mmask16 mask1 = _mm512_knot(mask);
-
-    cout <<32-__builtin_clz(mask)<<endl;
-    */
-    // Ausgabe des HashTable
-   /* uint32_t sum=0;
-    for (int i=0; i<distinctValues * scale; i++) {
-        if (hashVec[i]>0) {
-            sum+=countVec[i];
-        }
-    }
-    cout << "Final result check: compare parameter dataSize against sum of all count values in countVec:"<<endl;
-    cout << dataSize <<" "<<sum<<endl;*/
     
     return 0;
 
