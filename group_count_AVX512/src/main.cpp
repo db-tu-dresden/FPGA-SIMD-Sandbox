@@ -188,11 +188,11 @@ int  main(int argc, char** argv){
         cout << "HashTable for v4 not allocated" << endl;
     }
     // begin with execution of algorithm
-    initializeHashMap(hashVec,countVec,HSIZE_v4);
+    initializeHashMap(hashVec_v4,countVec_v4,HSIZE_v4);
     cout <<"=============================="<<endl;
     cout <<"Linear Probing - SIMD Variant 4:"<<endl;
     begin = chrono::high_resolution_clock::now();
-    LinearProbingAVX512Variant4(arr, dataSize, hashVec_v4, countVec_v4, HSIZE_v4);
+    LinearProbingAVX512Variant4(arr, dataSize, hashVec_v4, countVec_v4, HSIZE);
     end = std::chrono::high_resolution_clock::now();
     duration<double, std::milli> diff_v4 = end - begin;
     cout<<"Elapsed time for LinearProbing algorithm - SIMD Variant 4 (SoAoV_v1): "<<(diff_v4.count()) << " ms."<<endl;
