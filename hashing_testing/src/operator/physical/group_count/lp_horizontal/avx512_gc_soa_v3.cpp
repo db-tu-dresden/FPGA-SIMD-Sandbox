@@ -6,30 +6,30 @@
 #include <emmintrin.h>
 #include <smmintrin.h>
 
-#include "avx512_group_count_soa_v3.hpp"
+#include "avx512_gc_soa_v3.hpp"
 
 #define EMPTY_SPOT 0
 
 template <typename T>
-AVX512_group_count_SoA_v3<T>::AVX512_group_count_SoA_v3(size_t HSIZE, size_t (*hash_function)(T, size_t))
-    : Scalar_group_count<T>(HSIZE, hash_function)
+AVX512_gc_SoA_v3<T>::AVX512_gc_SoA_v3(size_t HSIZE, size_t (*hash_function)(T, size_t))
+    : Scalar_gc_SoA<T>(HSIZE, hash_function)
 {}
 
 template <typename T>
-AVX512_group_count_SoA_v3<T>::~AVX512_group_count_SoA_v3(){
+AVX512_gc_SoA_v3<T>::~AVX512_gc_SoA_v3(){
     // free(this->m_hash_vec);
     // free(this->m_count_vec);
 }
 
 
 template <typename T>
-std::string AVX512_group_count_SoA_v3<T>::identify(){
+std::string AVX512_gc_SoA_v3<T>::identify(){
     return "AVX512 Group Count SoA Version 3";
 }
 
 
 template <typename T>
-void AVX512_group_count_SoA_v3<T>::create_hash_table(T* input, size_t data_size){
+void AVX512_gc_SoA_v3<T>::create_hash_table(T* input, size_t data_size){
     size_t p = 0;
     size_t HSIZE = this->m_HSIZE;
     // Iterate over input 
@@ -64,7 +64,7 @@ void AVX512_group_count_SoA_v3<T>::create_hash_table(T* input, size_t data_size)
 
 
 template <>
-void AVX512_group_count_SoA_v3<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
+void AVX512_gc_SoA_v3<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
     size_t HSIZE = this->m_HSIZE;
     uint32_t* hashVec = this->m_hash_vec;
     uint32_t* countVec = this->m_count_vec;
@@ -133,7 +133,7 @@ void AVX512_group_count_SoA_v3<uint32_t>::create_hash_table(uint32_t* input, siz
 }
 
 template <typename T>
-T AVX512_group_count_SoA_v3<T>::get(T input){
+T AVX512_gc_SoA_v3<T>::get(T input){
     size_t rounds = 0;
     size_t HSIZE = this->m_HSIZE;
     
@@ -165,5 +165,5 @@ T AVX512_group_count_SoA_v3<T>::get(T input){
 }
 
 
-template class AVX512_group_count_SoA_v3<uint32_t>;
-template class AVX512_group_count_SoA_v3<uint64_t>;
+template class AVX512_gc_SoA_v3<uint32_t>;
+template class AVX512_gc_SoA_v3<uint64_t>;

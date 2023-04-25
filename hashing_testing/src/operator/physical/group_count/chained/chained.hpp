@@ -1,9 +1,9 @@
-#ifndef TUD_HASHING_TESTING_CHAINED_COUNT
-#define TUD_HASHING_TESTING_CHAINED_COUNT
+#ifndef TUD_HASHING_TESTING_CHAINED_CHAINED_COUNT
+#define TUD_HASHING_TESTING_CHAINED_CHAINED_COUNT
 
 #include <stdint.h>
 #include <stdlib.h> 
-#include "../../logical/group_count.hpp"
+#include "../../../logical/group_count.hpp"
 #include <unordered_map>
 // #include "../../../main/hash_function.hpp"
 template <typename T>

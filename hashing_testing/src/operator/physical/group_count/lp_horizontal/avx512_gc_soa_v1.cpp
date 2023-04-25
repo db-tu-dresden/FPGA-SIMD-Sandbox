@@ -6,30 +6,30 @@
 #include <emmintrin.h>
 #include <smmintrin.h>
 
-#include "avx512_group_count_soa_v1.hpp"
+#include "avx512_gc_soa_v1.hpp"
 
 #define EMPTY_SPOT 0
 
 template <typename T>
-AVX512_group_count_SoA_v1<T>::AVX512_group_count_SoA_v1(size_t HSIZE, size_t (*hash_function)(T, size_t))
-    : Scalar_group_count<T>(HSIZE, hash_function)
+AVX512_gc_SoA_v1<T>::AVX512_gc_SoA_v1(size_t HSIZE, size_t (*hash_function)(T, size_t))
+    : Scalar_gc_SoA<T>(HSIZE, hash_function)
 {}
 
 template <typename T>
-AVX512_group_count_SoA_v1<T>::~AVX512_group_count_SoA_v1(){
+AVX512_gc_SoA_v1<T>::~AVX512_gc_SoA_v1(){
     // free(this->m_hash_vec);
     // free(this->m_count_vec);
 }
 
 
 template <typename T>
-std::string AVX512_group_count_SoA_v1<T>::identify(){
+std::string AVX512_gc_SoA_v1<T>::identify(){
     return "AVX512 Group Count SoA Version 1";
 }
 
 
 template <typename T>
-void AVX512_group_count_SoA_v1<T>::create_hash_table(T* input, size_t data_size){
+void AVX512_gc_SoA_v1<T>::create_hash_table(T* input, size_t data_size){
     size_t p = 0;
     size_t HSIZE = this->m_HSIZE;
     // Iterate over input 
@@ -63,21 +63,24 @@ void AVX512_group_count_SoA_v1<T>::create_hash_table(T* input, size_t data_size)
 
 // only an 32 bit uint implementation rn, because we don't use the tvl rn. As soon as we use the TVL we should reform this code to support it.
 template <>
-void AVX512_group_count_SoA_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
+void AVX512_gc_SoA_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
     size_t HSIZE = this->m_HSIZE;
     uint32_t* hashVec = this->m_hash_vec;
     uint32_t* countVec = this->m_count_vec;
 
     __mmask16 oneMask = 0xFFFF;
-    __m512i zeroM512iArray = _mm512_setzero_epi32();
-    __m512i oneM512iArray = _mm512_setr_epi32 (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+    __m512i zero_512i = _mm512_setzero_epi32();
+    __m512i one_512i = _mm512_set1_epi32(1);
+    __m512i two_512i = _mm512_set1_epi32(2);
+    __m512i seq_512i = _mm512_setr_epi32 (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+    __m512i seq_512i_x2 = _mm512_setr_epi32 (0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30);
 
     size_t p = 0;
     while(p < data_size){
         // Set up of the values and keys.
         uint32_t inputValue = input[p];
         uint32_t hash_key = this->m_hash_function(inputValue,HSIZE);
-        __m512i broadcastCurrentValue = _mm512_set1_epi32(inputValue);
+        __m512i value_vector = _mm512_set1_epi32(inputValue);
 
         // We have three cases:
         //      A: We found the Value we searched for.
@@ -92,12 +95,12 @@ void AVX512_group_count_SoA_v1<uint32_t>::create_hash_table(uint32_t* input, siz
             
             //load dat
             __m512i nextElements = _mm512_maskz_loadu_epi32(overflow_correction_mask, &hashVec[hash_key]);   
-            __mmask16 compareRes = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, broadcastCurrentValue, nextElements);
+            __mmask16 compareRes = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, value_vector, nextElements);
 
             if(compareRes != 0){
             // A    -   Increment Count
-                __m512i nextCounts = _mm512_mask_loadu_epi32(zeroM512iArray, oneMask, &countVec[hash_key]);
-                nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes, nextCounts, oneM512iArray);
+                __m512i nextCounts = _mm512_mask_loadu_epi32(zero_512i, oneMask, &countVec[hash_key]);
+                nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes, nextCounts, one_512i);
                 _mm512_mask_storeu_epi32(&countVec[hash_key],compareRes,nextCounts);
                 break;
             }else{
@@ -123,5 +126,5 @@ void AVX512_group_count_SoA_v1<uint32_t>::create_hash_table(uint32_t* input, siz
     }
 }
 
-template class AVX512_group_count_SoA_v1<uint32_t>;
-template class AVX512_group_count_SoA_v1<uint64_t>;
+template class AVX512_gc_SoA_v1<uint32_t>;
+template class AVX512_gc_SoA_v1<uint64_t>;

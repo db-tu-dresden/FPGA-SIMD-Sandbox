@@ -7,16 +7,24 @@
 #include <cstdlib>
 #include <chrono>
 
-#include "../operator/physical/group_count/scalar_group_count.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soa_v1.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soa_v2.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soa_v3.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soaov_v1.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soaov_v2.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soa_conflict_v1.hpp"
-#include "../operator/physical/group_count/avx512_group_count_soa_conflict_v2.hpp"
-#include "../operator/physical/group_count/chained.hpp"
-#include "../operator/physical/group_count/chained2.hpp"
+#include "../operator/physical/group_count/lp/scalar_gc_soa.hpp"
+#include "../operator/physical/group_count/lp/scalar_gc_aos.hpp"
+
+#include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v1.hpp"
+#include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v2.hpp"
+#include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v3.hpp"
+#include "../operator/physical/group_count/lp_horizontal/avx512_gc_aos_v1.hpp"
+
+#include "../operator/physical/group_count/lcp/avx512_gc_soaov_v1.hpp"
+#include "../operator/physical/group_count/lcp/avx512_gc_soaov_v2.hpp"
+#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v1.hpp"
+
+#include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v1.hpp"
+#include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v2.hpp"
+#include "../operator/physical/group_count/lp_vertical/avx512_gc_aos_conflict_v1.hpp"
+
+#include "../operator/physical/group_count/chained/chained.hpp"
+#include "../operator/physical/group_count/chained/chained2.hpp"
 
 #include "datagenerator/datagen.hpp"
 #include "benchmark/table.hpp"
@@ -30,7 +38,7 @@
 // documentation
 
 enum Algorithm{
-    SCALAR_GROUP_COUNT, 
+    SCALAR_GROUP_COUNT_SOA, 
     AVX512_GROUP_COUNT_SOA_V1, 
     AVX512_GROUP_COUNT_SOA_V2, 
     AVX512_GROUP_COUNT_SOA_V3, 
@@ -38,6 +46,14 @@ enum Algorithm{
     AVX512_GROUP_COUNT_SOAOV_V2, 
     AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
     AVX512_GROUP_COUNT_SOA_CONFLICT_V2,
+    SCALAR_GROUP_COUNT_AOS, 
+    AVX512_GROUP_COUNT_AOS_V1, 
+    AVX512_GROUP_COUNT_AOS_V2, 
+    AVX512_GROUP_COUNT_AOS_V3, 
+    AVX512_GROUP_COUNT_AOSOV_V1,     
+    AVX512_GROUP_COUNT_AOSOV_V2, 
+    AVX512_GROUP_COUNT_AOS_CONFLICT_V1, 
+    AVX512_GROUP_COUNT_AOS_CONFLICT_V2,
     CHAINED,
     CHAINED2
 };
@@ -62,7 +78,7 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
 /// @param validation_size the size of the hash table of the validation_baseline
 /// @return 
 template <typename T> 
-bool validation(Group_count<T>* grouping, Scalar_group_count<T>* validation_baseline, size_t validation_size);
+bool validation(Group_count<T>* grouping, Scalar_gc_SoA<T>* validation_baseline, size_t validation_size);
 
 //--------------------------------------------
 // Time and Run functions for one Benchmark
@@ -80,7 +96,7 @@ bool validation(Group_count<T>* grouping, Scalar_group_count<T>* validation_base
 /// @param reset true if the hash table and count table shall be cleared again
 /// @return the time the execution took in nano seconds
 template <typename T>
-size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, Scalar_group_count<T>*& validation_baseline, size_t validation_size, bool validate = true, bool cleanup = false, bool reset = true);
+size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, Scalar_gc_SoA<T>*& validation_baseline, size_t validation_size, bool validate = true, bool cleanup = false, bool reset = true);
 
 /// @brief Executes the hash function and collecting performance data. 
 /// @tparam T the data type on which the algorithm shall be executed
@@ -206,6 +222,8 @@ template <typename T>
 void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algorithms_undertest, HashFunction hash_function_enum = HashFunction::MULITPLY_SHIFT);
 
 
+template <typename T> 
+bool all_algorithm_test();
 //--------------------------------------------
 // MAIN!
 //--------------------------------------------
@@ -220,13 +238,17 @@ int main(int argc, char** argv){
     // Chained<uint32_t>->chained_HSIZE = 2048;
     fill_tab_table();
 
+
+    all_algorithm_test<ps_type>();
+    return 0;
+
     size_t distinct_value_count = 2048;
     size_t all_data_sizes = 32 * 1024 * 1024;// 1024*1024*1024;
 
     float scale_boost = 1.0f;
 
     Algorithm algorithms_undertest [] = {
-        Algorithm::SCALAR_GROUP_COUNT
+        Algorithm::SCALAR_GROUP_COUNT_SOA
         , Algorithm::AVX512_GROUP_COUNT_SOA_V1
         // // // , Algorithm::AVX512_GROUP_COUNT_SOA_V2
         // // // , Algorithm::AVX512_GROUP_COUNT_SOA_V3
@@ -777,7 +799,7 @@ void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algori
     hash_fptr<T> hash_function = get_hash_function<T>(hash_function_enum);
     
     getGroupCount(alg, algorithms_undertest, HSIZE, hash_function);
-    Scalar_group_count<T> *val = new Scalar_group_count<T>(HSIZE, hash_function);
+    Scalar_gc_SoA<T> *val = new Scalar_gc_SoA<T>(HSIZE, hash_function);
 
     generate_data_p0<T>( // the seed is for rdd the run id
         data, data_size, distinct_value_count, hash_function, 
@@ -796,7 +818,7 @@ void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algori
 
 
 template <typename T>
-size_t run_test(Group_count<T>*& group_count, T*& data, size_t data_size, Scalar_group_count<T>* validation_baseline, size_t validation_size, bool validate, bool cleanup, bool reset){
+size_t run_test(Group_count<T>*& group_count, T*& data, size_t data_size, Scalar_gc_SoA<T>* validation_baseline, size_t validation_size, bool validate, bool cleanup, bool reset){
     uint64_t duration = run_test(group_count, data, data_size, false, false); 
 
     if(validate && validation_baseline != nullptr){
@@ -846,7 +868,7 @@ uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, st
 //--------------------------------------------
 
 template <typename T> 
-bool validation(Group_count<T>* grouping, Scalar_group_count<T> *validation_baseline, size_t validation_size){
+bool validation(Group_count<T>* grouping, Scalar_gc_SoA<T> *validation_baseline, size_t validation_size){
     std::cout << "Start Validation";
     size_t nr_of_errors = 0;
     for(size_t i = 0; i < validation_size; i++){
@@ -969,30 +991,42 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
     }
 
     switch(test){
-        case Algorithm::SCALAR_GROUP_COUNT:
-            run = new Scalar_group_count<T>(HSIZE, function);
+        case Algorithm::SCALAR_GROUP_COUNT_SOA:
+            run = new Scalar_gc_SoA<T>(HSIZE, function);
+            break;
+        case Algorithm::SCALAR_GROUP_COUNT_AOS:
+            run = new Scalar_gc_AoS<T>(HSIZE, function);
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
-            run = new AVX512_group_count_SoA_v1<T>(HSIZE, function);
+            run = new AVX512_gc_SoA_v1<T>(HSIZE, function);
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_V2:
-            run = new AVX512_group_count_SoA_v2<T>(HSIZE, function);
+            run = new AVX512_gc_SoA_v2<T>(HSIZE, function);
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_V3:
-            run = new AVX512_group_count_SoA_v3<T>(HSIZE, function);
+            run = new AVX512_gc_SoA_v3<T>(HSIZE, function);
+            break;        
+        case Algorithm::AVX512_GROUP_COUNT_AOS_V1:
+            run = new AVX512_gc_AoS_v1<T>(HSIZE, function);
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
-            run = new AVX512_group_count_SoAoV_v1<T>(HSIZE, function);
+            run = new AVX512_gc_SoAoV_v1<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V1:
+            run = new AVX512_gc_AoSoV_v1<T>(HSIZE, function);
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOAOV_V2:
-            run = new AVX512_group_count_SoAoV_v2<T>(HSIZE, function);
+            run = new AVX512_gc_SoAoV_v2<T>(HSIZE, function);
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
-            run = new AVX512_group_count_SoA_conflict_v1<T>(HSIZE, function);
+            run = new AVX512_gc_SoA_conflict_v1<T>(HSIZE, function);
             break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2:
-            run = new AVX512_group_count_SoA_conflict_v2<T>(HSIZE, function);
+            run = new AVX512_gc_SoA_conflict_v2<T>(HSIZE, function);
             break;        
+        case Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1:
+            run = new AVX512_gc_AoS_conflict_v1<T>(HSIZE, function);
+            break;
         case Algorithm::CHAINED:
             run = new Chained<T>(HSIZE, function);
             break;
@@ -1002,4 +1036,115 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
         default:
             throw std::runtime_error("One of the Algorithms isn't supported yet!");
     }
+}
+
+template <typename T> 
+bool all_algorithm_test(){
+    srand(std::time(nullptr));
+
+    std::cout << "\nAlgorithm Test\n";
+
+    Algorithm all_algorithms_undertest [] = {
+        Algorithm::SCALAR_GROUP_COUNT_SOA, 
+        Algorithm::AVX512_GROUP_COUNT_SOA_V1, 
+        Algorithm::AVX512_GROUP_COUNT_SOA_V2, 
+        Algorithm::AVX512_GROUP_COUNT_SOA_V3, 
+        Algorithm::AVX512_GROUP_COUNT_SOAOV_V1, 
+        Algorithm::AVX512_GROUP_COUNT_SOAOV_V2, 
+        Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
+        Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2, 
+        Algorithm::CHAINED, 
+        Algorithm::CHAINED2,
+        
+        Algorithm::SCALAR_GROUP_COUNT_AOS, 
+        Algorithm::AVX512_GROUP_COUNT_AOS_V1, 
+        // Algorithm::AVX512_GROUP_COUNT_AOS_V2, 
+        // Algorithm::AVX512_GROUP_COUNT_AOS_V3, 
+        Algorithm::AVX512_GROUP_COUNT_AOSOV_V1,
+        // Algorithm::AVX512_GROUP_COUNT_AOSOV_V2, 
+         Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
+        // Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2
+    };
+
+    const size_t algorithm_count = sizeof(all_algorithms_undertest) / sizeof(all_algorithms_undertest[0]);
+    const size_t distinct = 128+15;
+    const size_t data_size = distinct * 10 + 1;
+
+    bool error = false;
+    hash_fptr<T> function = get_hash_function<T>(HashFunction::MODULO);
+
+    Group_count<T> *base_line = nullptr;
+    getGroupCount(base_line, Algorithm::SCALAR_GROUP_COUNT_SOA, distinct * 2.1, function);
+
+    T* data = (T*) aligned_alloc(64, data_size * sizeof(T));
+
+
+    size_t d = generate_data_p0<T>(
+        data, 
+        data_size, 
+        distinct, 
+        function,
+        2,  // 2 collisions groups
+        45, //  of length 45
+        std::rand()
+    );
+    
+    base_line->create_hash_table(data, data_size);
+
+    T * all_values = (T*) aligned_alloc(64, distinct * sizeof(T));
+
+    size_t nr_placed = 0;
+    for(size_t i = 0; i < data_size && nr_placed < distinct; i++){
+        bool placed = false;
+
+        for(size_t e = 0; e < nr_placed && !placed; e++){
+            placed = all_values[e] == data[i];
+        }
+        
+        if(!placed){
+            all_values[nr_placed] = data[i];
+            nr_placed++;
+        }
+    }
+
+    
+    Group_count<T> *alg = nullptr;
+    for(size_t alg_id = 0; alg_id < algorithm_count; alg_id++){
+        Algorithm check = all_algorithms_undertest[alg_id];
+        bool okay = true;    
+        try{
+            getGroupCount(alg, check, distinct, function);
+        }catch(std::exception& e){
+            okay = false;
+            std::cout << "|\tUNKOWN ALGORITHM. Enum entry: " << check << std::endl;
+        }
+        if(okay){
+            bool promted = false;
+            alg->create_hash_table(data, data_size);
+            std::cout << "|\t" << alg->identify();
+            for(size_t i = 0; i < distinct; i++){
+                
+                size_t value = all_values[i];
+                size_t a_count = alg->get(value);
+                size_t b_count = base_line->get(value);
+
+                if(a_count != b_count){
+                    if(!promted){
+                        std::cout << "\tERROR\n";
+                        promted = true;
+                    }
+                    std::cout << "|\t|\t" << value << "\tis: " << a_count << "\tshould be: " << b_count<<std::endl;
+                    error = true;
+                }
+            }
+            if(promted && error){
+                std::cout << "|\t+------------------\n";
+            }
+            if(!promted){
+                std::cout << " \tOK\n";
+            }
+        }
+    }
+    std::cout << "+-------------\n\n";
+    return error;
 }

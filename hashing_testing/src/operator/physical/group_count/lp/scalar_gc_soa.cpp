@@ -2,12 +2,12 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "scalar_group_count.hpp"
+#include "scalar_gc_soa.hpp"
 
 #define EMPTY_SPOT 0
 
 template <typename T>
-Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, size_t (*hash_function)(T, size_t), bool extend, int32_t bonus_scale)
+Scalar_gc_SoA<T>::Scalar_gc_SoA(size_t HSIZE, size_t (*hash_function)(T, size_t), bool extend, int32_t bonus_scale)
     : Group_count<T>(HSIZE, hash_function, bonus_scale)
 {   
     size_t elements = HSIZE;
@@ -26,7 +26,7 @@ Scalar_group_count<T>::Scalar_group_count(size_t HSIZE, size_t (*hash_function)(
 }
 
 template <typename T>
-Scalar_group_count<T>::~Scalar_group_count(){
+Scalar_gc_SoA<T>::~Scalar_gc_SoA(){
     free(m_hash_vec);
     m_hash_vec = nullptr;
     free(m_count_vec);
@@ -34,12 +34,12 @@ Scalar_group_count<T>::~Scalar_group_count(){
 }
 
 template <typename T>
-std::string Scalar_group_count<T>::identify(){
+std::string Scalar_gc_SoA<T>::identify(){
     return "Scalar Group Count SoA Version 1";
 }
 
 template <typename T>
-void Scalar_group_count<T>::create_hash_table(T* input, size_t data_size){
+void Scalar_gc_SoA<T>::create_hash_table(T* input, size_t data_size){
     size_t p = 0;
     size_t HSIZE = this->m_HSIZE;
     // Iterate over input 
@@ -75,7 +75,7 @@ void Scalar_group_count<T>::create_hash_table(T* input, size_t data_size){
 }
 
 template <typename T>
-T Scalar_group_count<T>::get(T input){
+T Scalar_gc_SoA<T>::get(T input){
     size_t rounds = 0;
     size_t HSIZE = this->m_HSIZE;
     
@@ -97,7 +97,7 @@ T Scalar_group_count<T>::get(T input){
 }
 
 template <typename T>
-void Scalar_group_count<T>::print(bool horizontal){
+void Scalar_gc_SoA<T>::print(bool horizontal){
     size_t count = 0;
     size_t HSIZE = this->m_HSIZE;
 
@@ -129,7 +129,7 @@ void Scalar_group_count<T>::print(bool horizontal){
 }
 
 template <typename T>
-void Scalar_group_count<T>::clear(){
+void Scalar_gc_SoA<T>::clear(){
     for(size_t i = 0; i < this->m_HSIZE; i++){
         m_hash_vec[i] = 0;
         m_count_vec[i] = 0;
@@ -137,9 +137,9 @@ void Scalar_group_count<T>::clear(){
 }
 
 template <typename T>
-size_t Scalar_group_count<T>::get_HSIZE(){
+size_t Scalar_gc_SoA<T>::get_HSIZE(){
     return this->m_HSIZE;
 }
 
-template class Scalar_group_count<uint32_t>;
-template class Scalar_group_count<uint64_t>;
+template class Scalar_gc_SoA<uint32_t>;
+template class Scalar_gc_SoA<uint64_t>;
