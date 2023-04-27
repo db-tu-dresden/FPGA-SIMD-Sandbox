@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <vector>
 #include <cstdlib>
-#include <chrono>
 
 #include "../operator/physical/group_count/lp/scalar_gc_soa.hpp"
 #include "../operator/physical/group_count/lp/scalar_gc_aos.hpp"
@@ -26,6 +25,8 @@
 
 #include "../operator/physical/group_count/chained/chained.hpp"
 #include "../operator/physical/group_count/chained/chained2.hpp"
+
+#include "utility.hpp"
 
 #include "datagenerator/datagen.hpp"
 #include "benchmark/table.hpp"
@@ -109,16 +110,6 @@ size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, Scalar_
 /// @return the time the execution took in nano seconds
 template <typename T>
 size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cleanup = false, bool reset = true);
-
-/// @brief creates a time point now
-/// @return current time point
-std::chrono::high_resolution_clock::time_point time_now();
-
-/// @brief calculates the time differeance between two time points
-/// @param begin starting time point
-/// @param end end time point
-/// @return time between the given time points in nano seconds
-uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end);
 
 //--------------------------------------------
 // output functions
@@ -871,15 +862,6 @@ size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cl
     return duration;
 }
 
-std::chrono::high_resolution_clock::time_point time_now(){
-    return std::chrono::high_resolution_clock::now();
-}
-
-uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end){
-    return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-}
-
-
 //--------------------------------------------
 //validation function
 //--------------------------------------------
@@ -970,7 +952,7 @@ void status_output(size_t &runs_done, const size_t total_runs, double &percentag
     runs_done++;
     std::chrono::high_resolution_clock::time_point time_end;
     double current_percentage = (runs_done * 100.) / total_runs;
-    if(current_percentage >= percentage_done + percentage_print){
+    if(current_percentage > percentage_done + percentage_print){
         while(current_percentage > percentage_done + percentage_print){
             percentage_done += percentage_print;
         }
