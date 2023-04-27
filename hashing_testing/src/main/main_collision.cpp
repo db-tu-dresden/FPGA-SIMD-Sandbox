@@ -18,6 +18,7 @@
 #include "../operator/physical/group_count/lcp/avx512_gc_soaov_v1.hpp"
 #include "../operator/physical/group_count/lcp/avx512_gc_soaov_v2.hpp"
 #include "../operator/physical/group_count/lcp/avx512_gc_aosov_v1.hpp"
+#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v2.hpp"
 
 #include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v1.hpp"
 #include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v2.hpp"
@@ -230,8 +231,8 @@ bool all_algorithm_test();
 
 //meta benchmark info!
 using ps_type = uint32_t; 
-size_t repeats_same_data = 15;
-size_t repeats_different_data = 5;
+size_t repeats_same_data = 2;
+size_t repeats_different_data = 2;
 
 int main(int argc, char** argv){
     // Chained<uint32_t>->chained_hash_function = get_hash_function(HashFunction::NOISE);
@@ -240,7 +241,7 @@ int main(int argc, char** argv){
 
 
     all_algorithm_test<ps_type>();
-    return 0;
+    // return 0;
 
     size_t distinct_value_count = 2048;
     size_t all_data_sizes = 32 * 1024 * 1024;// 1024*1024*1024;
@@ -248,16 +249,32 @@ int main(int argc, char** argv){
     float scale_boost = 1.0f;
 
     Algorithm algorithms_undertest [] = {
-        Algorithm::SCALAR_GROUP_COUNT_SOA
+        Algorithm::SCALAR_GROUP_COUNT_SOA 
+        , Algorithm::SCALAR_GROUP_COUNT_AOS 
+
         , Algorithm::AVX512_GROUP_COUNT_SOA_V1
-        // // // , Algorithm::AVX512_GROUP_COUNT_SOA_V2
-        // // // , Algorithm::AVX512_GROUP_COUNT_SOA_V3
+        , Algorithm::AVX512_GROUP_COUNT_AOS_V1 
+        
+        // , Algorithm::AVX512_GROUP_COUNT_SOA_V2  // uninteresting 
+        // , Algorithm::AVX512_GROUP_COUNT_SOA_V3  // uninteresting
+
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
+        , Algorithm::AVX512_GROUP_COUNT_AOSOV_V1
+        
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V2 
-        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1
-        // // // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2
-        , Algorithm::CHAINED
-        , Algorithm::CHAINED2
+        , Algorithm::AVX512_GROUP_COUNT_AOSOV_V2 
+
+        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1 
+        , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
+        
+        // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2 // uninteresting
+        
+        // , Algorithm::CHAINED 
+        // , Algorithm::CHAINED2 
+
+        // , Algorithm::AVX512_GROUP_COUNT_AOS_V2 // not (yet) implemented 
+        // , Algorithm::AVX512_GROUP_COUNT_AOS_V3 // not (yet) implemented
+        // , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2 // not (yet) implemented
     };
     
     // size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
@@ -268,7 +285,7 @@ int main(int argc, char** argv){
         HashFunction::MODULO, 
         // // HashFunction::MURMUR, 
         // // HashFunction::TABULATION,
-        HashFunction::SIP_HASH,        
+        // HashFunction::SIP_HASH,        
         HashFunction::NOISE
     };
     
@@ -277,7 +294,7 @@ int main(int argc, char** argv){
 
 
 
-    /* //data generation Benchmarks
+    //* //data generation Benchmarks
     // test0<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, functions_to_test, number_hash_functions, scale_boost);
     // test1<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, functions_to_test, number_hash_functions, scale_boost);
     test2<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, functions_to_test, number_hash_functions, scale_boost);
@@ -286,7 +303,7 @@ int main(int argc, char** argv){
 
     // alg_testing<ps_type>(128, 64, Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2, &id_mod);
     
-    //* //Benchmarks with table data.
+    /* //Benchmarks with table data.
     std::string benchmark = "orders";
     size_t target = 4;
 
@@ -1018,6 +1035,9 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
         case Algorithm::AVX512_GROUP_COUNT_SOAOV_V2:
             run = new AVX512_gc_SoAoV_v2<T>(HSIZE, function);
             break;
+        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V2:
+            run = new AVX512_gc_AoSoV_v2<T>(HSIZE, function);
+            break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
             run = new AVX512_gc_SoA_conflict_v1<T>(HSIZE, function);
             break;
@@ -1061,8 +1081,8 @@ bool all_algorithm_test(){
         // Algorithm::AVX512_GROUP_COUNT_AOS_V2, 
         // Algorithm::AVX512_GROUP_COUNT_AOS_V3, 
         Algorithm::AVX512_GROUP_COUNT_AOSOV_V1,
-        // Algorithm::AVX512_GROUP_COUNT_AOSOV_V2, 
-         Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
+        Algorithm::AVX512_GROUP_COUNT_AOSOV_V2, 
+        Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
         // Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2
     };
 
