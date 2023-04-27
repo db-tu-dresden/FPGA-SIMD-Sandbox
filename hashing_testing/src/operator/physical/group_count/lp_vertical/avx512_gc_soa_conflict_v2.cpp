@@ -21,13 +21,6 @@ AVX512_gc_SoA_conflict_v2<T>::~AVX512_gc_SoA_conflict_v2(){
     // free(this->m_count_vec);
 }
 
-
-template <typename T>
-std::string AVX512_gc_SoA_conflict_v2<T>::identify(){
-    return "AVX512 Group Count SoA conflict Version 2";
-}
-
-
 template <typename T>
 void AVX512_gc_SoA_conflict_v2<T>::create_hash_table(T* input, size_t data_size){
     

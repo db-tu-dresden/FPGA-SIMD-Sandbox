@@ -19,11 +19,6 @@ Chained<T>::~Chained(){
 }
 
 template <typename T>
-std::string Chained<T>::identify(){
-    return "Chained Group Count AoS";
-}
-
-template <typename T>
 void Chained<T>::create_hash_table(T* input, size_t data_size){
     size_t p = 0;
     size_t HSIZE = this->m_HSIZE;

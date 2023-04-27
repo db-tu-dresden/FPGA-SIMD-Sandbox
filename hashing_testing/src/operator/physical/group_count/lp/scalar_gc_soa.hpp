@@ -25,7 +25,9 @@ class Scalar_gc_SoA : public Group_count<T>{
 
         void print(bool horizontal);
 
-        std::string identify();
+        std::string identify(){
+            return "LP SoA";
+        }
         
         size_t get_HSIZE();
         

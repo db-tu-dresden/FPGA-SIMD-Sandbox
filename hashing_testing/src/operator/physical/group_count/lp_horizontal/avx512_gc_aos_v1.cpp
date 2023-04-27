@@ -21,14 +21,6 @@ AVX512_gc_AoS_v1<T>::~AVX512_gc_AoS_v1(){
     // free(this->m_count_vec);
 }
 
-
-template <typename T>
-std::string AVX512_gc_AoS_v1<T>::identify(){
-    return "AVX512 Group Count AoS Version 1";
-}
-
-
-
 // only an 32 bit uint implementation rn, because we don't use the tvl rn. As soon as we use the TVL we should reform this code to support it.
 template <>
 void AVX512_gc_AoS_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){

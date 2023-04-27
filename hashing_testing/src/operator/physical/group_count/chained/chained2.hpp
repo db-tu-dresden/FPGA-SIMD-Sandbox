@@ -55,9 +55,7 @@ class Chained2 : public Group_count<T>{
     protected:
         std::unordered_map<Key, T, KeyHasher> *map;
 
-
     public:
-
         Chained2(size_t HSIZE, size_t (*hash_function)(T, size_t), bool extend = false, int32_t bonus_scale = 1);
         virtual ~Chained2();
         
@@ -67,7 +65,9 @@ class Chained2 : public Group_count<T>{
 
         void print(bool horizontal);
 
-        std::string identify();
+        std::string identify(){
+            return "unordered_map collision";
+        }
         
         size_t get_HSIZE();
         

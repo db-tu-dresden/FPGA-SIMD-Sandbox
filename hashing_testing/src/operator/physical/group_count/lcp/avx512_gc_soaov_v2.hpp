@@ -22,7 +22,9 @@ class AVX512_gc_SoAoV_v2 : public AVX512_gc_SoAoV_v1<T>{
         AVX512_gc_SoAoV_v2(size_t HSIZE, size_t (*hash_function)(T, size_t));
         virtual ~AVX512_gc_SoAoV_v2();
 
-        std::string identify();
+        std::string identify(){
+            return "LCP SoA";
+        }
 };
 
 #endif //TUD_HASHING_TESTING_AVX512_GROUP_COUNT_SOAOV_v2

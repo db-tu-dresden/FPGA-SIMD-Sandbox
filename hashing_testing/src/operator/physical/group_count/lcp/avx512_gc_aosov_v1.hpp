@@ -32,7 +32,9 @@ class AVX512_gc_AoSoV_v1 : public Scalar_gc_AoS<T>{
 
         void print(bool horizontal);
 
-        std::string identify();
+        std::string identify(){
+            return "LCP small AoS";
+        }
 
         size_t get_HSIZE(){
             return m_HSIZE_v * m_elements_per_vector;

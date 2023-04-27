@@ -10,10 +10,5 @@ AVX512_gc_AoSoV_v2<T>::AVX512_gc_AoSoV_v2(size_t HSIZE, size_t (*hash_function)(
 template <typename T>
 AVX512_gc_AoSoV_v2<T>::~AVX512_gc_AoSoV_v2(){}
 
-template <typename T>
-std::string AVX512_gc_AoSoV_v2<T>::identify(){
-    return "AVX512 Group Count AoSoV Version 2";
-}
-
 template class AVX512_gc_AoSoV_v2<uint32_t>;
 // template class AVX512_gc_AoSoV_v2<uint64_t>;

@@ -35,7 +35,9 @@ class AVX512_gc_SoAoV_v1 : public Scalar_gc_SoA<T>{
 
         void print(bool horizontal);
 
-        std::string identify();
+        std::string identify(){
+            return "LCP small SoA";
+        }
 
         size_t get_HSIZE(){
             return m_HSIZE_v * m_elements_per_vector;

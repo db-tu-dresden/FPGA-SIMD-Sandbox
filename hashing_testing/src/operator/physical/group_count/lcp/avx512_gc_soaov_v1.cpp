@@ -36,11 +36,6 @@ AVX512_gc_SoAoV_v1<T>::~AVX512_gc_SoAoV_v1(){
     free(this->m_masks);
 }
 
-template <typename T>
-std::string AVX512_gc_SoAoV_v1<T>::identify(){
-    return "AVX512 Group Count SoAoV Version 1";
-}
-
 template <>
 void AVX512_gc_SoAoV_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_size){
     

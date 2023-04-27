@@ -20,7 +20,9 @@ class Scalar_gc_AoS : public Group_count<T>{
 
         void print(bool horizontal);
 
-        std::string identify();
+        std::string identify(){
+            return "LP AoS";
+        }
         
         size_t get_HSIZE();
         

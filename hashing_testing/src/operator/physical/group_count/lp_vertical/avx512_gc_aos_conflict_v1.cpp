@@ -21,13 +21,6 @@ AVX512_gc_AoS_conflict_v1<T>::~AVX512_gc_AoS_conflict_v1(){
     // free(this->m_count_vec);
 }
 
-
-template <typename T>
-std::string AVX512_gc_AoS_conflict_v1<T>::identify(){
-    return "AVX512 Group Count AoS conflict Version 1";
-}
-
-
 template <typename T>
 void AVX512_gc_AoS_conflict_v1<T>::create_hash_table(T* input, size_t data_size){
     size_t HSIZE = this->m_HSIZE;

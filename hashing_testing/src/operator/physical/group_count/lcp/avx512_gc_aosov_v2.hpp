@@ -22,7 +22,9 @@ class AVX512_gc_AoSoV_v2 : public AVX512_gc_AoSoV_v1<T>{
         AVX512_gc_AoSoV_v2(size_t HSIZE, size_t (*hash_function)(T, size_t));
         virtual ~AVX512_gc_AoSoV_v2();
 
-        std::string identify();
+        std::string identify(){
+            return "LCP AoS";
+        }
 };
 
 #endif //TUD_HASHING_TESTING_AVX512_GROUP_COUNT_AOSOV_v2

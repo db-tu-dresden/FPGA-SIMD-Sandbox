@@ -32,11 +32,6 @@ Scalar_gc_AoS<T>::~Scalar_gc_AoS(){
 }
 
 template <typename T>
-std::string Scalar_gc_AoS<T>::identify(){
-    return "Scalar Group Count AoS Version 1";
-}
-
-template <typename T>
 void Scalar_gc_AoS<T>::create_hash_table(T* input, size_t data_size){
 
     size_t HSIZE = this->m_HSIZE;

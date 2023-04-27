@@ -34,11 +34,6 @@ Scalar_gc_SoA<T>::~Scalar_gc_SoA(){
 }
 
 template <typename T>
-std::string Scalar_gc_SoA<T>::identify(){
-    return "Scalar Group Count SoA Version 1";
-}
-
-template <typename T>
 void Scalar_gc_SoA<T>::create_hash_table(T* input, size_t data_size){
     size_t p = 0;
     size_t HSIZE = this->m_HSIZE;

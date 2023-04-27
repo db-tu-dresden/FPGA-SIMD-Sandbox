@@ -16,7 +16,9 @@ class AVX512_gc_SoA_conflict_v1 : public Scalar_gc_SoA<T>{
         
         void create_hash_table(T* input, size_t data_size);
         
-        std::string identify();
+        std::string identify(){
+            return "LP vertical SoA";
+        }
 };
 
 
