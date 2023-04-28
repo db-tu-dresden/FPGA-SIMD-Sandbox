@@ -1,0 +1,76 @@
+
+########################################################################
+#      Date:           Fri Apr 28 01:46:17 PDT 2023
+#    Job ID:           2286324.v-qsvr-1.aidevcloud
+#      User:           u177951
+# Resources:           cput=75:00:00,neednodes=1:fpga_runtime:stratix10:ppn=2,nodes=1:fpga_runtime:stratix10:ppn=2,walltime=01:00:00
+########################################################################
+
+sourcing /opt/intel/inteloneapi/setvars.sh
+ 
+:: WARNING: setvars.sh has already been run. Skipping re-execution.
+   To force a re-execution of setvars.sh, use the '--force' option.
+   Using '--force' can result in excessive use of your environment variables.
+  
+usage: source setvars.sh [--force] [--config=file] [--help] [...]
+  --force        Force setvars.sh to re-run, doing so may overload environment.
+  --config=file  Customize env vars using a setvars.sh configuration file.
+  --help         Display this help message and exit.
+  ...            Additional args are passed to individual env/vars.sh scripts
+                 and should follow this script's arguments.
+  
+  Some POSIX shells do not accept command-line options. In that case, you can pass
+  command-line options via the SETVARS_ARGS environment variable. For example:
+  
+  $ SETVARS_ARGS="ia32 --config=config.txt" ; export SETVARS_ARGS
+  $ . path/to/setvars.sh
+  
+  The SETVARS_ARGS environment variable is cleared on exiting setvars.sh.
+  
+
+Running on FPGA Hardware:
+aocl initialize: Running initialize from /opt/intel/oneapi/intel_s10sx_pac/linux64/libexec
+Program succeed. 
+Input vector length (atoi(argv[1])): 163840000 
+Number CL buckets: 40000 
+Number CLs: 10240000 
+==============================================
+============= Program Start ==================
+==============================================
+Global configuration:
+distinctValues | scale-facor | dataSize : 64000 | 1.6 | 163840000
+Configured HSIZE : 102400
+Configured DATATYPE within registers : j
+Configured register size (regSize) for data transfer : 256 byte (= 2048 bit)
+==============================================
+==============================================
+
+ 
+ ### START of Linear Probing for FPGA - SIMD Variant 1 ### 
+
+Memory allocated - 163840000 values, between 1 and 64000
+HashTable allocated - 102400 values
+Generation of initial data done.
+==============================
+Kernel-Start : LinearProbingFPGA_variant1() == SoA_v1 -- SIMD for FPGA Variant v1:
+Running on FPGA Hardware with a dataSize of 163840000 values!
+Kernel runtime of function LinearProbingFPGA_variant1(): 39559.8 ms.
+==============================
+Value in variable dataSize: 163840000
+ 
+Final result check: compare parameter dataSize against sum of all count values in countVec:
+163840000 163840000
+ 
+ 
+Final Evaluation of the Throughput: 
+Input_size_mb: 655.36
+HOST-DEVICE Throughput: 16.5663 MB/s
+ ### End of Linear Probing for FPGA - SIMD Variant 1 ### 
+==============================================
+==============================================
+
+########################################################################
+# End of output for job 2286324.v-qsvr-1.aidevcloud
+# Date: Fri Apr 28 01:47:56 PDT 2023
+########################################################################
+
