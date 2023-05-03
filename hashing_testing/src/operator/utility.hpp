@@ -7,11 +7,17 @@
 
 #include <immintrin.h>
 
-void print512i(__m512i a, bool newline = true){
+void print512i(__m512i a, bool low_to_high = false, bool newline = true){
     uint32_t *res = (uint32_t*) aligned_alloc(64, 1*sizeof(__m512i));
     _mm512_store_epi32 (res, a);
-    for(uint32_t i = 16; i > 0; i--){
-        std::cout << res[i-1] << "\t";
+    if(low_to_high){
+        for(uint32_t i = 0; i < 16; i++){
+            std::cout << res[i] << "\t";
+        }
+    }else{
+        for(uint32_t i = 16; i > 0; i--){
+            std::cout << res[i-1] << "\t";
+        }
     }
     free(res);
     if(newline){

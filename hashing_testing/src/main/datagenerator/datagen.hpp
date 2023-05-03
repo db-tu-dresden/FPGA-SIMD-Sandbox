@@ -476,9 +476,11 @@ size_t generate_data_p0(
     size_t expected_hsize = p0_parameter_gen_hsize(collision_count, collision_size);
 
     if(expected_hsize > distinct_values){
+        throw std::runtime_error("The configuration asks for to many numbers! increase distinct_values or decrease the collision parameters.");    
         return 0; // HSIZE is to small for the given configuration to fit.
     }
     if(seed == 0){
+        throw std::runtime_error("The seed may not be zero!");
         return 0; // invalid seed
     }
     
@@ -511,7 +513,7 @@ size_t generate_data_p0(
     }
 
     generate_benchmark_data<T>(result, data_size, &numbers, seed+1 );    
-    return data_size;
+    return numbers.size();
 }
 
 

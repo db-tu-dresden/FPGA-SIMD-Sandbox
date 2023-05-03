@@ -18,6 +18,8 @@
 #include "../operator/physical/group_count/lcp/avx512_gc_soaov_v2.hpp"
 #include "../operator/physical/group_count/lcp/avx512_gc_aosov_v1.hpp"
 #include "../operator/physical/group_count/lcp/avx512_gc_aosov_v2.hpp"
+#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v3.hpp"
+#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v4.hpp"
 
 #include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v1.hpp"
 #include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v2.hpp"
@@ -53,7 +55,9 @@ enum Algorithm{
     AVX512_GROUP_COUNT_AOS_V2, 
     AVX512_GROUP_COUNT_AOS_V3, 
     AVX512_GROUP_COUNT_AOSOV_V1,     
-    AVX512_GROUP_COUNT_AOSOV_V2, 
+    AVX512_GROUP_COUNT_AOSOV_V2,    
+    AVX512_GROUP_COUNT_AOSOV_V3,     
+    AVX512_GROUP_COUNT_AOSOV_V4,  
     AVX512_GROUP_COUNT_AOS_CONFLICT_V1, 
     AVX512_GROUP_COUNT_AOS_CONFLICT_V2,
     CHAINED,
@@ -222,8 +226,8 @@ bool all_algorithm_test();
 
 //meta benchmark info!
 using ps_type = uint32_t; 
-size_t repeats_same_data = 2;
-size_t repeats_different_data = 2;
+size_t repeats_same_data = 3;
+size_t repeats_different_data = 3;
 
 int main(int argc, char** argv){
     // Chained<uint32_t>->chained_hash_function = get_hash_function(HashFunction::NOISE);
@@ -240,32 +244,34 @@ int main(int argc, char** argv){
     float scale_boost = 1.0f;
 
     Algorithm algorithms_undertest [] = {
-        Algorithm::SCALAR_GROUP_COUNT_SOA 
-        , Algorithm::SCALAR_GROUP_COUNT_AOS 
+        // Algorithm::SCALAR_GROUP_COUNT_SOA 
+        // , Algorithm::SCALAR_GROUP_COUNT_AOS 
 
-        , Algorithm::AVX512_GROUP_COUNT_SOA_V1
+        /*,*/ Algorithm::AVX512_GROUP_COUNT_SOA_V1
         , Algorithm::AVX512_GROUP_COUNT_AOS_V1 
         
-        // , Algorithm::AVX512_GROUP_COUNT_SOA_V2  // uninteresting 
-        // , Algorithm::AVX512_GROUP_COUNT_SOA_V3  // uninteresting
+        // // , Algorithm::AVX512_GROUP_COUNT_SOA_V2  // uninteresting 
+        // // , Algorithm::AVX512_GROUP_COUNT_SOA_V3  // uninteresting
 
-        , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
-        , Algorithm::AVX512_GROUP_COUNT_AOSOV_V1
+        // , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
+        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V1
         
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V2 
         , Algorithm::AVX512_GROUP_COUNT_AOSOV_V2 
 
-        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1 
-        , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
+        // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1 
+        // , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
         
-        // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2 // uninteresting
+        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V3
+        , Algorithm::AVX512_GROUP_COUNT_AOSOV_V4
+    //     // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2 // uninteresting
         
-        // , Algorithm::CHAINED 
-        // , Algorithm::CHAINED2 
+    //     // , Algorithm::CHAINED 
+    //     // , Algorithm::CHAINED2 
 
-        // , Algorithm::AVX512_GROUP_COUNT_AOS_V2 // not (yet) implemented 
-        // , Algorithm::AVX512_GROUP_COUNT_AOS_V3 // not (yet) implemented
-        // , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2 // not (yet) implemented
+    //     // , Algorithm::AVX512_GROUP_COUNT_AOS_V2 // not (yet) implemented 
+    //     // , Algorithm::AVX512_GROUP_COUNT_AOS_V3 // not (yet) implemented
+    //     // , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2 // not (yet) implemented
     };
     
     // size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
@@ -273,7 +279,7 @@ int main(int argc, char** argv){
         // // HashFunction::MULTIPLY_PRIME,
         // HashFunction::MULITPLY_SHIFT, 
         // HashFunction::MULTIPLY_ADD_SHIFT, 
-        HashFunction::MODULO, 
+        // HashFunction::MODULO, 
         // // HashFunction::MURMUR, 
         // // HashFunction::TABULATION,
         // HashFunction::SIP_HASH,        
@@ -1020,6 +1026,12 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
         case Algorithm::AVX512_GROUP_COUNT_AOSOV_V2:
             run = new AVX512_gc_AoSoV_v2<T>(HSIZE, function);
             break;
+        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V3:
+            run = new AVX512_gc_AoSoV_v3<T>(HSIZE, function);
+            break;
+        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V4:
+            run = new AVX512_gc_AoSoV_v4<T>(HSIZE, function);
+            break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
             run = new AVX512_gc_SoA_conflict_v1<T>(HSIZE, function);
             break;
@@ -1063,14 +1075,16 @@ bool all_algorithm_test(){
         // Algorithm::AVX512_GROUP_COUNT_AOS_V2, 
         // Algorithm::AVX512_GROUP_COUNT_AOS_V3, 
         Algorithm::AVX512_GROUP_COUNT_AOSOV_V1,
-        Algorithm::AVX512_GROUP_COUNT_AOSOV_V2, 
-        Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
+        Algorithm::AVX512_GROUP_COUNT_AOSOV_V2,
+        Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1, 
+        Algorithm::AVX512_GROUP_COUNT_AOSOV_V3,
+        Algorithm::AVX512_GROUP_COUNT_AOSOV_V4
         // Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2
     };
 
     const size_t algorithm_count = sizeof(all_algorithms_undertest) / sizeof(all_algorithms_undertest[0]);
-    const size_t distinct = 128+15;
-    const size_t data_size = distinct * 10 + 1;
+    const size_t distinct = 32;///+15;
+    const size_t data_size = distinct * 2 + 1;
 
     bool error = false;
     hash_fptr<T> function = get_hash_function<T>(HashFunction::MODULO);
@@ -1086,8 +1100,8 @@ bool all_algorithm_test(){
         data_size, 
         distinct, 
         function,
-        2,  // 2 collisions groups
-        45, //  of length 45
+        1,  // 2 collisions groups
+        9, //  of length 45
         std::rand()
     );
     
@@ -1096,7 +1110,7 @@ bool all_algorithm_test(){
     T * all_values = (T*) aligned_alloc(64, distinct * sizeof(T));
 
     size_t nr_placed = 0;
-    for(size_t i = 0; i < data_size && nr_placed < distinct; i++){
+    for(size_t i = 0; i < data_size && nr_placed < d; i++){
         bool placed = false;
 
         for(size_t e = 0; e < nr_placed && !placed; e++){
@@ -1113,18 +1127,18 @@ bool all_algorithm_test(){
     Group_count<T> *alg = nullptr;
     for(size_t alg_id = 0; alg_id < algorithm_count; alg_id++){
         Algorithm check = all_algorithms_undertest[alg_id];
-        bool okay = true;    
+        bool executable = true;    
         try{
             getGroupCount(alg, check, distinct, function);
         }catch(std::exception& e){
-            okay = false;
+            executable = false;
             std::cout << "|\tUNKOWN ALGORITHM. Enum entry: " << check << std::endl;
         }
-        if(okay){
+        if(executable){
             bool promted = false;
             alg->create_hash_table(data, data_size);
             std::cout << "|\t" << alg->identify();
-            for(size_t i = 0; i < distinct; i++){
+            for(size_t i = 0; i < nr_placed; i++){
                 
                 size_t value = all_values[i];
                 size_t a_count = alg->get(value);

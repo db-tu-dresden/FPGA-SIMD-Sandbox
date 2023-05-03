@@ -101,7 +101,7 @@ void generate_random_values(
         T num;
         //keep generating until num is not 0
         do{
-            num = noise(id, seed);
+            num = noise(id, seed);// % 1000; //todo remove the mod 1000
             id++;
         }while(num == 0);
         
@@ -334,7 +334,6 @@ template<typename T>
 void generate_benchmark_data(T*& result, size_t data_size, std::vector<T> *numbers, size_t seed){
     size_t count[numbers->size()];
     size_t nr_values_per_bucket = (data_size / numbers->size()) + 1;
-
     for(size_t i = 0; i < numbers->size(); i++){
         count[i] = nr_values_per_bucket;
     }

@@ -111,7 +111,7 @@ void fill(T* data, size_t data_size, size_t seed){
 int main(int argc, char** argv){
     using type = uint32_t;
     size_t stack_size = 8192; // report of: ulimit -a 
-    stack_size -= 16;
+    stack_size -= 12;
     size_t element_count = stack_size * 1024 / sizeof(type) / 2; // this should fit into the stack
 
     size_t repeats = 500;
