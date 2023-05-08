@@ -276,13 +276,13 @@ void LinearProbingFPGA_variant4(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// #######################################
 			// #### END OF FPGA parallelized part ####
 			// #######################################
-/*
+
 			// store data from hash_map & count_map back to global memory	
 			for(size_t i = 0; i < m_HSIZE_v; i++){
 				size_t h = i * m_elements_per_vector;
 				store_epi32(hashVec_globalMem, h, hash_map[i]);
 				store_epi32(countVec_globalMem, h, count_map[i]);
-			}*/
+			}
 		});
 	}).wait();
 }   

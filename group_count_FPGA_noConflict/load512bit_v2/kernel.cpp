@@ -284,13 +284,13 @@ void LinearProbingFPGA_variant2(queue& q, uint32_t *arr_d, uint32_t *hashVec_d, 
 			// we can't use #pragma unroll, due to unknown value of HSIZE 
 			// -> High value of HSIZE in combination with pragma unroll can cause HIGH RAM UITLIZATION (~199%)
 			// Because we know, that we are working often with 16 elements per register (16x32bit=512bit), we unroll with factor 16
-/*			
+		
 			#pragma unroll 16
 			for(int i=0; i<HSIZE; i++) {
 				hashVec_globalMem[i]=hashVec[i]; 
 				countVec_globalMem[i]=countVec[i]; 	
 			}
-*/
+
 
 		});
 	}).wait();
