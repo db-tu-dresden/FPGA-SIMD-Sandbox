@@ -195,6 +195,8 @@ template <typename T>
 int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
 template <typename T> 
 int test2(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
+template <typename T> 
+int test3(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float = 1.f);
 
 /// @brief Executes a the given algorithms with the given functions a number of times. Uses generate_data_p0 to generate the data and uses different scaleing factors
 /// @tparam T  the datatype with which the test shall be executed
@@ -244,26 +246,26 @@ int main(int argc, char** argv){
     float scale_boost = 1.0f;
 
     Algorithm algorithms_undertest [] = {
-        // Algorithm::SCALAR_GROUP_COUNT_SOA 
-        // , Algorithm::SCALAR_GROUP_COUNT_AOS 
+        Algorithm::SCALAR_GROUP_COUNT_SOA 
+        , Algorithm::SCALAR_GROUP_COUNT_AOS 
 
-        /*,*/ Algorithm::AVX512_GROUP_COUNT_SOA_V1
+        , Algorithm::AVX512_GROUP_COUNT_SOA_V1
         , Algorithm::AVX512_GROUP_COUNT_AOS_V1 
         
         // // , Algorithm::AVX512_GROUP_COUNT_SOA_V2  // uninteresting 
         // // , Algorithm::AVX512_GROUP_COUNT_SOA_V3  // uninteresting
 
+        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1 
+        , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
+        
         // , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
         // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V1
-        
+        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V3
+
         , Algorithm::AVX512_GROUP_COUNT_SOAOV_V2 
         , Algorithm::AVX512_GROUP_COUNT_AOSOV_V2 
+        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V4
 
-        // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1 
-        // , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
-        
-        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V3
-        , Algorithm::AVX512_GROUP_COUNT_AOSOV_V4
     //     // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2 // uninteresting
         
     //     // , Algorithm::CHAINED 
@@ -289,12 +291,10 @@ int main(int argc, char** argv){
     size_t number_algorithms_undertest = sizeof(algorithms_undertest) / sizeof(algorithms_undertest[0]);
     size_t number_hash_functions = sizeof(functions_to_test) / sizeof(functions_to_test[0]);
 
-
-
     //* //data generation Benchmarks
     // test0<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, functions_to_test, number_hash_functions, scale_boost);
     // test1<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, functions_to_test, number_hash_functions, scale_boost);
-    test2<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, functions_to_test, number_hash_functions, scale_boost);
+    test3<ps_type>(all_data_sizes, distinct_value_count, algorithms_undertest, number_algorithms_undertest, functions_to_test, number_hash_functions, scale_boost);
     
     //*/
 
@@ -696,6 +696,141 @@ int test2(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     return 0;
 }
 
+//todo rework
+template <typename T> 
+int test3(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
+    size_t noise_id = 1;
+    //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
+    srand(std::time(nullptr));
+    noise_id = std::rand();
+
+    /// Benchmark info and variable declaration    
+    std::chrono::high_resolution_clock::time_point time_begin, time_end;
+    time_begin = time_now();
+
+    std::stringstream file_name_builder;
+    file_name_builder << "benchmark_test3_" << data_size << "_" << distinct_value_count << ".csv";     
+    std::string file_name = file_name_builder.str();
+    create_result_file(file_name);
+
+    const size_t elements_in_vector = (512 / 8) / sizeof(T);
+
+    float all_scales[] = {1.0f ,1.1f, 1.5f, 2.0f}; //higher is better for performance
+    size_t nr_scales = sizeof(all_scales) / sizeof(all_scales[0]);
+
+    size_t all_collision_chain_length[] = {18, 16, 14, 12, 10, 8, 6, 4, 2, 1}; // lower is better for performance
+    size_t nr_collision_chain_length = sizeof(all_collision_chain_length) / sizeof(all_collision_chain_length[0]);
+
+    size_t all_collision_chain_count[]{32, 8}; //lower is better for performance
+    size_t nr_collision_chain_count = sizeof(all_collision_chain_count)/sizeof(all_collision_chain_count[0]);
+
+    size_t total_configs = nr_scales * nr_collision_chain_count * nr_collision_chain_length * all_hash_functions_size * repeats_different_data * algorithms_undertest_size * 2;
+    size_t total_runs = repeats_same_data * total_configs; 
+
+    /// run information and status output
+    T* data = nullptr;
+    data = (T*) aligned_alloc(64, data_size * sizeof(T));
+    Group_count<T> *alg = nullptr;
+
+    double percentage_print = 0.1;
+    double percentage_done = -percentage_print;
+    size_t runs_done = 0;
+
+    std::cout << "test3 has " << total_configs << " different configurations. It will run each config " 
+        << repeats_same_data << " times resulting in " << total_runs << " total runs\n";
+    std::cout << "percentage done:\n";
+    // std::cout << nr_scales << " " << nr_collision_chain_count << " " << nr_collision_chain_length << std::endl;
+    for(size_t good = 0; good <= 1; good++){
+        bool best_case_layout = good == 1;
+    // std::cout << "d1\n"; 
+        for(size_t collision_chain_count_id = 0; collision_chain_count_id < nr_collision_chain_count; collision_chain_count_id++){
+            size_t current_collision_chain_count = all_collision_chain_count[collision_chain_count_id];
+    // std::cout << "\td2\n"; 
+            
+            for(size_t conf = 0; conf < nr_collision_chain_length && data != nullptr; conf++){// iterate over all configurations of collisions and clusters
+                size_t current_collision_chain_length = all_collision_chain_length[conf];
+    // std::cout << "\t\td3\n"; 
+
+                for(size_t scale_id = 0; scale_id < nr_scales; scale_id ++){
+                    float current_scale = all_scales[scale_id];
+    // std::cout << "\t\t\td4\n"; 
+
+                    size_t HSIZE = (size_t)(current_scale * distinct_value_count + 0.5f);
+                    HSIZE = (HSIZE + elements_in_vector - 1);
+                    HSIZE /= elements_in_vector;
+                    HSIZE *= elements_in_vector;
+
+                    for(size_t rdd = 0; rdd < repeats_different_data; rdd++){
+                        size_t seed = noise(noise_id++, 0);
+    // std::cout << "\t\t\t\td5\n"; 
+    
+                        for(size_t hash_function_id = 0; hash_function_id < all_hash_functions_size; hash_function_id++){ // sets the hashfunction. different functions lead to different data        
+                            HashFunction hash_function_enum = functions_to_test[hash_function_id];
+                            hash_fptr<T> function = get_hash_function<T>(hash_function_enum);
+    // std::cout << "\t\t\t\t\td6\n"; 
+                    
+                            size_t distinct_vals_generated = generate_data_v3<T>( // the seed is for rdd the run id
+                                data, data_size, distinct_value_count, HSIZE, function,
+                                current_collision_chain_count, current_collision_chain_length, seed, best_case_layout
+                            );
+
+                            if(distinct_vals_generated == 0){
+                                throw std::runtime_error("generate_data_v3 run into a problem with its data generation");
+                            }
+
+                            for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
+                                Algorithm test = algorithms_undertest[aus];    
+                                getGroupCount(alg, test, HSIZE, function);
+    // std::cout << "\t\t\t\t\t\td7\n"; 
+                                
+                                size_t internal_HSIZE = alg->get_HSIZE();
+                                std::string alg_identification = alg->identify();
+                                
+                                for(size_t rsd = 0; rsd < repeats_same_data; rsd++){ // could be seen as a run id
+                                    size_t time = 0;
+                                    alg->clear();
+    // std::cout << "\t\t\t\t\t\t\td8\n"; 
+
+                                    time = run_test<T>(alg, data, data_size, false);
+                                    write_to_file(
+                                        file_name, alg_identification, time, data_size,  
+                                        sizeof(T), distinct_value_count, current_scale, internal_HSIZE, 
+                                        hash_function_enum, seed, rsd,    // run
+                                        current_collision_chain_count, current_collision_chain_length, best_case_layout, good,
+                                        conf
+                                    );
+
+                                    status_output(runs_done, total_runs, percentage_done, percentage_print, time_begin);
+                                }
+                            }
+                        }
+                    }
+                }
+            }        
+        }
+    }
+
+
+
+
+
+
+    if(data != nullptr){
+        free(data);
+        data = nullptr;
+    }
+
+    if(alg != nullptr){
+        delete alg;
+        alg = nullptr;
+    }
+
+    time_end = time_now();
+    size_t duration = duration_time(time_begin, time_end);
+    std::cout << "\n\n\tIT TOOK\t" << duration << " ns OR\t" << (uint32_t)(duration / 1000000000.0) << " s OR\t" << (uint32_t)(duration / 60000000000.0)  << " min for " << data_size << "\n\n";
+
+    return 0;
+}
 
 template <typename T> 
 int test0_benchdata(T* data, size_t data_size, std::string bench_filename, size_t column, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost){
@@ -971,9 +1106,9 @@ void status_output(size_t &runs_done, const size_t total_runs, double &percentag
         size_t meta_time_min = (size_t)(meta_time_sec / 60.0 + 0.5);
         size_t meta_time_left = (size_t)(meta_time_sec / work_done * (1 - work_done));
         if(meta_time_sec < 60){
-            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_sec << " sec. Approx time left:\t" ;
+            std::cout << "\t" <<((int32_t)(1000 * percentage_done))/1000. << "%\tit took ~" << meta_time_sec << " sec. Approx time left:\t" ;
         }else{
-            std::cout << "\t" << percentage_done << "%\tit took ~" << meta_time_min << " min. Approx time left:\t" ;
+            std::cout << "\t" << ((int32_t)(1000 * percentage_done))/1000. << "%\tit took ~" << meta_time_min << " min. Approx time left:\t" ;
         }
         if(meta_time_left < 60){
             std::cout << meta_time_left << " sec" << std::endl;

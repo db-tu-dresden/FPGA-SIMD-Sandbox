@@ -79,6 +79,23 @@ void next_position(size_t &pos, size_t &budget, size_t HSIZE, size_t seed){
     pos = (pos + 1 + offset) % HSIZE;
 }
 
+
+void next_position(size_t &pos, size_t move, size_t &budget, size_t HSIZE, size_t max_move, size_t seed){
+    size_t skip = 0;
+    int64_t max_budget_move = max_move - move;
+    if(budget > 0 && max_budget_move > 0){
+        skip = noise(pos + move + budget, seed);
+        skip %= budget;
+        skip %= max_budget_move;
+        budget -= skip;
+    }
+    if(move > max_move){
+        move = max_move;
+    }
+    pos = pos + move + skip;
+    pos %= HSIZE;
+}
+
 /// @brief tries to generate enough data for each bucket for the given hash function. THROWS error if the hash function can't generate a given number for a bucket
 /// @tparam T what number gets generated
 /// @param numbers result numbers associated to their bucket
@@ -353,5 +370,52 @@ void generate_benchmark_data(T*& result, size_t data_size, std::vector<T> *numbe
         }while(!placed);
     }
 }
+
+
+/// @brief Fills the result array with a random order of the numbers provided
+/// @tparam T is the type of the result array
+/// @param result an array that shall be filled
+/// @param data_size 
+/// @param numbers a vector that contains values that shall be inserted into the result
+/// @param seed a seed that gets used by the random number generator
+template<typename T>
+void generate_benchmark_data(T*& result, size_t data_size, std::vector<T> numbers_collision,  std::vector<T> numbers_cluster,size_t seed){
+    std::vector<T> numbers;
+    size_t val_count = numbers_collision.size() + numbers_cluster.size();
+    size_t count[val_count];
+
+    size_t nr_values_per_bucket = (data_size / val_count) + 1;
+
+    size_t data_gen_i = 0;
+    size_t count_i = 0;
+
+    for(T x: numbers_cluster){
+        result[data_gen_i++] = x;
+        count[count_i++] = nr_values_per_bucket - 1;
+        numbers.push_back(x);
+    }
+
+    for(T x: numbers_collision){
+        count[count_i++] = nr_values_per_bucket;
+        numbers.push_back(x);
+    }
+
+    
+    for(size_t i = data_gen_i; i < data_size; i++){
+        size_t ran_id = noise(i, seed);
+        bool placed = false;
+
+        do{
+            ran_id %= numbers.size();
+            if(count[ran_id] > 0){
+                result[i] = (T)(numbers.at(ran_id));
+                count[ran_id]--;
+                placed = true;
+            }
+            ran_id++;
+        }while(!placed);
+    }
+}
+
 
 #endif //TUD_HASHING_TESTING_DATAGEN_HELP
