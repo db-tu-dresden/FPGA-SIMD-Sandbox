@@ -79,6 +79,9 @@ void next_position(size_t &pos, size_t &budget, size_t HSIZE, size_t seed){
     pos = (pos + 1 + offset) % HSIZE;
 }
 
+void next_position(size_t &pos, size_t move, size_t HSIZE){
+    pos = (pos + move + 1) % HSIZE;
+}
 
 void next_position(size_t &pos, size_t move, size_t &budget, size_t HSIZE, size_t max_move, size_t seed){
     size_t skip = 0;

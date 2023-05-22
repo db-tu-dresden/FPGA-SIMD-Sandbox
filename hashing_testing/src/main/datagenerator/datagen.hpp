@@ -623,6 +623,64 @@ size_t generate_data_v3(
 }
 
 
+
+//only bad case
+template<typename T>
+size_t generate_data_v4(
+    T*& result,
+    size_t data_size,
+    size_t distinct_values,
+    size_t hsize,
+    size_t (*hash_function)(T, size_t),
+    size_t collision_chain_count,
+    size_t collision_chain_length,
+    size_t seed,
+    size_t space,
+    bool just_distinct_values = false // NOTE: this should only be used for datageneration testing
+){
+
+    std::multimap<size_t, T> all_numbers;   
+    std::vector<T> numbers_collision;
+    std::vector<T> numbers_single;
+
+    size_t expected_hsize = p0_parameter_gen_hsize(collision_chain_count, collision_chain_length);
+
+    if(expected_hsize > hsize){
+        throw std::runtime_error("The configuration asks for to many numbers! increase distinct_values or decrease the collision parameters.");    
+        return 0; // HSIZE is to small for the given configuration to fit.
+    }
+    if(seed == 0){
+        throw std::runtime_error("The seed may not be zero!");
+        return 0; // invalid seed
+    }
+
+    all_number_gen<T>(all_numbers, hash_function, hsize, collision_chain_length, seed+3);
+
+    size_t pos = noise(hsize * distinct_values, seed) % hsize;
+    size_t random_nrs = distinct_values - expected_hsize;
+    size_t free_space = hsize - distinct_values;
+    // std::cout << random_nrs << "\t" << free_space << std::endl;
+    size_t skip_free;
+
+    size_t random_nrs_inbetween;
+    size_t r_counter = 0;
+
+
+    //generate collision chains on different buckets and move the counter only one. 
+    for(size_t i = 0; i < collision_chain_count; i++){
+        generate_collision<T>(&numbers_collision, &all_numbers, hsize, pos, collision_chain_length);
+        next_position(pos, space, hsize);
+    }
+    generate_cluster<T>(&numbers_single, &all_numbers, hsize, pos, random_nrs);
+
+    // std::cout << numbers_collision.size() << "\t" << numbers_single.size() << std::endl;
+    if(numbers_collision.size() + numbers_single.size() > distinct_values){
+        return 0;
+    }
+
+    generate_benchmark_data<T>(result, data_size, numbers_collision, numbers_single, seed+1 );    
+    return numbers_collision.size() + numbers_single.size();
+}
 /*
     Data generator with different options for data layout. 
     DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!
