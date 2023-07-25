@@ -421,4 +421,13 @@ void generate_benchmark_data(T*& result, size_t data_size, std::vector<T> number
 }
 
 
+
+
+template<typename T>
+void print_vector(std::vector<T> numbers){
+    for(T i: numbers){
+        std::cout << (uint32_t)i << "\t";
+    }
+    std::cout << std::endl;
+}
 #endif //TUD_HASHING_TESTING_DATAGEN_HELP

@@ -101,9 +101,26 @@ void analyse2(T* data, size_t data_size){
 
 
 
-using ps_type = uint64_t;
+using ps_type = uint8_t;
 
 int main(int argc, char** argv){
+    size_t distinct = 9;
+    size_t hsize = distinct + 1;
+    size_t data_size = distinct * 3;
+
+    ps_type* data = new ps_type[data_size];
+
+    size_t generated = generate_data_v5<ps_type>(data, data_size, distinct, hsize, &modulo<ps_type>, 1, 0);
+
+    std::cout << "Generated Numbers:\t" << generated << std::endl; 
+
+    std::cout << (uint32_t)data[0];
+    for(size_t i =1; i < data_size; i++){
+        std::cout << ", " << (uint32_t) data[i];
+    }
+    std::cout << std::endl;
+
+/*
 
     size_t data_size = 2048 * 3;
     uint32_t *data = new uint32_t[data_size];
@@ -295,5 +312,5 @@ int main(int argc, char** argv){
     // }
     delete []data;
 
-
+*/
 }

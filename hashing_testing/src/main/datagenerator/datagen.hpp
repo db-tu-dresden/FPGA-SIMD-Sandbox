@@ -681,6 +681,119 @@ size_t generate_data_v4(
     generate_benchmark_data<T>(result, data_size, numbers_collision, numbers_single, seed+1 );    
     return numbers_collision.size() + numbers_single.size();
 }
+
+
+
+
+
+
+
+
+/*
+    generates data such that every x-th element is a value. random from these values a number of collisions get choosen such that. these values point to position 0.
+
+
+*/
+template<typename T>
+size_t generate_data_v5(
+    T*& result,
+    size_t data_size,
+    size_t distinct_values,
+    size_t hsize,
+    size_t (*hash_function)(T, size_t),
+    size_t collision_size,
+    size_t seed,
+    bool just_distinct_values = false // NOTE: this should only be used for datageneration testing
+){
+    if(distinct_values > hsize){
+        std::cout << "too many values for hash table\n";
+        return 0;
+    }
+    if(collision_size >= distinct_values){
+        std::cout << "too many to collide with the first value\n";
+        return 0;
+    }
+
+    // if there are to many collisions to generate it is easier to just generate the once to stay aka the inverse. 
+    bool inverse = collision_size > distinct_values * 0.5; 
+    size_t to_generate_ids = (collision_size * !inverse) 
+                            + ((distinct_values - 1 - collision_size) * inverse);
+
+    std::cout << "inverse:\t" << inverse << std::endl;
+    std::cout << "ids to gen:\t" << to_generate_ids << std::endl;
+
+    std::vector<T> ids;
+    for(size_t c = 0; c < to_generate_ids; c++){
+        size_t nid = (noise(c, seed++) % (distinct_values - 1))+1;
+        bool okay = true;
+        for(size_t i: ids){
+            okay == nid != i;
+        }
+        if(!okay){
+            c--;
+        }else{
+            ids.push_back(nid);
+        }
+    }
+
+    std::cout << "ids:\n";
+    print_vector<T>(ids);
+
+    std::vector<T> collision_ids;    
+    for(size_t i = 1; i < distinct_values; i++){
+        bool is_in = vector_contains<T>(&ids, i);
+        bool insert = (is_in != inverse);
+        if(insert){
+            collision_ids.push_back(i);
+        }
+    }
+
+    std::cout << "collision_ids:\n";
+    print_vector<T>(collision_ids);
+
+    std::multimap<size_t, T> all_numbers;
+    std::vector<T> numbers;
+    
+    all_number_gen<T>(all_numbers, hash_function, hsize, collision_size +3, seed++);
+    
+    size_t start_pos = 0; // TODO change this to have a different starting position than 0.
+    size_t save_pos = 0;
+    typename std::multimap<size_t, T>::iterator itLow, itUp, it;
+
+    itLow = all_numbers.lower_bound(start_pos);
+    itUp = all_numbers.upper_bound(start_pos);
+    itLow++;
+    size_t c;
+    for(it = itLow, c = 0; it != itUp && c < collision_size; it++, c++){
+        numbers.push_back(it->second);   
+    }
+
+    std::cout << "positions:" << std::endl;
+    double step_size = (hsize * 1.0) / distinct_values;
+    double current_pos = start_pos;
+    for(size_t i = 0; i < distinct_values; i++){
+        bool is_in = vector_contains<T>(&collision_ids, i);
+        if(!is_in){
+            size_t pos = ((size_t)current_pos) % hsize;
+            std::cout << pos << "\t";
+            size_t value = all_numbers.lower_bound(pos)->second;
+            numbers.push_back(value);
+        }
+        current_pos += step_size;
+    }
+
+    std::cout << std::endl;
+    std::cout << "numbers:\n";
+    print_vector<T>(numbers);
+
+    generate_benchmark_data<T>(result, data_size, &numbers, seed++);
+    return numbers.size();
+}
+
+
+
+
+
 /*
     Data generator with different options for data layout. 
     DOES NOT ALLOCATE THE MEMORY JUST FILLS IT!
