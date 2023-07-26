@@ -31,4 +31,4 @@ g++ -mavx512f -mavx512cd -O3 -fno-tree-vectorize -o collision \
 #     src/operator/physical/gc/avx512_gc_soa_collision_v1.cpp
 
 
-g++ src/main/stack_heap.cpp -O3 -o stack_heap_test
+# g++ src/main/stack_heap.cpp -O3 -o stack_heap_test

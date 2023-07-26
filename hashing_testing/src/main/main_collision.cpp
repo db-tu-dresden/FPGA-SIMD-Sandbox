@@ -8,6 +8,7 @@
 
 #include "../operator/physical/group_count/lp/scalar_gc_soa.hpp"
 #include "../operator/physical/group_count/lp/scalar_gc_aos.hpp"
+#include "../operator/physical/group_count/lp/scalar_gc_aos_v2.hpp"
 
 #include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v1.hpp"
 #include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v2.hpp"
@@ -51,6 +52,7 @@ enum Algorithm{
     AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
     AVX512_GROUP_COUNT_SOA_CONFLICT_V2,
     SCALAR_GROUP_COUNT_AOS, 
+    SCALAR_GROUP_COUNT_AOS_V2, 
     AVX512_GROUP_COUNT_AOS_V1, 
     AVX512_GROUP_COUNT_AOS_V2, 
     AVX512_GROUP_COUNT_AOS_V3, 
@@ -249,7 +251,8 @@ int main(int argc, char** argv){
 
     Algorithm algorithms_undertest [] = {
         Algorithm::SCALAR_GROUP_COUNT_SOA 
-        , Algorithm::SCALAR_GROUP_COUNT_AOS 
+        , Algorithm::SCALAR_GROUP_COUNT_AOS
+        , Algorithm::SCALAR_GROUP_COUNT_AOS_V2
 
         , Algorithm::AVX512_GROUP_COUNT_SOA_V1
         , Algorithm::AVX512_GROUP_COUNT_AOS_V1 
@@ -1277,6 +1280,9 @@ void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (
         case Algorithm::SCALAR_GROUP_COUNT_AOS:
             run = new Scalar_gc_AoS<T>(HSIZE, function);
             break;
+        case Algorithm::SCALAR_GROUP_COUNT_AOS_V2:
+            run = new Scalar_gc_AoS_V2<T>(HSIZE, function);
+            break;
         case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
             run = new AVX512_gc_SoA_v1<T>(HSIZE, function);
             break;
@@ -1346,6 +1352,7 @@ bool all_algorithm_test(){
         Algorithm::CHAINED2,
         
         Algorithm::SCALAR_GROUP_COUNT_AOS, 
+        Algorithm::SCALAR_GROUP_COUNT_AOS_V2, 
         Algorithm::AVX512_GROUP_COUNT_AOS_V1, 
         // Algorithm::AVX512_GROUP_COUNT_AOS_V2, 
         // Algorithm::AVX512_GROUP_COUNT_AOS_V3, 
@@ -1358,7 +1365,7 @@ bool all_algorithm_test(){
     };
 
     const size_t algorithm_count = sizeof(all_algorithms_undertest) / sizeof(all_algorithms_undertest[0]);
-    const size_t distinct = 32;///+15;
+    const size_t distinct = 128;///+15;
     const size_t data_size = distinct * 2 + 1;
 
     bool error = false;
@@ -1375,8 +1382,8 @@ bool all_algorithm_test(){
         data_size, 
         distinct, 
         function,
-        1,  // 2 collisions groups
-        9, //  of length 45
+        2,  // 2 collisions groups
+        24,  //  of length 24
         std::rand()
     );
     
