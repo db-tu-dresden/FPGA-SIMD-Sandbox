@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h> 
-
+#include <string>
 
 template <typename T>
 class Group_count{

@@ -6,29 +6,9 @@
 #include <vector>
 #include <cstdlib>
 
-#include "../operator/physical/group_count/lp/scalar_gc_soa.hpp"
-#include "../operator/physical/group_count/lp/scalar_gc_aos.hpp"
-#include "../operator/physical/group_count/lp/scalar_gc_aos_v2.hpp"
+#include "../operator/physical/group_count/group_count_handler/group_count_algorithms.hpp"
 
-#include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v1.hpp"
-#include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v2.hpp"
-#include "../operator/physical/group_count/lp_horizontal/avx512_gc_soa_v3.hpp"
-#include "../operator/physical/group_count/lp_horizontal/avx512_gc_aos_v1.hpp"
-
-#include "../operator/physical/group_count/lcp/avx512_gc_soaov_v1.hpp"
-#include "../operator/physical/group_count/lcp/avx512_gc_soaov_v2.hpp"
-#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v1.hpp"
-#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v2.hpp"
-#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v3.hpp"
-#include "../operator/physical/group_count/lcp/avx512_gc_aosov_v4.hpp"
-
-#include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v1.hpp"
-#include "../operator/physical/group_count/lp_vertical/avx512_gc_soa_conflict_v2.hpp"
-#include "../operator/physical/group_count/lp_vertical/avx512_gc_aos_conflict_v1.hpp"
-
-#include "../operator/physical/group_count/chained/chained.hpp"
-#include "../operator/physical/group_count/chained/chained2.hpp"
-
+#include "fileio/file.hpp"
 #include "utility.hpp"
 
 #include "datagenerator/datagen.hpp"
@@ -37,43 +17,14 @@
 #include "hash_function.hpp"
 
 // TODO
+// further refactor 
+// cmake!
+// run test!
 // p2 data generaiton
 // TVL integration!
 // rethink how different collisions could be passed to the given test. ATM: hard coded in the testX functions.
 // documentation
 
-enum Algorithm{
-    SCALAR_GROUP_COUNT_SOA, 
-    AVX512_GROUP_COUNT_SOA_V1, 
-    AVX512_GROUP_COUNT_SOA_V2, 
-    AVX512_GROUP_COUNT_SOA_V3, 
-    AVX512_GROUP_COUNT_SOAOV_V1,     
-    AVX512_GROUP_COUNT_SOAOV_V2, 
-    AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
-    AVX512_GROUP_COUNT_SOA_CONFLICT_V2,
-    SCALAR_GROUP_COUNT_AOS, 
-    SCALAR_GROUP_COUNT_AOS_V2, 
-    AVX512_GROUP_COUNT_AOS_V1, 
-    AVX512_GROUP_COUNT_AOS_V2, 
-    AVX512_GROUP_COUNT_AOS_V3, 
-    AVX512_GROUP_COUNT_AOSOV_V1,     
-    AVX512_GROUP_COUNT_AOSOV_V2,    
-    AVX512_GROUP_COUNT_AOSOV_V3,     
-    AVX512_GROUP_COUNT_AOSOV_V4,  
-    AVX512_GROUP_COUNT_AOS_CONFLICT_V1, 
-    AVX512_GROUP_COUNT_AOS_CONFLICT_V2,
-    CHAINED,
-    CHAINED2
-};
-
-/// @brief creates a new instance of Group_count.
-/// @tparam T the data type for the execution
-/// @param run the instance of the Group_count. If not nullptr then it gets deleted
-/// @param test the algorithm that shall be created
-/// @param HSIZE the hash table size for the algorithm
-/// @param function the hash function that shall be used
-template <typename T>
-void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (*function)(T, size_t));
 
 //--------------------------------------------
 //validation function
@@ -121,45 +72,8 @@ size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cl
 // output functions
 //--------------------------------------------
 
-/// @brief creates a new empty file with the given namen. important an already existing file might be overwritten
-/// @param filename the name of the file that shall be created
-void create_result_file(std::string filename, size_t test_number = 0);
 
-/// @brief Writes all the necessary information about one benchmark run into a file
-/// @param filename the name of the file
-/// @param alg_identification the name of the algorithm ( can be optained using identify() )
-/// @param time how long the execution took in ns
-/// @param data_size how much data was processed
-/// @param bytes how many bytes the base data type had
-/// @param distinct_value_count how many distinct values were used during the computation
-/// @param scale the scaleing factor for the hash table
-/// @param HSIZE the real hash table size
-/// @param hash_function_enum the enum for the hash function
-/// @param seed which datageneration seed was used
-/// @param rsd the run id with the same configuration
-/// @param config_collision_count how many collision groups where plant
-/// @param config_collition_size how big these collisions were
-/// @param conig_cluster_count how many cluster were plant
-/// @param config_cluster_size how big theses cluster were
-/// @param config_id a general id that combines all 4 values with loss
-void write_to_file( 
-    std::string filename, 
-    std::string alg_identification, 
-    uint64_t time, 
-    size_t data_size,
-    size_t bytes,
-    size_t distinct_value_count, 
-    float scale, 
-    size_t HSIZE, 
-    HashFunction hash_function_enum, 
-    size_t seed, 
-    size_t rsd, 
-    size_t config_collision_count,
-    size_t config_collition_size,
-    size_t conig_cluster_count,
-    size_t config_cluster_size,
-    size_t config_id
-);
+
 
 /// @brief Prints to the console how long the benchmark already runs, and gives an estimation on how long it will keep on running
 /// @param runs_done how many iterations are done already (will be changed by this function!)
@@ -183,7 +97,7 @@ void status_output(size_t &runs_done, const size_t total_runs, double &percentag
 /// @param all_hash_functions_size 
 /// @return 0
 template <typename T> 
-int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
+int test0(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
 /// @brief Executes a the given algorithms with the given functions a number of times. Uses generate_data_p1 to generate the data
 /// @tparam T the datatype with which the test shall be executed
 /// @param data_size how large the table that gets agregated shall be
@@ -194,13 +108,13 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 /// @param all_hash_functions_size 
 /// @return -1 if one of the given configuration can't be used. 0 otherwise
 template <typename T> 
-int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
+int test1(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
 template <typename T> 
-int test2(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
+int test2(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
 template <typename T> 
-int test3(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float = 1.f);
+int test3(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float = 1.f);
 template <typename T> 
-int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float = 1.f);
+int test4(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float = 1.f);
 
 /// @brief Executes a the given algorithms with the given functions a number of times. Uses generate_data_p0 to generate the data and uses different scaleing factors
 /// @tparam T  the datatype with which the test shall be executed
@@ -212,16 +126,16 @@ int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 /// @param all_hash_functions_size 
 /// @return 0
 template <typename T> 
-int test0_benchdata(T* data, size_t data_size, std::string bench_filename, size_t column, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
+int test0_benchdata(T* data, size_t data_size, std::string bench_filename, size_t column, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost = 1.f);
 
-/// @brief Test if the given Algorithm with the given HashFunction works correctly
+/// @brief Test if the given Group_Count_Algorithm with the given HashFunction works correctly
 /// @tparam T type for the execution
-/// @param data_size how much data should be used to test the given Algorithm
+/// @param data_size how much data should be used to test the given Group_Count_Algorithm
 /// @param distinct_value_count how many distinct values should be used
-/// @param algorithms_undertest Algorithm to be tested
+/// @param algorithms_undertest Group_Count_Algorithm to be tested
 /// @param hash_function_enum HashFunction that shall be used
 template <typename T> 
-void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algorithms_undertest, HashFunction hash_function_enum = HashFunction::MULITPLY_SHIFT);
+void alg_testing(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm algorithms_undertest, HashFunction hash_function_enum = HashFunction::MULITPLY_SHIFT);
 
 
 template <typename T> 
@@ -241,44 +155,44 @@ int main(int argc, char** argv){
     fill_tab_table();
 
 
-    all_algorithm_test<ps_type>();
+    // all_algorithm_test<ps_type>();
     // return 0;
 
-    size_t distinct_value_count = 2048;
+    size_t distinct_value_count = 1024;
     size_t all_data_sizes = 32 * 1024 * 1024;// 1024*1024*1024;
 
     float scale_boost = 1.0f;
 
-    Algorithm algorithms_undertest [] = {
-        Algorithm::SCALAR_GROUP_COUNT_SOA 
-        , Algorithm::SCALAR_GROUP_COUNT_AOS
-        , Algorithm::SCALAR_GROUP_COUNT_AOS_V2
+    Group_Count_Algorithm algorithms_undertest [] = {
+        Group_Count_Algorithm::SCALAR_GROUP_COUNT_SOA 
+        , Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS
+        , Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS_V2
 
-        , Algorithm::AVX512_GROUP_COUNT_SOA_V1
-        , Algorithm::AVX512_GROUP_COUNT_AOS_V1 
+    //     , Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V1
+    //     , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V1 
         
-        // // , Algorithm::AVX512_GROUP_COUNT_SOA_V2  // uninteresting 
-        // // , Algorithm::AVX512_GROUP_COUNT_SOA_V3  // uninteresting
+    //     // // , Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V2  // uninteresting 
+    //     // // , Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V3  // uninteresting
 
-        , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1 
-        , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
+    //     , Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1 
+    //     , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1 
         
-        // , Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
-        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V1
-        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V3
+    //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_SOAOV_V1 
+    //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V1
+    //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V3
 
-        , Algorithm::AVX512_GROUP_COUNT_SOAOV_V2 
-        , Algorithm::AVX512_GROUP_COUNT_AOSOV_V2 
-        // , Algorithm::AVX512_GROUP_COUNT_AOSOV_V4
+    //     , Group_Count_Algorithm::AVX512_GROUP_COUNT_SOAOV_V2 
+    //     , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V2 
+    //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V4
 
-    //     // , Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2 // uninteresting
+    // //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2 // uninteresting
         
-    //     // , Algorithm::CHAINED 
-    //     // , Algorithm::CHAINED2 
+    // //     // , Group_Count_Algorithm::CHAINED 
+    // //     // , Group_Count_Algorithm::CHAINED2 
 
-    //     // , Algorithm::AVX512_GROUP_COUNT_AOS_V2 // not (yet) implemented 
-    //     // , Algorithm::AVX512_GROUP_COUNT_AOS_V3 // not (yet) implemented
-    //     // , Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2 // not (yet) implemented
+    // //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V2 // not (yet) implemented 
+    // //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V3 // not (yet) implemented
+    // //     // , Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2 // not (yet) implemented
     };
     
     // size_t (*all_hash_functions[])(ps_type, size_t) = {&hashx, &id_mod, &murmur, &tab};
@@ -303,7 +217,7 @@ int main(int argc, char** argv){
     
     //*/
 
-    // alg_testing<ps_type>(128, 64, Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2, &id_mod);
+    // alg_testing<ps_type>(128, 64, Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2, &id_mod);
     
     /* //Benchmarks with table data.
     std::string benchmark = "orders";
@@ -335,7 +249,7 @@ int main(int argc, char** argv){
 //--------------------------------------------
 
 template <typename T> 
-int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost){
+int test0(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost){
     if(scale_boost < 1){
         return -1;
     }
@@ -403,7 +317,7 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                     HSIZE *= elements;
 
                     for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
-                        Algorithm test = algorithms_undertest[aus];    
+                        Group_Count_Algorithm test = algorithms_undertest[aus];    
                         std::string alg_identification = "";
                         size_t internal_HSIZE;
 
@@ -455,7 +369,7 @@ int test0(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 
 
 template <typename T> 
-int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
+int test1(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
     size_t noise_id = 1;
     //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
     srand(std::time(nullptr));
@@ -524,7 +438,7 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                 size_t seed = noise(noise_id++, 0);
 
                 for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
-                    Algorithm test = algorithms_undertest[aus];    
+                    Group_Count_Algorithm test = algorithms_undertest[aus];    
                     
                     std::string alg_identification = "";
                     size_t internal_HSIZE;
@@ -534,7 +448,7 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                         distinct_vals_generated = generate_data_p1<T>( // the seed is for rdd the run id
                             data, data_size, distinct_value_count, HSIZE, function,
                             collision_count[conf], collision_size[conf], cluster_count[conf], cluster_size[conf],
-                            seed + data_gen_try, test == Algorithm::AVX512_GROUP_COUNT_SOAOV_V1
+                            seed + data_gen_try, test == Group_Count_Algorithm::AVX512_GROUP_COUNT_SOAOV_V1
                         );
                         data_gen_try++;
                     }while(distinct_vals_generated == 0 && data_gen_try < 5);
@@ -586,7 +500,7 @@ int test1(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 }
 
 template <typename T> 
-int test2(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
+int test2(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
     size_t noise_id = 1;
     //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
     srand(std::time(nullptr));
@@ -658,7 +572,7 @@ int test2(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                 }
 
                 for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
-                    Algorithm test = algorithms_undertest[aus];    
+                    Group_Count_Algorithm test = algorithms_undertest[aus];    
                     getGroupCount(alg, test, HSIZE, function);
                     
                     size_t internal_HSIZE = alg->get_HSIZE();
@@ -703,7 +617,7 @@ int test2(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 
 //todo rework
 template <typename T> 
-int test3(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
+int test3(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
     size_t noise_id = 1;
     //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
     srand(std::time(nullptr));
@@ -784,7 +698,7 @@ int test3(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                             }
 
                             for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
-                                Algorithm test = algorithms_undertest[aus];    
+                                Group_Count_Algorithm test = algorithms_undertest[aus];    
                                 getGroupCount(alg, test, HSIZE, function);
 
                                 
@@ -833,7 +747,7 @@ int test3(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 
 //todo rework
 template <typename T> 
-int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
+int test4(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float unused_float){
     size_t noise_id = 1;
     //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
     srand(std::time(nullptr));
@@ -853,7 +767,9 @@ int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     // float all_scales[] = {1.0f ,1.1f, 1.5f, 2.0f}; //higher is better for performance
     // size_t nr_scales = sizeof(all_scales) / sizeof(all_scales[0]);
     const float current_scale = 1.5f;
+    std::cout << "illegal?\n";
     size_t HSIZE = (size_t)(current_scale * distinct_value_count + 0.5f);
+    std::cout << "illegal?\n";
     HSIZE = (HSIZE + elements_in_vector - 1);
     HSIZE /= elements_in_vector;
     HSIZE *= elements_in_vector;
@@ -871,7 +787,7 @@ int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     size_t total_runs = repeats_same_data * total_configs; 
 
     /// run information and status output
-    T* data = nullptr;
+    T* data = nullptr;    
     data = (T*) aligned_alloc(64, data_size * sizeof(T));
     Group_count<T> *alg = nullptr;
 
@@ -885,7 +801,6 @@ int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
     // std::cout << nr_scales << " " << nr_collision_chain_count << " " << nr_collision_chain_length << std::endl;
     size_t good = 0; //we want a bad layout!!!
     bool best_case_layout = good == 1;
-
     for(size_t collision_chain_count_id = 0; collision_chain_count_id < nr_collision_chain_count; collision_chain_count_id++){
         size_t current_collision_chain_count = all_collision_chain_count[collision_chain_count_id];
         
@@ -911,7 +826,7 @@ int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
                         }
 
                         for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
-                            Algorithm test = algorithms_undertest[aus];    
+                            Group_Count_Algorithm test = algorithms_undertest[aus];    
                             getGroupCount(alg, test, HSIZE, function);
 
                             size_t internal_HSIZE = alg->get_HSIZE();
@@ -956,7 +871,7 @@ int test4(size_t data_size, size_t distinct_value_count, Algorithm *algorithms_u
 
 
 template <typename T> 
-int test0_benchdata(T* data, size_t data_size, std::string bench_filename, size_t column, size_t distinct_value_count, Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost){
+int test0_benchdata(T* data, size_t data_size, std::string bench_filename, size_t column, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t algorithms_undertest_size, HashFunction* functions_to_test, size_t all_hash_functions_size, float scale_boost){
     if(scale_boost < 1){
         return -1;
     }
@@ -1008,7 +923,7 @@ int test0_benchdata(T* data, size_t data_size, std::string bench_filename, size_
             HSIZE *= elements;
             // std::cout << "Current HSIZE:\t" << HSIZE << std::endl;
             for(size_t aus = 0; aus < algorithms_undertest_size; aus++){
-                Algorithm test = algorithms_undertest[aus];    
+                Group_Count_Algorithm test = algorithms_undertest[aus];    
                 std::string alg_identification = "";
                 size_t internal_HSIZE;
 
@@ -1055,7 +970,7 @@ int test0_benchdata(T* data, size_t data_size, std::string bench_filename, size_
 }
 
 template <typename T> 
-void alg_testing(size_t data_size, size_t distinct_value_count, Algorithm algorithms_undertest, HashFunction hash_function_enum){
+void alg_testing(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm algorithms_undertest, HashFunction hash_function_enum){
 
     size_t noise_id = 1;
     //FOR REPRODUCIBLE DATA REMOVE THE FOLLOWING TWO LINES OF CODE!
@@ -1165,73 +1080,6 @@ bool validation(Group_count<T>* grouping, Scalar_gc_SoA<T> *validation_baseline,
 // output functions
 //--------------------------------------------
 
-void create_result_file(std::string filename, size_t test_number){
-    std::ofstream myfile;
-    myfile.open (filename);
-    if(myfile.is_open()){
-
-        switch(test_number){
-            case 3:
-                myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,layout,layout,config_ID\n";
-                break;
-            case 4:
-                myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,layout,space,config_ID\n";
-                break;
-            default:
-                myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,cluster_count,cluster_length,config_ID\n";
-                break;
-        }
-        myfile.close();
-    } else {
-        throw std::runtime_error("Could not open file to write results!");
-    }
-}
-void create_result_file(std::string filename){
-    std::ofstream myfile;
-    myfile.open (filename);
-    if(myfile.is_open()){
-        myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,cluster_count,cluster_length,config_ID\n";
-        myfile.close();
-    } else {
-        throw std::runtime_error("Could not open file to write results!");
-    }
-}
-void write_to_file( 
-    std::string filename,
-    std::string alg_identification,
-    uint64_t time, 
-    size_t data_size,
-    size_t bytes,
-    size_t distinct_value_count,
-    float scale,
-    size_t HSIZE,
-    HashFunction hash_function_enum, 
-    size_t seed,  
-    size_t rsd,
-    size_t config_collision_count,
-    size_t config_collition_size,
-    size_t config_cluster_count,
-    size_t config_cluster_size, 
-    size_t config_id
-){
-    std::ofstream myfile;
-    myfile.open (filename, std::ios::app);
-    if(myfile.is_open()){
-        // "Algorithm,time,data size,bytes,distinct value count,scale,hash table size,hash function ID,seed,run ID";
-        myfile << alg_identification << "," << time << "," 
-            << data_size << "," << bytes 
-            << "," << distinct_value_count  << "," << scale << "," 
-            << HSIZE << "," << get_hash_function_name(hash_function_enum) << "," 
-            << seed << "," << rsd << "," 
-            << config_collision_count << "," << config_collition_size << "," 
-            << config_cluster_count << "," << config_cluster_size << ","
-            << config_id << "\n"; 
-        myfile.close();
-    } else {
-        throw std::runtime_error("Could not open file to write results!");
-    }
-}
-
 void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin){
     runs_done++;
     std::chrono::high_resolution_clock::time_point time_end;
@@ -1266,113 +1114,46 @@ void status_output(size_t &runs_done, const size_t total_runs, double &percentag
 // other functions
 //--------------------------------------------
 
-template <typename T>
-void getGroupCount(Group_count<T> *& run, Algorithm test, size_t HSIZE, size_t (*function)(T, size_t)){
-    if(run != nullptr){
-        delete run;
-        run = nullptr;
-    }
-
-    switch(test){
-        case Algorithm::SCALAR_GROUP_COUNT_SOA:
-            run = new Scalar_gc_SoA<T>(HSIZE, function);
-            break;
-        case Algorithm::SCALAR_GROUP_COUNT_AOS:
-            run = new Scalar_gc_AoS<T>(HSIZE, function);
-            break;
-        case Algorithm::SCALAR_GROUP_COUNT_AOS_V2:
-            run = new Scalar_gc_AoS_V2<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_V1:
-            run = new AVX512_gc_SoA_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_V2:
-            run = new AVX512_gc_SoA_v2<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_V3:
-            run = new AVX512_gc_SoA_v3<T>(HSIZE, function);
-            break;        
-        case Algorithm::AVX512_GROUP_COUNT_AOS_V1:
-            run = new AVX512_gc_AoS_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOAOV_V1:
-            run = new AVX512_gc_SoAoV_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V1:
-            run = new AVX512_gc_AoSoV_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOAOV_V2:
-            run = new AVX512_gc_SoAoV_v2<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V2:
-            run = new AVX512_gc_AoSoV_v2<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V3:
-            run = new AVX512_gc_AoSoV_v3<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_AOSOV_V4:
-            run = new AVX512_gc_AoSoV_v4<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1:
-            run = new AVX512_gc_SoA_conflict_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2:
-            run = new AVX512_gc_SoA_conflict_v2<T>(HSIZE, function);
-            break;        
-        case Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1:
-            run = new AVX512_gc_AoS_conflict_v1<T>(HSIZE, function);
-            break;
-        case Algorithm::CHAINED:
-            run = new Chained<T>(HSIZE, function);
-            break;
-        case Algorithm::CHAINED2:
-            run = new Chained2<T>(HSIZE, function);
-            break;
-        default:
-            throw std::runtime_error("One of the Algorithms isn't supported yet!");
-    }
-}
-
 template <typename T> 
 bool all_algorithm_test(){
     srand(std::time(nullptr));
 
     std::cout << "\nAlgorithm Test\n";
 
-    Algorithm all_algorithms_undertest [] = {
-        Algorithm::SCALAR_GROUP_COUNT_SOA, 
-        Algorithm::AVX512_GROUP_COUNT_SOA_V1, 
-        Algorithm::AVX512_GROUP_COUNT_SOA_V2, 
-        Algorithm::AVX512_GROUP_COUNT_SOA_V3, 
-        Algorithm::AVX512_GROUP_COUNT_SOAOV_V1, 
-        Algorithm::AVX512_GROUP_COUNT_SOAOV_V2, 
-        Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
-        Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2, 
-        Algorithm::CHAINED, 
-        Algorithm::CHAINED2,
+    Group_Count_Algorithm all_algorithms_undertest [] = {
+        Group_Count_Algorithm::SCALAR_GROUP_COUNT_SOA, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V2, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V3, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOAOV_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOAOV_V2, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V2, 
+        Group_Count_Algorithm::CHAINED, 
+        Group_Count_Algorithm::CHAINED2,
         
-        Algorithm::SCALAR_GROUP_COUNT_AOS, 
-        Algorithm::SCALAR_GROUP_COUNT_AOS_V2, 
-        Algorithm::AVX512_GROUP_COUNT_AOS_V1, 
-        // Algorithm::AVX512_GROUP_COUNT_AOS_V2, 
-        // Algorithm::AVX512_GROUP_COUNT_AOS_V3, 
-        Algorithm::AVX512_GROUP_COUNT_AOSOV_V1,
-        Algorithm::AVX512_GROUP_COUNT_AOSOV_V2,
-        Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1, 
-        Algorithm::AVX512_GROUP_COUNT_AOSOV_V3,
-        Algorithm::AVX512_GROUP_COUNT_AOSOV_V4
-        // Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2
+        Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS, 
+        Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS_V2, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V2, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V3, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V1,
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V2,
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V3,
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V4,
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V2
     };
 
     const size_t algorithm_count = sizeof(all_algorithms_undertest) / sizeof(all_algorithms_undertest[0]);
-    const size_t distinct = 128;///+15;
+    const size_t distinct = 128;
     const size_t data_size = distinct * 2 + 1;
 
     bool error = false;
     hash_fptr<T> function = get_hash_function<T>(HashFunction::MODULO);
 
     Group_count<T> *base_line = nullptr;
-    getGroupCount(base_line, Algorithm::SCALAR_GROUP_COUNT_SOA, distinct * 2.1, function);
+    getGroupCount(base_line, Group_Count_Algorithm::SCALAR_GROUP_COUNT_SOA, distinct * 2.1, function);
 
     T* data = (T*) aligned_alloc(64, data_size * sizeof(T));
 
@@ -1405,10 +1186,9 @@ bool all_algorithm_test(){
         }
     }
 
-    
     Group_count<T> *alg = nullptr;
     for(size_t alg_id = 0; alg_id < algorithm_count; alg_id++){
-        Algorithm check = all_algorithms_undertest[alg_id];
+        Group_Count_Algorithm check = all_algorithms_undertest[alg_id];
         bool executable = true;    
         try{
             getGroupCount(alg, check, distinct, function);
