@@ -1,0 +1,1 @@
+add_library(LP_VERTICAL avx512_gc_soa_conflict_v1.cpp avx512_gc_soa_conflict_v2.cpp avx512_gc_aos_conflict_v1.cpp)

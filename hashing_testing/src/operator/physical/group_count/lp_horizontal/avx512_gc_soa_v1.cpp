@@ -6,7 +6,7 @@
 #include <emmintrin.h>
 #include <smmintrin.h>
 
-#include "avx512_gc_soa_v1.hpp"
+#include "operator/physical/group_count/lp_horizontal/avx512_gc_soa_v1.hpp"
 
 #define EMPTY_SPOT 0
 

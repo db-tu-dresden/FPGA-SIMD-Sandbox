@@ -1,0 +1,1 @@
+add_library(LCP avx512_gc_aosov_v1.cpp avx512_gc_aosov_v2.cpp avx512_gc_aosov_v3.cpp avx512_gc_aosov_v4.cpp avx512_gc_soaov_v1.cpp avx512_gc_soaov_v2.cpp)

@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "utility.hpp"
-#include "datagenerator/datagen.hpp"
+#include "main/datagenerator/datagen.hpp"
 
 void swap(uint64_t &a, uint64_t &b){
     a ^= b;
@@ -116,8 +116,9 @@ int main(int argc, char** argv){
 
     size_t repeats = 500;
 
-    
-    srand(std::time(nullptr));
+    size_t time = 0;
+    // time = std::time(nullptr);
+    srand(time);
     size_t seed = std::rand();
 
     std::cout << "stack_heap_test using " << element_count << " values and seed: " << seed <<  std::endl;

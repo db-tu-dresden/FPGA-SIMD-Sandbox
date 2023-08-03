@@ -5,16 +5,17 @@
 #include <stdint.h>
 #include <vector>
 #include <cstdlib>
+#include <string>
 
-#include "../operator/physical/group_count/group_count_handler/group_count_algorithms.hpp"
+#include "operator/physical/group_count/group_count_handler/group_count_algorithms.hpp"
 
-#include "fileio/file.hpp"
-#include "utility.hpp"
+#include "main/benchmark/table.hpp"
+#include "main/datagenerator/datagen.hpp"
+#include "main/fileio/file.hpp"
 
-#include "datagenerator/datagen.hpp"
-#include "benchmark/table.hpp"
+#include "main/hash_function.hpp"
+#include "main/utility.hpp"
 
-#include "hash_function.hpp"
 
 // TODO
 // further refactor 
@@ -159,7 +160,7 @@ int main(int argc, char** argv){
     // return 0;
 
     size_t distinct_value_count = 1024;
-    size_t all_data_sizes = 32 * 1024 * 1024;// 1024*1024*1024;
+    size_t all_data_sizes = 1 * 1024 * 1024;// 1024*1024*1024;
 
     float scale_boost = 1.0f;
 

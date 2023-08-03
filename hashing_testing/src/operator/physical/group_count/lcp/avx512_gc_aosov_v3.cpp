@@ -2,8 +2,8 @@
 
 
 
-#include "avx512_gc_aosov_v3.hpp"
-#include "../../../utility.hpp"
+#include "operator/physical/group_count/lcp/avx512_gc_aosov_v3.hpp"
+#include "operator/utility.hpp"
 
 #define EMPTY_SPOT 0
 

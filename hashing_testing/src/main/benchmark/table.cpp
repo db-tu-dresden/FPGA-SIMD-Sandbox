@@ -8,7 +8,7 @@
 
 #include <regex>
 
-#include "table.hpp"
+#include "main/benchmark/table.hpp"
 
 size_t convert_number(std::string str){
     size_t pos{};

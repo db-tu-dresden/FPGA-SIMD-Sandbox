@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "chained2.hpp"
+#include "operator/physical/group_count/chained/chained2.hpp"
 
 #define EMPTY_SPOT 0
 

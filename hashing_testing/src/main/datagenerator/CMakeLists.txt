@@ -1,0 +1,1 @@
+add_library(DATAGEN datagenerator.cpp datagenerator_help.cpp)

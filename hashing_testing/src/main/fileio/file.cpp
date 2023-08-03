@@ -1,6 +1,28 @@
 #include <stdexcept>
 
-#include "file.hpp"
+#include "main/fileio/file.hpp"
+
+// void create_result_file(std::string filename, size_t test_number){
+//     std::ofstream myfile;
+//     myfile.open (filename);
+//     if(myfile.is_open()){
+
+//         switch(test_number){
+//             case 3:
+//                 myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,layout,layout,config_ID\n";
+//                 break;
+//             case 4:
+//                 myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,layout,space,config_ID\n";
+//                 break;
+//             default:
+//                 myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,cluster_count,cluster_length,config_ID\n";
+//                 break;
+//         }
+//         myfile.close();
+//     } else {
+//         throw std::runtime_error("Could not open file to write results!");
+//     }
+// }
 
 void create_result_file(std::string filename, size_t test_number){
     std::ofstream myfile;
@@ -18,6 +40,49 @@ void create_result_file(std::string filename, size_t test_number){
                 myfile << "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count,collision_length,cluster_count,cluster_length,config_ID\n";
                 break;
         }
+        myfile.close();
+    } else {
+        throw std::runtime_error("Could not open file to write results!");
+    }
+}
+
+void create_result_file(std::string filename, std::string header){
+    std::ofstream myfile;
+    myfile.open(filename);
+    if(myfile.is_open()){
+        myfile << header << "\n";
+        myfile.close();
+    }else{
+        throw std::runtime_error("Could not open file to write results!");
+    }
+}
+
+
+void create_strided_benchmark_result_file(std::string filename){
+    create_result_file(filename, "Algorithm,time,data_size,bytes,distinct_value_count,scale,hash_table_size,hash_function_ID,seed,run_ID,collision_count");
+}
+void write_to_strided_benchmark_file(
+    std::string filename,
+    std::string alg_identification,
+    uint64_t time, 
+    size_t data_size,
+    size_t bytes,
+    size_t distinct_value_count,
+    double scale,
+    size_t HSIZE,
+    HashFunction hash_function_enum, 
+    size_t seed,  
+    size_t run_id,
+    size_t collision_count
+){
+    std::ofstream myfile;
+    myfile.open (filename, std::ios::app);
+    if(myfile.is_open()){
+        // "Algorithm,time,data size,bytes,distinct value count,scale,hash table size,hash function ID,seed,run ID";
+        myfile << alg_identification << "," << time << "," << data_size << "," 
+            << bytes << "," << distinct_value_count  << "," << scale << "," 
+            << HSIZE << "," << get_hash_function_name(hash_function_enum) << "," 
+            << seed << "," << run_id << "," << collision_count << "\n"; 
         myfile.close();
     } else {
         throw std::runtime_error("Could not open file to write results!");

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "chained.hpp"
+#include "operator/physical/group_count/chained/chained.hpp"
 
 #define EMPTY_SPOT 0
 
@@ -52,4 +52,4 @@ size_t Chained<T>::get_HSIZE(){
 }
 
 template class Chained<uint32_t>;
-// template class Chained<uint64_t>;
+template class Chained<uint64_t>;

@@ -1,4 +1,4 @@
-#include "avx512_gc_soaov_v2.hpp"
+#include "operator/physical/group_count/lcp/avx512_gc_soaov_v2.hpp"
 
 #define EMPTY_SPOT 0
 

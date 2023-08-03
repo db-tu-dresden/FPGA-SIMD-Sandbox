@@ -1,0 +1,8 @@
+# add_subdirectory(chained)
+add_subdirectory(group_count_handler)
+add_subdirectory(lp)
+if(USE_AVX512)
+    add_subdirectory(lcp)
+    add_subdirectory(lp_horizontal)
+    add_subdirectory(lp_vertical)
+endif()

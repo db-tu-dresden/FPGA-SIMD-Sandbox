@@ -1,0 +1,1 @@
+add_library(LP_HORIZONTAL avx512_gc_soa_v1.cpp avx512_gc_soa_v2.cpp avx512_gc_soa_v3.cpp avx512_gc_aos_v1.cpp)

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "scalar_gc_soa.hpp"
+#include "operator/physical/group_count/lp/scalar_gc_soa.hpp"
 
 #define EMPTY_SPOT 0
 
