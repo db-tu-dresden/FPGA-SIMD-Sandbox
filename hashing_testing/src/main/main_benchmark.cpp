@@ -17,7 +17,7 @@ using ps_type = uint32_t;
 size_t repeats_same_data = 3;
 size_t repeats_different_data = 1;
 
-double percentage_print = 5.;
+double percentage_print = .5;
 
 
 template<typename T> 
@@ -30,7 +30,7 @@ int main(int argc, char** argv){
     //TODO user input so we don't need to recompile all the time!
 
     size_t distinct_value_count = 16384;
-    size_t data_amount = 128 * 1024 * 1024;
+    size_t data_amount = 64 * 1024 * 1024;
 
     float scale_boost = 1.0f;
 
@@ -88,9 +88,9 @@ size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Co
     std::string file_name = file_name_builder.str();
     create_strided_benchmark_result_file(file_name);
 
-    size_t count_collisions = distinct_value_count/4;
-    size_t collisions_steps = 8;
-    double scale_factors[] = {1,4,8,16};
+    size_t collisions_steps = 2;
+    size_t count_collisions = distinct_value_count/collisions_steps;
+    double scale_factors[] = {1,4,8,16,32};
         
     size_t count_sf = sizeof(scale_factors) / sizeof(scale_factors[0]);
     
@@ -117,7 +117,7 @@ size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Co
                 double current_scale = scale_factors[scale_factors_id];
                 size_t hsize = distinct_value_count * current_scale;
 
-                for(size_t collisions = 0; collisions < count_collisions; collisions += collisions_steps){
+                for(size_t collisions = 0; collisions < distinct_value_count; collisions += collisions_steps){
                     generate_strided_data<T>(data, data_size, distinct_value_count, hsize, function, collisions, data_seed);
 
                     for(size_t alg_id = 0; alg_id < count_alg_ut; alg_id++){
