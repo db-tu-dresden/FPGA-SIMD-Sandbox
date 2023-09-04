@@ -74,7 +74,9 @@ void AVX512_gc_AoS_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_
 
             }
             hash_key += 16;
-            hash_key = hash_key > HSIZE? 0: hash_key;
+            if(hash_key >= HSIZE){
+                hash_key = 0;
+            }
         }
     }
 }

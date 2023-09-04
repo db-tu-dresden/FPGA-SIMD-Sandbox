@@ -1,7 +1,3 @@
-
-
-
-
 #include "operator/physical/group_count/lcp/avx512_gc_aosov_v1.hpp"
 
 #define EMPTY_SPOT 0
@@ -61,8 +57,10 @@ void AVX512_gc_AoSoV_v1<uint32_t>::create_hash_table(uint32_t* input, size_t dat
                 m_hash_table_v[index + 1] = _mm512_mask_set1_epi32(m_hash_table_v[index + 1], m_masks[pos], 1);
                 break;
             }
-            
-            hash_key = (hash_key + 1) % this->m_HSIZE_v;
+            ++hash_key;
+            if(hash_key >= this->m_HSIZE_v){
+                hash_key = 0;
+            }
         }
     }
 
@@ -157,3 +155,4 @@ uint32_t AVX512_gc_AoSoV_v1<uint32_t>::get(uint32_t input){
 }
 
 template class AVX512_gc_AoSoV_v1<uint32_t>;
+// template class AVX512_gc_AoSoV_v1<uint64_t>;

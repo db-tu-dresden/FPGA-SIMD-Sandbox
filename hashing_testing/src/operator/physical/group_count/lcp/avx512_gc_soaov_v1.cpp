@@ -61,8 +61,13 @@ void AVX512_gc_SoAoV_v1<uint32_t>::create_hash_table(uint32_t* input, size_t dat
                 m_count_map_v[hash_key] = _mm512_mask_set1_epi32(m_count_map_v[hash_key], m_masks[pos], 1);
                 break;
             }
-            
-            hash_key = (hash_key + 1) % this->m_HSIZE_v;
+
+            //branch prediction should be faster than modulo.
+            ++hash_key;
+            if(hash_key >= this->m_HSIZE_v){
+                hash_key = 0;
+            }
+            // hash_key = (hash_key + 1) % this->m_HSIZE_v;
         }
     }
 

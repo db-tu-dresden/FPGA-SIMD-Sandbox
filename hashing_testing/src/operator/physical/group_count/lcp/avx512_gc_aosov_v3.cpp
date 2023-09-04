@@ -1,7 +1,3 @@
-
-
-
-
 #include "operator/physical/group_count/lcp/avx512_gc_aosov_v3.hpp"
 #include "operator/utility.hpp"
 
@@ -131,3 +127,4 @@ uint32_t AVX512_gc_AoSoV_v3<uint32_t>::get(uint32_t input){
 }
 
 template class AVX512_gc_AoSoV_v3<uint32_t>;
+// template class AVX512_gc_AoSoV_v3<uint64_t>;

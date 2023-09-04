@@ -131,4 +131,4 @@ size_t Scalar_gc_AoS<T>::get_HSIZE(){
 }
 
 template class Scalar_gc_AoS<uint32_t>;
-template class Scalar_gc_AoS<uint64_t>;
+// template class Scalar_gc_AoS<uint64_t>;

@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
+#include <cmath>
+
 
 #include "main/utility.hpp"
 
@@ -15,9 +17,9 @@
 
 using ps_type = uint32_t;
 size_t repeats_same_data = 3;
-size_t repeats_different_data = 1;
+size_t repeats_different_data = 5;
 
-double percentage_print = .5;
+double percentage_print = 0.5;
 
 
 template<typename T> 
@@ -29,16 +31,22 @@ int main(int argc, char** argv){
 
     //TODO user input so we don't need to recompile all the time!
 
-    size_t distinct_value_count = 16384;
-    size_t data_amount = 64 * 1024 * 1024;
+    size_t distinct_value_count = 16 * 1024;
+    size_t data_amount = 8 * 1024 * 1024;
 
     float scale_boost = 1.0f;
 
 
     Group_Count_Algorithm algorithms_undertest[] = {
-        Group_Count_Algorithm::SCALAR_GROUP_COUNT_SOA,
-        Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS,
-        Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS_V2
+        // Group_Count_Algorithm::SCALAR_GROUP_COUNT_SOA,
+        // Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS,
+        // Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS_V2,
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_CONFLICT_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_CONFLICT_V1, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_SOAOV_V2, 
+        Group_Count_Algorithm::AVX512_GROUP_COUNT_AOSOV_V2 
     };
 
     HashFunction hashfunctions_undertest[] = {
@@ -49,9 +57,20 @@ int main(int argc, char** argv){
     size_t num_hashfunc_undertest = sizeof(hashfunctions_undertest) / sizeof(hashfunctions_undertest[0]);
 
     strided_benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
+    // distinct_value_count *= 2;
+    // distinct_value_count = 2048;
+    // strided_benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
+    // distinct_value_count *= 2;
+    // strided_benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
+    // distinct_value_count *= 2;
+    // strided_benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
+    // distinct_value_count *= 2;
+    // strided_benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
 
 }
 
+
+// runs the given algorithm with the given data. Afterwards it might clear the hash_table (reset = true) and or deletes the operator (clean up)
 template <typename T>
 size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cleanup = false, bool reset = true){
     std::chrono::high_resolution_clock::time_point time_begin, time_end;
@@ -74,12 +93,14 @@ size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cl
 }
 
 
+
+// benchmarking the algorithms with the strided data generator. The data generator creates planned collision data.
+// with higher scaling factors gabs are introduced in a orderly and uniform fashion. The values are "slotted" and the gabs come after every slot. 
 template<typename T> 
 size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t count_alg_ut, HashFunction *hashfunctions_undertest, size_t count_hf_ut){
     size_t seed = 0;
     srand(std::time(nullptr));
     seed = std::rand();
-
     std::chrono::high_resolution_clock::time_point time_begin;
     time_begin = time_now();
 
@@ -88,20 +109,26 @@ size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Co
     std::string file_name = file_name_builder.str();
     create_strided_benchmark_result_file(file_name);
 
-    size_t collisions_steps = 2;
-    size_t count_collisions = distinct_value_count/collisions_steps;
-    double scale_factors[] = {1,4,8,16,32};
+    size_t collisions_steps = distinct_value_count;
+    size_t diminish = 2;
+    size_t max_count_collisions = std::log(collisions_steps)/std::log(diminish) + 1;
+    size_t count_collisions = 100;
+    if(max_count_collisions < count_collisions){
+        count_collisions = max_count_collisions;
+    }
+
+    double scale_factors[] = {1, 2, 4, 16};
         
     size_t count_sf = sizeof(scale_factors) / sizeof(scale_factors[0]);
     
     // double percentage_done  = -percentage_print;
     size_t runs_done = 0;
 
-    size_t total_configs = count_alg_ut * count_hf_ut * count_sf * (count_collisions / collisions_steps);
+    size_t total_configs = count_alg_ut * count_hf_ut * count_sf * count_collisions;
     size_t total_runs = total_configs * repeats_same_data * repeats_different_data;
 
     std::cout << "stided benchmark has " << total_configs << " different Configs.\nThis results in " << total_runs << " total runs\n";
-    std::cout << "percentage done:\n";
+    std::cout << "percentage done:" << std::endl;
     
     T* data = nullptr;
     data = (T*) aligned_alloc(64, data_size * sizeof(T));
@@ -117,7 +144,10 @@ size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Co
                 double current_scale = scale_factors[scale_factors_id];
                 size_t hsize = distinct_value_count * current_scale;
 
-                for(size_t collisions = 0; collisions < distinct_value_count; collisions += collisions_steps){
+                size_t local_steps = collisions_steps;
+                for(size_t collisions_id = count_collisions; collisions_id > 0; collisions_id--){
+                    size_t collisions = local_steps;
+                    local_steps /= diminish;
                     generate_strided_data<T>(data, data_size, distinct_value_count, hsize, function, collisions, data_seed);
 
                     for(size_t alg_id = 0; alg_id < count_alg_ut; alg_id++){

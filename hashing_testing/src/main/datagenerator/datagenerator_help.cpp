@@ -136,6 +136,8 @@ void all_number_gen(
     size_t collision_size,
     size_t seed
 ){
+
+    size_t min_repeats = 5;
     if(different_values == 0){
         return;
     }
@@ -145,19 +147,22 @@ void all_number_gen(
         vals_per_bucket = 2;
     }
 
-    size_t mul = vals_per_bucket;
-    if(mul > 32){
-        mul = 32;
+    size_t mul = vals_per_bucket / min_repeats;
+    if(mul < 2){
+        mul = 2;
     }
+    // if(mul > 32){
+    //     mul = 32;
+    // }
 
     size_t number_of_values = different_values * mul;
     
     //kick of data generation as long as there isn't enough values per bucket
     size_t retry = 0;
     size_t ENOUGH_VALS = 2;
-    const size_t max_retry = 100;
+    const size_t max_retry = min_repeats * 50;
     do{
-        if(ENOUGH_VALS == 2 && retry > 10){
+        if(ENOUGH_VALS == 2 && retry > max_retry/5){
             ENOUGH_VALS = enough_values_per_bucket(numbers, different_values, 1);
         }else if(ENOUGH_VALS == 0){
             throw std::runtime_error("bad hash function! Not all hash values where able to be generated!");

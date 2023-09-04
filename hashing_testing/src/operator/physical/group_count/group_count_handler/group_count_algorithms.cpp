@@ -72,7 +72,7 @@ void getGroupCount(Group_count<T> *& run, Group_Count_Algorithm test, size_t HSI
 }
 
 
-template void getGroupCount<>(Group_count<uint64_t> *& , Group_Count_Algorithm , size_t , size_t (*)(uint64_t, size_t));
+// template void getGroupCount<>(Group_count<uint64_t> *& , Group_Count_Algorithm , size_t , size_t (*)(uint64_t, size_t));
 template void getGroupCount<>(Group_count<uint32_t> *& , Group_Count_Algorithm , size_t , size_t (*)(uint32_t, size_t));
 // template void getGroupCount<>(Group_count<uint16_t> *& , Group_Count_Algorithm , size_t , size_t (*)(uint16_t, size_t));
 // template void getGroupCount<>(Group_count<uint8_t> *& , Group_Count_Algorithm , size_t , size_t (*)(uint8_t, size_t));

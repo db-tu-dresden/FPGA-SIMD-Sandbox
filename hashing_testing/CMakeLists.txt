@@ -22,9 +22,11 @@ include_directories(hashing PUBLIC
 add_subdirectory("src/")
 
 add_executable(hashing src/main/main_benchmark.cpp)
+add_executable(datagen src/main/datagen_test.cpp)
 # add_executable(datagen_test src/main/main_datagen_test.cpp)
 
 target_link_libraries(hashing PUBLIC TABLE FILE GCH LP HASH_FUNCTIONS DATAGEN)
+target_link_libraries(datagen PUBLIC HASH_FUNCTIONS DATAGEN)
 # target_link_libraries(CHAINED)
 if(USE_AVX512)
     target_link_libraries(hashing PUBLIC LCP LP_HORIZONTAL LP_VERTICAL)

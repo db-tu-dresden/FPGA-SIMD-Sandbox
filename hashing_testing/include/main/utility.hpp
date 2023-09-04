@@ -49,7 +49,18 @@ void print_time(size_t time_sec){
     time_sec -= time_min * 60;
     size_t time_hour = time_min/60;
     time_min -= time_hour * 60;
-    std::cout << time_hour << ":" << time_min << ":" << time_sec;
+    if(time_hour < 10){
+        std::cout << 0;
+    }
+    std::cout << time_hour << ":";
+    if(time_min < 10){
+        std::cout << 0;
+    }
+    std::cout << time_min << ":";
+    if(time_sec < 10){
+        std::cout << 0;
+    }
+    std::cout << time_sec;
 }
 
 
@@ -69,7 +80,7 @@ void status_output(size_t runs_done, const size_t total_runs, const double perce
         double time_per_percent = time_sec / percent_done;
         size_t time_left_sec = (1 - percent_done) * time_per_percent;
 
-        std::cout << "\t" << (uint32_t)(percent_done * 10000)/100. << "%\tit took ~";
+        std::cout << "\t" << (uint32_t)(percent_done * 10000)/100. << "%\tit took: \t";
         print_time(time_sec);
         std::cout << "\tApprox time left:\t";
         print_time(time_left_sec);

@@ -20,7 +20,7 @@ void print_vector(std::vector<T> numbers){
             count = 0;
             std::cout << "\n";
         }
-        std::cout << (uint64_t)i << "\t";
+        std::cout << (uint64_t)(i) << "\t";
         count++;
     }
     std::cout << std::endl;
@@ -47,19 +47,15 @@ void distribute(
 
     size_t dist = data_size;
     if(evenly_distributed){
-        dist = dist / distinct_values + 1;
+        dist = (dist+distinct_values-1) / distinct_values;
     }
-    
+    // std::cout << "DIST!\t" << dist << std::endl;
     size_t id = 0;
 
     for(; id < raw_non_collision.size(); id++){
         value.push_back(raw_non_collision[id]);
-        if(evenly_distributed){
-            max_occurences_left.push_back(dist - 1);
-            result[id] = raw_non_collision[id];
-        }else{
-            max_occurences_left.push_back(dist);
-        }
+        max_occurences_left.push_back(dist - 1);
+        result[id] = raw_non_collision[id];
     }
     for(T val: raw_collision){
         value.push_back(val);
@@ -67,15 +63,20 @@ void distribute(
     }
 
     size_t help_id = 0;
-    while(id < data_size){
-        size_t occ;
-        size_t ran;
-        do{
-            ran = noise(help_id++, seed) % value.size();
-            occ = max_occurences_left[ran];
-        }while(occ == 0);
-        size_t val = value[ran];
+    size_t stepper = 2;
+    while(value.size() % stepper == 0){
+        stepper++;
+    }
 
+    while(id < data_size){
+        size_t ran = noise(help_id++, seed) % value.size();
+        size_t occ = max_occurences_left[ran];
+        while(occ == 0){
+            ran = (ran + stepper) % value.size();
+            occ = max_occurences_left[ran];
+        }
+        max_occurences_left[ran]--;
+        T val = value[ran];
         result[id] = val;
         id++;
     }
@@ -105,6 +106,9 @@ size_t generate_strided_data(
     return raw_collision.size() + raw_non_collision.size();
 }
 
+// generates a list of indices to for which to not generate collisions
+// than selects random numbers according to that list.
+// values that are not on the list generate a collision instead.
 
 template<typename T>
 void generate_strided_data_raw(
@@ -116,10 +120,20 @@ void generate_strided_data_raw(
     size_t collision_size,
     size_t &seed
 ){
+    if(collision_size > distinct_values){
+        collision_size = distinct_values;
+    }
+    if(collision_size > 0){
+        collision_size--;
+    }
+    //collisions size of 1 and 0 is the same. there can't be a one value collision. 
+
     collision_data.clear();
     non_collision_data.clear();
-
-    bool inverse = collision_size > distinct_values * 0.5;
+    bool inverse = collision_size >= distinct_values * 0.5;
+    // if(collision_size >= distinct_values){
+    //     collision_size = distinct_values - 1;
+    // }
     size_t to_generate_ids = (collision_size * !inverse) + ((distinct_values - 1 - collision_size) * inverse);
     
     // std::cout << "collision_size " << collision_size << std::endl;
@@ -147,9 +161,9 @@ void generate_strided_data_raw(
     }
 // print_vector(collide);
     std::multimap<size_t, T> all_numbers;
-    all_number_gen<T>(all_numbers, hash_function, hsize, collision_size + 5, seed++);
+    all_number_gen<T>(all_numbers, hash_function, hsize, collision_size + 2, seed++);
 
-    size_t start_pos = 0;//noise(0, seed++) % hsize;
+    size_t start_pos = noise(0, seed++) % hsize;
     double step_size = (hsize * 1.0) / distinct_values;
     double current_pos = start_pos;
 

@@ -89,12 +89,13 @@ void AVX512_gc_SoA_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_
             //load dat
             __m512i nextElements = _mm512_maskz_loadu_epi32(overflow_correction_mask, &hashVec[hash_key]);   
             __mmask16 compareRes = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, value_vector, nextElements);
+            // __mmask16 checkForFreeSpace = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, _mm512_setzero_epi32(), nextElements);
 
             if(compareRes != 0){
             // A    -   Increment Count
                 __m512i nextCounts = _mm512_mask_loadu_epi32(zero_512i, oneMask, &countVec[hash_key]);
                 nextCounts = _mm512_mask_add_epi32(nextCounts, compareRes, nextCounts, one_512i);
-                _mm512_mask_storeu_epi32(&countVec[hash_key],compareRes,nextCounts);
+                _mm512_mask_storeu_epi32(&countVec[hash_key], compareRes, nextCounts);
                 break;
             }else{
                 __mmask16 checkForFreeSpace = _mm512_mask_cmpeq_epi32_mask(overflow_correction_mask, _mm512_setzero_epi32(), nextElements);
@@ -120,4 +121,4 @@ void AVX512_gc_SoA_v1<uint32_t>::create_hash_table(uint32_t* input, size_t data_
 }
 
 template class AVX512_gc_SoA_v1<uint32_t>;
-template class AVX512_gc_SoA_v1<uint64_t>;
+// template class AVX512_gc_SoA_v1<uint64_t>;

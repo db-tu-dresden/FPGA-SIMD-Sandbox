@@ -176,4 +176,4 @@ void AVX512_gc_AoS_conflict_v1<uint32_t>::create_hash_table(uint32_t* input, siz
 }
 
 template class AVX512_gc_AoS_conflict_v1<uint32_t>;
-template class AVX512_gc_AoS_conflict_v1<uint64_t>;
+// template class AVX512_gc_AoS_conflict_v1<uint64_t>;

@@ -13,7 +13,7 @@ clean(){
 while getopts 'vhc' flag; do
     case "${flag}" in
     v) v_flag="USE_AVX512=ON" 
-    echo "${v_flag}";;
+        echo "${v_flag}";;
     c) clean
         exit 1 ;;
     *) print_usage

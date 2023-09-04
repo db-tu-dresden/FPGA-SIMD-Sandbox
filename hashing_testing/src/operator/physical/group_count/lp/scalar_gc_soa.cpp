@@ -137,4 +137,4 @@ size_t Scalar_gc_SoA<T>::get_HSIZE(){
 }
 
 template class Scalar_gc_SoA<uint32_t>;
-template class Scalar_gc_SoA<uint64_t>;
+// template class Scalar_gc_SoA<uint64_t>;

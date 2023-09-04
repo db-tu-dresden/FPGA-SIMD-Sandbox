@@ -159,4 +159,4 @@ T AVX512_gc_SoA_v3<T>::get(T input){
 
 
 template class AVX512_gc_SoA_v3<uint32_t>;
-template class AVX512_gc_SoA_v3<uint64_t>;
+// template class AVX512_gc_SoA_v3<uint64_t>;

@@ -177,4 +177,4 @@ void AVX512_gc_SoA_v2<uint32_t>::create_hash_table(uint32_t* input, size_t data_
 }
 
 template class AVX512_gc_SoA_v2<uint32_t>;
-template class AVX512_gc_SoA_v2<uint64_t>;
+// template class AVX512_gc_SoA_v2<uint64_t>;
