@@ -38,10 +38,7 @@ void distribute(
     bool non_collisions_first,
     bool evenly_distributed
 ){
-    // std::cout << "collision\n";
-    // print_vector(raw_collision);
-    // std::cout << "non collision\n";
-    // print_vector(raw_non_collision);
+
     std::vector<size_t> max_occurences_left;
     std::vector<T> value;
 
@@ -80,6 +77,8 @@ void distribute(
         result[id] = val;
         id++;
     }
+    max_occurences_left.clear();
+    value.clear();
 }
 
 
@@ -102,8 +101,11 @@ size_t generate_strided_data(
     generate_strided_data_raw<T>(raw_collision, raw_non_collision, distinct_values, hsize, hash_function, collision_size, seed);
 
     distribute<T>(result, raw_collision, raw_non_collision, data_size, distinct_values, seed, non_collisions_first, evenly_distributed);
-
-    return raw_collision.size() + raw_non_collision.size();
+    
+    size_t result_size = raw_collision.size() + raw_non_collision.size();
+    raw_collision.clear();
+    raw_non_collision.clear();
+    return result_size;
 }
 
 // generates a list of indices to for which to not generate collisions
@@ -120,30 +122,32 @@ void generate_strided_data_raw(
     size_t collision_size,
     size_t &seed
 ){
+    //collisions size of 1 and 0 is the same. there can't be a one value collision. 
     if(collision_size > distinct_values){
         collision_size = distinct_values;
     }
     if(collision_size > 0){
         collision_size--;
     }
-    //collisions size of 1 and 0 is the same. there can't be a one value collision. 
+    if(collision_size > distinct_values){
+        collision_size = 0;
+    }
 
     collision_data.clear();
     non_collision_data.clear();
-    bool inverse = collision_size >= distinct_values * 0.5;
-    // if(collision_size >= distinct_values){
-    //     collision_size = distinct_values - 1;
-    // }
+    
+    bool inverse = collision_size >= (distinct_values * 0.5);
+    
+    //how many ids should be generate.
+    // not inverse: generate collision ids
+    // inverse: generate ids of non collisions.
     size_t to_generate_ids = (collision_size * !inverse) + ((distinct_values - 1 - collision_size) * inverse);
     
-    // std::cout << "collision_size " << collision_size << std::endl;
-    // std::cout << "inverse " << inverse << std::endl;
-    // std::cout << "to_gen " << to_generate_ids << std::endl;
-
+    // now we generate ids
     std::vector<size_t> ids;
     size_t help = 0;
     for(size_t c = 0; c < to_generate_ids; c++){
-        size_t nid = (noise(c + help++, seed) % (distinct_values - 1)) + 1;
+        size_t nid = (noise(c + help++, seed) % (distinct_values - 1)) + 1; // nid is never 0
         bool okay = !vector_contains<size_t>(ids, nid);
         if(okay){
             ids.push_back(nid);
@@ -152,14 +156,16 @@ void generate_strided_data_raw(
         }
     }
     seed++;
-// print_vector(ids);
+
+    // now we go through all distinct_value ids to generate collide ids this makes the next step easier for us 
     std::vector<bool> collide;
     for(size_t i = 1; i < distinct_values; i++){
         bool is_in = vector_contains<size_t>(ids, i);
         bool insert = (is_in != inverse);
         collide.push_back(insert);
     }
-// print_vector(collide);
+
+    // all_numbers genreates alot of numbers we could cut it down for this, but we would need to push it back a bit.
     std::multimap<size_t, T> all_numbers;
     all_number_gen<T>(all_numbers, hash_function, hsize, collision_size + 2, seed++);
 

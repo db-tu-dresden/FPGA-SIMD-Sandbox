@@ -16,8 +16,8 @@
 #include "main/datagenerator/datagenerator.hpp"
 
 using ps_type = uint32_t;
-size_t repeats_same_data = 3;
-size_t repeats_different_data = 5;
+size_t repeats_same_data = 2;
+size_t repeats_different_data = 2;
 
 double percentage_print = 0.5;
 
@@ -31,15 +31,15 @@ int main(int argc, char** argv){
 
     //TODO user input so we don't need to recompile all the time!
 
-    size_t distinct_value_count = 16 * 1024;
-    size_t data_amount = 8 * 1024 * 1024;
+    size_t distinct_value_count = 12 * 1024;
+    size_t data_amount = 4 * 1024 * 1024;
 
     float scale_boost = 1.0f;
 
 
     Group_Count_Algorithm algorithms_undertest[] = {
-        // Group_Count_Algorithm::SCALAR_GROUP_COUNT_SOA,
-        // Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS,
+        Group_Count_Algorithm::SCALAR_GROUP_COUNT_SOA,
+        Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS,
         // Group_Count_Algorithm::SCALAR_GROUP_COUNT_AOS_V2,
         Group_Count_Algorithm::AVX512_GROUP_COUNT_SOA_V1, 
         Group_Count_Algorithm::AVX512_GROUP_COUNT_AOS_V1, 
@@ -110,14 +110,14 @@ size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Co
     create_strided_benchmark_result_file(file_name);
 
     size_t collisions_steps = distinct_value_count;
-    size_t diminish = 2;
-    size_t max_count_collisions = std::log(collisions_steps)/std::log(diminish) + 1;
+    size_t diminish = 4;
+    size_t max_count_collisions = std::ceil(std::log(collisions_steps)/std::log(diminish)) + 1;
     size_t count_collisions = 100;
     if(max_count_collisions < count_collisions){
         count_collisions = max_count_collisions;
     }
 
-    double scale_factors[] = {1, 2, 4, 16};
+    double scale_factors[] = {1, 2, 4, 8, 16};
         
     size_t count_sf = sizeof(scale_factors) / sizeof(scale_factors[0]);
     

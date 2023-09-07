@@ -1,7 +1,3 @@
-
-
-
-
 #include "operator/physical/group_count/lcp/avx512_gc_soaov_v1.hpp"
 
 #define EMPTY_SPOT 0
