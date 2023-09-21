@@ -58,7 +58,7 @@ void Scalar_gc_AoS_V2<T>::create_hash_table(T* input, size_t data_size){
                 break;
             }
             //go to the next spot++hash_key;
-            if(hash_key >= this->m_HSIZE_v){
+            if(hash_key >= this->m_HSIZE){
                 hash_key = 0;
             }
             // hash_key = (hash_key + 1) % HSIZE;
