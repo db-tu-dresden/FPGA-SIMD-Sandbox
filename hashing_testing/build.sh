@@ -1,16 +1,18 @@
 
 print_usage(){
     printf "Hashing project"
-    printf "-v enables AVX512"
-    printf "-c deletes the build folder"
-    printf "-h shows this help"
+    printf "\n\t-v enables AVX512"
+    printf "\n\t-c deletes the build folder"
+    printf "\n\t-h shows this help\n"
 }
 
 clean(){
+    printf "Deleting all project files\n"
     rm -r build/
+    printf "Deletion done\n"
 }
 
-while getopts 'vhc' flag; do
+while getopts 'vch' flag; do
     case "${flag}" in
     v) v_flag="USE_AVX512=ON" 
         echo "${v_flag}";;
@@ -31,4 +33,4 @@ then
 else
     cmake -D "$v_flag" .. 
 fi
-cmake --build . --verbose
+cmake --build .

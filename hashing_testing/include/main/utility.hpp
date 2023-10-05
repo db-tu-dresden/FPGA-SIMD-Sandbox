@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 
+
 std::chrono::high_resolution_clock::time_point time_now(){
     return std::chrono::high_resolution_clock::now();
 }
@@ -12,6 +13,9 @@ uint64_t duration_time (std::chrono::high_resolution_clock::time_point begin, st
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
 }
 
+uint64_t duration_time_seconds (std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end){
+    return std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();
+}
 
 void status_output(size_t &runs_done, const size_t total_runs, double &percentage_done, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin){
     runs_done++;
@@ -44,7 +48,7 @@ void status_output(size_t &runs_done, const size_t total_runs, double &percentag
 }
 
 
-void print_time(size_t time_sec){
+void print_time(size_t time_sec, bool new_line = true){
     size_t time_min = time_sec/60;
     time_sec -= time_min * 60;
     size_t time_hour = time_min/60;
@@ -61,8 +65,20 @@ void print_time(size_t time_sec){
         std::cout << 0;
     }
     std::cout << time_sec;
+    if(new_line){
+        std::cout << std::endl;
+    }
 }
 
+void print_time(std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end, bool new_line = true){
+    uint64_t duration = duration_time_seconds(begin, end);
+    print_time(duration, new_line);
+}
+
+void print_time(std::chrono::high_resolution_clock::time_point begin, bool new_line = true){
+    std::chrono::high_resolution_clock::time_point end = time_now();
+    print_time(begin, end, new_line);
+}
 
 
 void status_output(size_t runs_done, const size_t total_runs, const double percentage_print, std::chrono::high_resolution_clock::time_point time_begin, bool force = false){
@@ -81,9 +97,9 @@ void status_output(size_t runs_done, const size_t total_runs, const double perce
         size_t time_left_sec = (1 - percent_done) * time_per_percent;
 
         std::cout << "\t" << (uint32_t)(percent_done * 10000)/100. << "%\tit took: \t";
-        print_time(time_sec);
+        print_time(time_sec, false);
         std::cout << "\tApprox time left:\t";
-        print_time(time_left_sec);
+        print_time(time_left_sec, false);
         std::cout << std::endl;
     }
 }

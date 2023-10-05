@@ -65,13 +65,64 @@ void generate_random_values(
 /// @param collision_size 
 /// @param seed 
 template<typename T>
-void all_number_gen(
+void all_number_gen_o(
     std::multimap<size_t, T> &numbers,
     size_t (*hash_function)(T, size_t),
     size_t different_values,
     size_t collision_size,
     size_t seed
 );
+
+/// @brief 
+/// @tparam T 
+/// @param numbers 
+/// @param hash_function 
+/// @param different_values 
+/// @param collision_size 
+/// @param seed 
+template<typename T>
+void all_number_gen(
+    T **& numbers,
+    size_t (*hash_function)(T, size_t),
+    size_t different_values,
+    size_t collision_size,
+    size_t seed
+);
+
+template<typename T> 
+size_t generate_numbers(
+    T **& numbers,
+    size_t bucket_count,
+    size_t bucket_size,
+    size_t (*hash_function)(T, size_t),
+    size_t to_gen,
+    size_t pos
+);
+template<typename T> 
+bool add_number(
+    T**& numbers,
+    size_t bucket_count,
+    size_t bucket_size,
+    size_t bucket,
+    T value,
+    bool force = false
+);
+
+template<typename T> 
+void free_all_numbers(
+    T**& numbers,
+    size_t bucket_count
+);
+
+template<typename T> 
+void malloc_all_numbers(
+    T**& numbers,
+    size_t bucket_count,
+    size_t bucket_size
+);
+
+template<typename T>
+void print(T** n, size_t bc);
 
 /// @brief generates one collision at the starting position with the given collision length. if the length is to big a neighboring bucket might get used to help fill the collision
 /// @tparam T the data type of the numbers

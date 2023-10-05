@@ -4,6 +4,7 @@
 #include "main/datagenerator/datagen_help.hpp"
 #include "main/hash_function.hpp"
 
+#include <limits>
 
 template<typename T> 
 bool enough_values_per_bucket(std::multimap<size_t, T> &numbers, size_t HSIZE, size_t min_numbers){
@@ -14,6 +15,33 @@ bool enough_values_per_bucket(std::multimap<size_t, T> &numbers, size_t HSIZE, s
     }
     return true;
 }
+void print_count(size_t *numbers, size_t HSIZE){
+    for(size_t i = 0; i < HSIZE; i++){
+        std::cout << numbers[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+bool enough_values_per_bucket(size_t *numbers, size_t HSIZE, size_t min_numbers){
+    for(size_t i = 0; i < HSIZE; i++){
+        if(numbers[i] < min_numbers){
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename T> 
+bool count_reset(std::multimap<size_t, T> &all_numbers, size_t * numbers, size_t HSIZE){
+    // print_count(numbers, HSIZE);
+    
+    for(size_t i = 0; i < HSIZE; i++){
+        numbers[i] = all_numbers.count(i);
+    }
+    // print_count(numbers, HSIZE);
+    return false;//enough_values_per_bucket(numbers, HSIZE, min_numbers);
+}
+
 
 size_t noise(size_t position, size_t seed){
     size_t BIT_NOISE1 = 0x68E31DA4;
@@ -121,6 +149,155 @@ void generate_random_values(
     }
 }
 
+
+
+template<typename T>
+bool generate_random_values(
+    std::multimap<size_t, T> &numbers,
+    size_t * nr_count,
+    size_t (*hash_function)(T, size_t),
+    size_t different_values,
+    size_t number_of_values,
+    size_t seed,
+    size_t start_sequence
+){
+    size_t generated = 0;
+    size_t wanted_values = numbers.size() + number_of_values;
+    size_t id = 0;
+    T num;
+    if(start_sequence == 0){
+        num = noise(0x837A, seed);
+    }else{
+        num = start_sequence;
+    }
+
+    while(numbers.size() < wanted_values){
+        //keep generating until num is not 0
+        do{
+            num++;
+        }while(num == 0);
+        size_t hash = hash_function(num, different_values);
+        if(nr_count[hash] <= number_of_values + 4){
+            numbers.insert(std::pair<size_t, T>(hash, (T)(num)));
+            nr_count[hash]++;
+            generated++;
+        }
+    }
+    return generated >= 0;
+}
+
+template<typename T> 
+void malloc_all_numbers(
+    T**& numbers,
+    size_t bucket_count,
+    size_t bucket_size
+){
+    if(numbers == nullptr){
+        numbers = (T **) malloc(bucket_count * sizeof(T*));
+        for(size_t i = 0; i < bucket_count; i++){
+            numbers[i] = (T *) malloc((bucket_size + 2) * sizeof(T));
+        }
+        for(size_t i = 0; i < bucket_count; i++){
+            numbers[i][0] = 0;
+        }
+    }
+}
+
+template<typename T> 
+void free_all_numbers(
+    T**& numbers,
+    size_t bucket_count
+){
+    if(numbers != nullptr){
+        for(size_t i = 0; i < bucket_count; i++){
+        free(numbers[i]);
+        }
+        free(numbers);
+        numbers = nullptr;
+    }
+}
+
+template<typename T>
+void print(T** n, size_t bc){
+    std::cout << "----------------------" << bc<< std::endl;
+    for(size_t i = 0; i < bc; i++){
+        for(size_t e = 0; e <= n[i][0]; e++){
+            std::cout << n[i][e] << "\t";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "----------------------" << std::endl;
+}
+
+
+template<typename T> 
+bool add_number(
+    T**& numbers,
+    size_t bucket_count,
+    size_t bucket_size,
+    size_t bucket,
+    T value,
+    bool force
+){
+    // std::cout << "\nadd:\t(" << bucket << "," << value << ")" << std::flush;
+    bool insert = bucket < bucket_count;
+    // std::cout << "\t" << insert << std::flush;
+    if(!force){
+        // std::cout << "\tnf";
+        for(size_t i = 1; i <= numbers[bucket][0] && insert; i++){
+            insert = numbers[bucket][i] != value;
+        }
+    }
+    // std::cout << "\t" << insert << std::flush;
+    insert = insert && numbers[bucket][0] < bucket_size;
+    // std::cout << "\t" << insert << std::endl;
+    if(insert){
+        size_t pos = numbers[bucket][0] + 1;
+        numbers[bucket][pos] = value;
+        numbers[bucket][0]++;
+    } 
+    // print(numbers, bucket_count);
+    return insert;
+}
+
+// bool unsave_add_number(
+//     T**& numbers,
+//     size_t bucket_count,
+//     size_t bucket_size, 
+//     size_t bucket,
+//     T value
+// ){
+//     bool insert = bucket < bucket_count;
+//     insert = insert && numbers[bucket][0] < bucket_size;
+//     if(insert){
+//         size_t pos = numbers[bucket][0] + 1;
+//         numbers[bucket][pos] = value;
+//         numbers[bucket][0]++;
+//     }  
+//     return insert;
+// }
+
+template<typename T> 
+size_t generate_numbers(
+    T **& numbers,
+    size_t bucket_count,
+    size_t bucket_size,
+    size_t (*hash_function)(T, size_t),
+    size_t to_gen,
+    size_t pos
+){
+    size_t inserted = 0;
+    T value = pos;
+    for(size_t i = 0; i < to_gen; i++){
+        value += value == 0;
+        size_t bucket = hash_function(value, bucket_count);
+        inserted += add_number(numbers, bucket_count, bucket_size, bucket, value);
+        value ++;
+        // print(numbers, bucket_count);
+    }
+    return inserted;
+}
+
 /// @brief 
 /// @tparam T 
 /// @param numbers 
@@ -130,6 +307,66 @@ void generate_random_values(
 /// @param seed 
 template<typename T>
 void all_number_gen(
+    T **& numbers,
+    size_t (*hash_function)(T, size_t),
+    size_t different_values,
+    size_t collision_size,
+    size_t seed
+){
+    if(different_values < 1){
+        different_values = 1;
+    }
+    if(collision_size < 1){
+        collision_size = 1;
+    }
+    T pos = (T)(noise(0, seed));
+    
+    size_t total_max_values = (std::numeric_limits<T>::max() - 1) - std::numeric_limits<T>::min();
+    size_t max_wanted_values = different_values * collision_size;
+    size_t free_values = total_max_values - max_wanted_values;
+    
+    malloc_all_numbers(numbers, different_values, collision_size);
+    size_t tries = 0;
+    size_t max_tries = 100;
+    size_t min_steps = (max_wanted_values / 5) + 1;
+    // if(min_steps < different_values){
+    //     min_steps = different_values;
+    // }
+    size_t count = 0;
+    do{
+        count = 0;
+        size_t generated = generate_numbers(numbers, different_values, collision_size, hash_function, min_steps, pos);
+
+
+        size_t skip_step = 0;
+        if(generated > 0 && free_values > 1){
+            skip_step = noise(pos, seed) % free_values;
+        }
+
+        pos += min_steps;
+        pos += skip_step;
+        free_values -= skip_step;
+        
+        for(size_t i = 0; i < different_values; i++){
+            count += numbers[i][0];
+        }
+        std::cout << "." << std::flush;
+        // print(numbers, different_values);
+    }while(count < max_wanted_values && tries++ < max_tries);
+    std::cout  << "\t" << max_wanted_values << " " << count << " " << (max_wanted_values <= count) << ".\t"; 
+    // print(numbers, different_values);
+}  
+
+
+/// @brief 
+/// @tparam T 
+/// @param numbers 
+/// @param hash_function 
+/// @param different_values 
+/// @param collision_size 
+/// @param seed 
+template<typename T>
+void all_number_gen_o(
     std::multimap<size_t, T> &numbers,
     size_t (*hash_function)(T, size_t),
     size_t different_values,
@@ -137,43 +374,52 @@ void all_number_gen(
     size_t seed
 ){
 
-    size_t min_repeats = 5;
     if(different_values == 0){
+        std::cout << "quickwayout\n";
         return;
     }
 
-    size_t vals_per_bucket = collision_size + 1;
-    if(vals_per_bucket < 2){
-        vals_per_bucket = 2;
+    size_t step = collision_size;
+    if(step < 2){
+        step = 2;
     }
+    step *= 2;
+    step--;
+    size_t min_nr_vals = step * different_values;
+    const size_t max_retry = different_values*2;
 
-    size_t mul = vals_per_bucket / min_repeats;
-    if(mul < 2){
-        mul = 2;
-    }
-    // if(mul > 32){
-    //     mul = 32;
-    // }
 
-    size_t number_of_values = different_values * mul;
+    size_t * nr_count = (size_t *) malloc(different_values * sizeof(size_t));
     
-    //kick of data generation as long as there isn't enough values per bucket
+    count_reset<T>(numbers, nr_count, different_values);
+    bool generated = false;
+    // std::cout << "generation\n";
+    size_t sequence = noise(0x837A, seed);
+    generate_random_values(numbers, nr_count, hash_function, 
+        different_values, min_nr_vals, seed, sequence);
+    sequence = (sequence + min_nr_vals) % different_values;
+    count_reset<T>(numbers, nr_count, different_values);
+    
     size_t retry = 0;
     size_t ENOUGH_VALS = 2;
-    const size_t max_retry = min_repeats * 50;
-    do{
-        if(ENOUGH_VALS == 2 && retry > max_retry/5){
-            ENOUGH_VALS = enough_values_per_bucket(numbers, different_values, 1);
+    while(!enough_values_per_bucket(nr_count, different_values, collision_size) 
+        || (!generated && !count_reset<T>(numbers, nr_count, different_values)))
+    {
+        if(ENOUGH_VALS == 2 && retry > max_retry/3){
+            ENOUGH_VALS = enough_values_per_bucket(nr_count, different_values, 1);
         }else if(ENOUGH_VALS == 0){
             throw std::runtime_error("bad hash function! Not all hash values where able to be generated!");
         }else if(retry > max_retry){
             throw std::runtime_error("generation is takeing to long. abort!");
         }
-
-        generate_random_values(numbers, hash_function, different_values, number_of_values, seed + retry);
-        retry++;
-    }while(!enough_values_per_bucket(numbers, different_values, vals_per_bucket));
-}
+        // std::cout << "generation:\t" << retry << std::endl;
+        generated = generate_random_values(numbers, nr_count, hash_function, 
+            different_values, step, seed + ++retry, sequence);
+        sequence = (sequence + step) % different_values;
+    }
+    free(nr_count);    
+    // print_count(nr_count, different_values);
+}   
 
 /// @brief generates one collision at the starting position with the given collision length. if the length is to big a neighboring bucket might get used to help fill the collision
 /// @tparam T the data type of the numbers
@@ -416,22 +662,64 @@ void generate_benchmark_data(T*& result, size_t data_size, std::vector<T> number
 }
 
 
+template void all_number_gen<uint64_t>(uint64_t**& numbers, size_t (*hash_function)(uint64_t, size_t), size_t dv, size_t cs, size_t seed);
+template void all_number_gen<uint32_t>(uint32_t**& numbers, size_t (*hash_function)(uint32_t, size_t), size_t dv, size_t cs, size_t seed);
+template void all_number_gen<uint16_t>(uint16_t**& numbers, size_t (*hash_function)(uint16_t, size_t), size_t dv, size_t cs, size_t seed);
+template void all_number_gen<uint8_t>(uint8_t**& numbers, size_t (*hash_function)(uint8_t, size_t), size_t dv, size_t cs, size_t seed);
+template void all_number_gen<int64_t>(int64_t**& numbers, size_t (*hash_function)(int64_t, size_t), size_t dv, size_t cs, size_t seed);
+template void all_number_gen<int32_t>(int32_t**& numbers, size_t (*hash_function)(int32_t, size_t), size_t dv, size_t cs, size_t seed);
+template void all_number_gen<int16_t>(int16_t**& numbers, size_t (*hash_function)(int16_t, size_t), size_t dv, size_t cs, size_t seed);
+template void all_number_gen<int8_t>(int8_t**& numbers, size_t (*hash_function)(int8_t, size_t), size_t dv, size_t cs, size_t seed);
 
+template void free_all_numbers<uint64_t>(uint64_t**&numbers, size_t bc);
+template void free_all_numbers<uint32_t>(uint32_t**&numbers, size_t bc);
+template void free_all_numbers<uint16_t>(uint16_t**&numbers, size_t bc);
+template void free_all_numbers<uint8_t>(uint8_t**&numbers, size_t bc);
+template void free_all_numbers<int64_t>(int64_t**&numbers, size_t bc);
+template void free_all_numbers<int32_t>(int32_t**&numbers, size_t bc);
+template void free_all_numbers<int16_t>(int16_t**&numbers, size_t bc);
+template void free_all_numbers<int8_t>(int8_t**&numbers, size_t bc);
 
+template void malloc_all_numbers<uint64_t>(uint64_t**&numbers, size_t bc, size_t bs);
+template void malloc_all_numbers<uint32_t>(uint32_t**&numbers, size_t bc, size_t bs);
+template void malloc_all_numbers<uint16_t>(uint16_t**&numbers, size_t bc, size_t bs);
+template void malloc_all_numbers<uint8_t>(uint8_t**&numbers, size_t bc, size_t bs);
+template void malloc_all_numbers<int64_t>(int64_t**&numbers, size_t bc, size_t bs);
+template void malloc_all_numbers<int32_t>(int32_t**&numbers, size_t bc, size_t bs);
+template void malloc_all_numbers<int16_t>(int16_t**&numbers, size_t bc, size_t bs);
+template void malloc_all_numbers<int8_t>(int8_t**&numbers, size_t bc, size_t bs);
 
-template void all_number_gen<uint64_t>(std::multimap<size_t, uint64_t> &numbers, size_t (*hash_function)(uint64_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
-template void all_number_gen<uint32_t>(std::multimap<size_t, uint32_t> &numbers, size_t (*hash_function)(uint32_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
-template void all_number_gen<uint16_t>(std::multimap<size_t, uint16_t> &numbers, size_t (*hash_function)(uint16_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
-template void all_number_gen<uint8_t>(std::multimap<size_t, uint8_t> &numbers, size_t (*hash_function)(uint8_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
-template void all_number_gen<int64_t>(std::multimap<size_t, int64_t> &numbers, size_t (*hash_function)(int64_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
-template void all_number_gen<int32_t>(std::multimap<size_t, int32_t> &numbers, size_t (*hash_function)(int32_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
-template void all_number_gen<int16_t>(std::multimap<size_t, int16_t> &numbers, size_t (*hash_function)(int16_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
-template void all_number_gen<int8_t>(std::multimap<size_t, int8_t> &numbers, size_t (*hash_function)(int8_t, size_t),
-    size_t different_values, size_t collision_size, size_t seed);
+template bool add_number<uint64_t>(uint64_t**&numbers, size_t bc, size_t bs, size_t b, uint64_t v, bool force);
+template bool add_number<uint32_t>(uint32_t**&numbers, size_t bc, size_t bs, size_t b, uint32_t v, bool force);
+template bool add_number<uint16_t>(uint16_t**&numbers, size_t bc, size_t bs, size_t b, uint16_t v, bool force);
+template bool add_number<uint8_t>(uint8_t**&numbers, size_t bc, size_t bs, size_t b, uint8_t v, bool force);
+template bool add_number<int64_t>(int64_t**&numbers, size_t bc, size_t bs, size_t b, int64_t v, bool force);
+template bool add_number<int32_t>(int32_t**&numbers, size_t bc, size_t bs, size_t b, int32_t v, bool force);
+template bool add_number<int16_t>(int16_t**&numbers, size_t bc, size_t bs, size_t b, int16_t v, bool force);
+template bool add_number<int8_t>(int8_t**&numbers, size_t bc, size_t bs, size_t b, int8_t v, bool force);
+
+template void print<uint64_t>(uint64_t** n, size_t bc);
+template void print<int64_t>(int64_t** n, size_t bc);
+template void print<uint32_t>(uint32_t** n, size_t bc);
+template void print<int32_t>(int32_t** n, size_t bc);
+template void print<uint16_t>(uint16_t** n, size_t bc);
+template void print<int16_t>(int16_t** n, size_t bc);
+template void print<uint8_t>(uint8_t** n, size_t bc);
+template void print<int8_t>(int8_t** n, size_t bc);
+
+// template void all_number_gen_o<uint64_t>(std::multimap<size_t, uint64_t> &numbers, size_t (*hash_function)(uint64_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);
+// template void all_number_gen_o<uint32_t>(std::multimap<size_t, uint32_t> &numbers, size_t (*hash_function)(uint32_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);
+// template void all_number_gen_o<uint16_t>(std::multimap<size_t, uint16_t> &numbers, size_t (*hash_function)(uint16_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);
+// template void all_number_gen_o<uint8_t>(std::multimap<size_t, uint8_t> &numbers, size_t (*hash_function)(uint8_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);
+// template void all_number_gen_o<int64_t>(std::multimap<size_t, int64_t> &numbers, size_t (*hash_function)(int64_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);
+// template void all_number_gen_o<int32_t>(std::multimap<size_t, int32_t> &numbers, size_t (*hash_function)(int32_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);
+// template void all_number_gen_o<int16_t>(std::multimap<size_t, int16_t> &numbers, size_t (*hash_function)(int16_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);
+// template void all_number_gen_o<int8_t>(std::multimap<size_t, int8_t> &numbers, size_t (*hash_function)(int8_t, size_t),
+//     size_t different_values, size_t collision_size, size_t seed);

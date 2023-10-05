@@ -17,13 +17,35 @@
 
 using ps_type = uint32_t;
 size_t repeats_same_data = 2;
-size_t repeats_different_data = 2;
+size_t repeats_different_data = 1;
+size_t repeats_different_layout = 2;
+
+/*
+* Generation types:
+*   0: strided
+*   1: bad
+*/
+const uint8_t MAX_GENERATION_TYPES = 2;
+
 
 double percentage_print = 0.5;
 
+template<typename T>
+void create_Datagenerator(
+    Datagenerator<T> *& datagen,
+    size_t hsize, 
+    size_t (*hash_function)(T, size_t),
+    size_t max_collision_size, 
+    size_t number_seed)
+{
+    if(datagen != nullptr){
+        delete datagen;
+    }
+    datagen = new Datagenerator<T>(hsize, hash_function, max_collision_size, number_seed);
+}
 
 template<typename T> 
-size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t count_alg_ut, HashFunction *hashfunctions_undertest, size_t count_hf_ut);
+size_t benchmark(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t count_alg_ut, HashFunction *hashfunctions_undertest, size_t count_hf_ut, size_t data_gen_typ_mask = 1);
 
 
 int main(int argc, char** argv){
@@ -56,7 +78,7 @@ int main(int argc, char** argv){
     size_t num_alg_undertest = sizeof(algorithms_undertest) / sizeof(algorithms_undertest[0]);
     size_t num_hashfunc_undertest = sizeof(hashfunctions_undertest) / sizeof(hashfunctions_undertest[0]);
 
-    strided_benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
+    benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
     // distinct_value_count *= 2;
     // distinct_value_count = 2048;
     // strided_benchmark<ps_type>(data_amount, distinct_value_count,algorithms_undertest, num_alg_undertest, hashfunctions_undertest, num_hashfunc_undertest);
@@ -97,7 +119,7 @@ size_t run_test(Group_count<T>*& group_count, T* data, size_t data_size, bool cl
 // benchmarking the algorithms with the strided data generator. The data generator creates planned collision data.
 // with higher scaling factors gabs are introduced in a orderly and uniform fashion. The values are "slotted" and the gabs come after every slot. 
 template<typename T> 
-size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t count_alg_ut, HashFunction *hashfunctions_undertest, size_t count_hf_ut){
+size_t benchmark(size_t data_size, size_t distinct_value_count, Group_Count_Algorithm *algorithms_undertest, size_t count_alg_ut, HashFunction *hashfunctions_undertest, size_t count_hf_ut, size_t data_gen_typ_mask){
     size_t seed = 0;
     srand(std::time(nullptr));
     seed = std::rand();
@@ -118,8 +140,14 @@ size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Co
     }
 
     double scale_factors[] = {1, 2, 4, 8, 16};
-        
     size_t count_sf = sizeof(scale_factors) / sizeof(scale_factors[0]);
+    double max_scale_factor = 1;
+    for(size_t i = 0; i < count_sf; i++){
+        if(max_scale_factor < scale_factors[i]){
+            max_scale_factor = scale_factors[i];
+        }
+    }
+
     
     // double percentage_done  = -percentage_print;
     size_t runs_done = 0;
@@ -133,46 +161,88 @@ size_t strided_benchmark(size_t data_size, size_t distinct_value_count, Group_Co
     T* data = nullptr;
     data = (T*) aligned_alloc(64, data_size * sizeof(T));
     Group_count<T> *alg = nullptr;
-    for(size_t random_data = 0; random_data < repeats_different_data; random_data++){
-        size_t data_seed = noise(random_data, seed);
-        
-        for(size_t hash_function_id = 0; hash_function_id < count_hf_ut; hash_function_id++){
-            HashFunction function_id = hashfunctions_undertest[hash_function_id];
-            hash_fptr<T> function = get_hash_function<T>(function_id);
+    Datagenerator<T> *datagen = nullptr;
+
+    for(size_t hash_function_id = 0; hash_function_id < count_hf_ut; hash_function_id++){
+        HashFunction function_id = hashfunctions_undertest[hash_function_id];
+        hash_fptr<T> function = get_hash_function<T>(function_id);
+
+        for(size_t random_data = 0; random_data < repeats_different_data; random_data++){
+            
+            size_t data_seed = noise(random_data, seed);
+
+            create_Datagenerator(
+                datagen,
+                distinct_value_count * 1024 * 4,
+                function,
+                max_scale_factor * 2,
+                data_seed
+            );
 
             for(size_t scale_factors_id = 0; scale_factors_id < count_sf; scale_factors_id++){
                 double current_scale = scale_factors[scale_factors_id];
                 size_t hsize = distinct_value_count * current_scale;
+                
+                datagen->transform_hsize(hsize);
+                bool success_datagen = datagen->transform_finalise();
+                if(!success_datagen){
+                    std::stringstream error_stream;
+                    error_stream << "Datagenerator transformation not successful: "<< data_seed << " " << hsize;
+                    throw std::runtime_error(error_stream.str());
+                }
 
-                size_t local_steps = collisions_steps;
-                for(size_t collisions_id = count_collisions; collisions_id > 0; collisions_id--){
-                    size_t collisions = local_steps;
-                    local_steps /= diminish;
-                    generate_strided_data<T>(data, data_size, distinct_value_count, hsize, function, collisions, data_seed);
+                for(size_t random_layout = 0; success_datagen &&  random_layout < repeats_different_layout; random_layout++){
+                    size_t layout_seed = noise(random_layout, data_seed);
 
-                    for(size_t alg_id = 0; alg_id < count_alg_ut; alg_id++){
-                        getGroupCount(alg, algorithms_undertest[alg_id], hsize, function);
-                        std::string alg_identification = alg->identify();
-                        size_t internal_HSIZE = alg->get_HSIZE();
+                    size_t local_steps = collisions_steps;
+                    for(size_t collisions_id = count_collisions; collisions_id > 0; collisions_id--){
+                        size_t collisions = local_steps;
+                        local_steps /= diminish;
 
-                        for(size_t run_id = 0; run_id < repeats_same_data; run_id++){
-                            alg->clear();
-                            size_t time = 0;
-                            time = run_test<T>(alg, data, data_size);
-                            write_to_strided_benchmark_file(
-                                file_name, alg_identification, time, data_size,
-                                sizeof(T), distinct_value_count, current_scale, internal_HSIZE,
-                                function_id, data_seed, run_id, collisions
-                            );
+                        for(uint8_t data_generation_count = 0; data_generation_count < MAX_GENERATION_TYPES; data_generation_count++){
+                            bool generated = (data_gen_typ_mask >> data_generation_count) & 0b1;
+                            if(generated){
+                                switch (data_generation_count)
+                                {
+                                case 0:
+                                    datagen->get_data_strided(data, data_size, distinct_value_count, collisions, layout_seed);
+                                    break;
+                                case 1:
+                                    datagen->get_data_bad(data, data_size, distinct_value_count, collisions, layout_seed);
+                                    break;
+                                default:
+                                    std::stringstream error_stream;
+                                    error_stream << "Unknown Datageneration function. Wanted Generation: " << data_generation_count;
+                                    throw std::runtime_error(error_stream.str());
+                                    break;
+                                }
+                            }
 
-                            runs_done++;
+                            for(size_t alg_id = 0; generated && alg_id < count_alg_ut; alg_id++){
+                                getGroupCount(alg, algorithms_undertest[alg_id], hsize, function);
+                                std::string alg_identification = alg->identify();
+                                size_t internal_HSIZE = alg->get_HSIZE();
 
-                            status_output(runs_done, total_runs, percentage_print, time_begin);
+                                for(size_t run_id = 0; run_id < repeats_same_data; run_id++){
+                                    alg->clear();
+                                    size_t time = 0;
+                                    time = run_test<T>(alg, data, data_size);
+                                    write_to_strided_benchmark_file(
+                                        file_name, alg_identification, time, data_size,
+                                        sizeof(T), distinct_value_count, current_scale, internal_HSIZE,
+                                        function_id, data_seed, run_id, collisions
+                                    );
+
+                                    runs_done++;
+
+                                    status_output(runs_done, total_runs, percentage_print, time_begin);
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }  
+            }  
+        }
     }
 
     if(data != nullptr){
