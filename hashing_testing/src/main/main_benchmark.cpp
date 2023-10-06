@@ -15,6 +15,8 @@
 #include "main/fileio/file.hpp"
 #include "main/datagenerator/datagenerator.hpp"
 
+#include <tslintrin.hpp>
+
 using ps_type = uint32_t;
 size_t repeats_same_data = 2;
 size_t repeats_different_data = 1;

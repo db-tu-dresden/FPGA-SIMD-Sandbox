@@ -1,0 +1,3 @@
+[submodule "hashing_testing/tools/tsl"]
+	path = hashing_testing/tools/tsl
+	url = https://github.com/db-tu-dresden/TSL.git
