@@ -29,15 +29,17 @@ include_directories(hashing PUBLIC
 "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
+include_directories(hashing PUBLIC ${TSL_INCLUDE_DIRECTORY})
+
 add_subdirectory("src/")
 
 add_executable(hashing src/main/main_benchmark.cpp)
 add_executable(datagen src/main/datagen_test.cpp)
+add_executable(tsl_testing src/main/main_tsl_test.cpp)
+
 # add_executable(datagen_test src/main/main_datagen_test.cpp)
-
-target_include_directories(hashing PUBLIC ${TSL_INCLUDE_DIRECTORY})
 target_link_libraries(hashing PUBLIC TABLE FILE GCH LP HASH_FUNCTIONS DATAGEN tsl)
-
+target_link_libraries(tsl_testing tsl)
 # target_include_directories(hashing PUBLIC ${TSL_INCLUDE_DIRECTORY} "${TSL_INCLUDE_DIRECTORY}/../supplementary/runtime/cpu/include/")
 # target_link_libraries(hashing tsl)
 
