@@ -289,7 +289,7 @@ void AVX512_gc_SoA_conflict_v2<uint32_t>::create_hash_table(uint32_t* input, siz
         }
         p++;
     }
-
+    free(buffer);
     // multiple improvements are possible:
     // 1.   we could increase the performance of the worst case first write.
     // 2.   we could absorbe the scalar remainder with overflow masks
