@@ -5,19 +5,14 @@
 #include <stdint.h>
 #include <iostream>
 
-// #include <immintrin.h>
-// #include <emmintrin.h>
-// #include <smmintrin.h>
-
 #include <tslintrin.hpp>
 
-#include "operator/logical/group_count.hpp"
-#include "operator/physical/group_count/lp/scalar_gc_soa.hpp"
+#include "operator/logical/tsl_group_count_soa.hpp"
 
 /// @brief TSL_gc_LCP_SoA uses AVX512. It has an array of vectors which don't need to be loaded
 /// @tparam T 
 template <class SimdT, typename T>
-class TSL_gc_LCP_SoA : public Scalar_gc_SoA<T>{
+class TSL_gc_LCP_SoA : public Group_Count_TSL_SOA<T>{
     
     using ps = tsl::simd<T, SimdT>;
     using vec_t = typename ps::register_type;
@@ -36,7 +31,8 @@ class TSL_gc_LCP_SoA : public Scalar_gc_SoA<T>{
         bool m_transfer = false;
         
     public:
-        TSL_gc_LCP_SoA(size_t HSIZE, size_t (*hash_function)(T, size_t));
+        TSL_gc_LCP_SoA(size_t HSIZE, size_t (*hash_function)(T, size_t), size_t numa_node);
+        
         virtual ~TSL_gc_LCP_SoA();
         
         void create_hash_table(T* input, size_t data_size);
@@ -47,11 +43,14 @@ class TSL_gc_LCP_SoA : public Scalar_gc_SoA<T>{
             return "TSL LCP SoA";
         }
 
+        void clear();
+
         size_t get_HSIZE(){
             return m_HSIZE_v * m_elements_per_vector;
         }
 
         T get(T value);
 };
+
 
 #endif //TUD_HASHING_TESTING_TSL_GROUP_COUNT_LCP_SOA

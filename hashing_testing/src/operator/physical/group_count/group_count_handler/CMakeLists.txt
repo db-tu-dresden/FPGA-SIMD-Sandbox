@@ -5,4 +5,4 @@
 # endif()
 
 add_library(GCH group_count_algorithms.cpp)
-
+target_link_libraries(GCH tsl)

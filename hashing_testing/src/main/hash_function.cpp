@@ -7,6 +7,22 @@ size_t table[8][256];
 size_t _k_update_rounds = 2;
 size_t _k_finalize_rounds = 2;
 
+size_t noise(size_t position, size_t seed){
+    size_t BIT_NOISE1 = 0x68E31DA4;
+    size_t BIT_NOISE2 = 0xB5297A4D;
+    size_t BIT_NOISE3 = 0x1B56C4E9;
+
+    uint64_t mangled = position;
+    mangled *= BIT_NOISE1;
+    mangled += seed;
+    mangled ^= (mangled << 13);
+    mangled += BIT_NOISE2;
+    mangled ^= (mangled >> 7);
+    mangled *= BIT_NOISE3;
+    mangled ^= (mangled << 17);
+    return mangled;
+}
+
 void fill_tab_table(){
     size_t seed = 0xfa7343;
     for(size_t i = 0; i < 8; i++){

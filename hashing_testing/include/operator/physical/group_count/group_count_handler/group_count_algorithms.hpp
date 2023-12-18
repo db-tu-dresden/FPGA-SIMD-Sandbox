@@ -8,6 +8,11 @@
 #include "operator/physical/group_count/lp/scalar_gc_aos_v2.hpp"
 
 
+
+#include "operator/physical/group_count/lcp/tsl_gc_lcp_soa.hpp"
+// #include "operator/physical/group_count/lp_horizontal/tsl_gc_lp_h_soa.hpp"
+// #include "operator/physical/group_count/lp_vertical/tsl_gc_lp_v_soa.hpp"
+
 //chained is somehow broken rn.
 // #include "operator/physical/group_count/chained/chained.hpp"
 // #include "operator/physical/group_count/chained/chained2.hpp"
@@ -54,6 +59,12 @@ enum Group_Count_Algorithm{
     CHAINED2
 };
 
+enum Group_Count_Algorithm_TSL{
+    LP_H_SOA,
+    LP_V_SOA,
+    LCP_SOA
+};
+
 
 /// @brief creates a new instance of Group_count for the selected Group_Count_Algorithm
 /// @tparam T the data type for the execution
@@ -64,5 +75,7 @@ enum Group_Count_Algorithm{
 template <typename T>
 void getGroupCount(Group_count<T> *& run, Group_Count_Algorithm test, size_t HSIZE, size_t (*function)(T, size_t));
 
+template<class SimdT, typename T>
+void getTSLGroupCount(Group_Count_TSL_SOA<T> *&run, Group_Count_Algorithm_TSL test, size_t HSIZE, size_t (*function)(T, size_t), size_t numa_node);
 
 #endif //TUD_HASHING_TESTING_HASH_TABLE_ALGORITHMS

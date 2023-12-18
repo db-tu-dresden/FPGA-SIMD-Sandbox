@@ -34,10 +34,15 @@ size_t rotate_left(const size_t v);
 
 void compress(size_t& v0, size_t& v1, size_t& v2, size_t& v3, const size_t rounds);
 
+// /// @brief a noise function that we use as a semi random function
+// /// @param position 
+// /// @param seed 
+// /// @return a number that depends on both the position and the seed
+size_t noise(size_t postion, size_t seed);
+
 //---------------------------------------
 // hash function
 //---------------------------------------
-
 
 /// @brief based on highwayhash sip_hash. Instead of an array we use key and N and act like they were in an array
 /// @tparam T 
@@ -101,10 +106,8 @@ size_t multiply_add_shift(T key, size_t N);
 template<typename T>
 size_t multiply_shift(T key, size_t N);
 
-
 // BASED ON: "A SevenDimensional Analysis of Hashing Methods and its Implications on Query Processing"'s 
 // murmur3_64_finalizer
-
 /// @brief hashing function based on murmur3_64_finalizer as given in "A SevenDimensional Analysis of Hashing Methods and its Implications on Query Processing". Uses fast range to reduce value
 /// @tparam T gives the type the key has
 /// @param key the key that shall be maped on the range

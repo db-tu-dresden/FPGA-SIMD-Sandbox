@@ -124,3 +124,22 @@ void write_to_file(
         throw std::runtime_error("Could not open file to write results!");
     }
 }
+
+
+void write_to_file(
+    std::string filename,
+    std::string content,
+    bool override
+){
+    std::ofstream myfile;
+    if(override)
+        myfile.open(filename, std::ios::out);
+    else
+        myfile.open(filename, std::ios::app);
+    if(myfile.is_open()){
+        myfile << content << "\n";
+        myfile.close();
+    }else{
+        throw std::runtime_error("Unable to open the file to write the results!\n");
+    }
+}

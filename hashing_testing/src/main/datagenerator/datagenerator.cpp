@@ -1,5 +1,4 @@
 #include "main/datagenerator/datagenerator.hpp"
-#include "main/datagenerator/datagen_help.hpp"
 #include <iostream>
 #include <limits>
 
@@ -15,44 +14,31 @@ void vector_print(std::vector<T> x);
 template<typename T>
 void array_print(T* x, size_t len);
 
-template<typename T>
-size_t total_distinct_values();
-
-
-
-
-
 
 ///***************************************/
 //* implementations of public functions *//
 /***************************************///
-
 template<typename T>
 Datagenerator<T>::Datagenerator(
     size_t different_values, 
     size_t (*hash_function)(T, size_t),
     size_t max_collision_size, 
     size_t number_seed
-):m_original_bucket_count{different_values},m_hash_function{hash_function},m_original_bucket_size{max_collision_size},m_seed{number_seed}{
-
+):m_bucket_count{different_values},m_hash_function{hash_function},m_seed{number_seed}{
+    m_original_bucket_count = different_values;
+    if(m_original_bucket_count < 1){
+        m_original_bucket_count = 1;
+    }
+    m_original_bucket_size = max_collision_size;
     if(m_original_bucket_size <= 1){
         m_original_bucket_size = 2;
     }
     
-    size_t expected_different = different_values * (m_original_bucket_size);
-    size_t max_different = total_distinct_values<T>();
-    
-    if(max_different <= expected_different){
-        throw std::runtime_error("We expect to generate more different values than it is possible to.");
-    }
-    
-    // generate all the possible data.
-    all_number_gen<T>(m_original_numbers, m_hash_function, m_original_bucket_count, m_original_bucket_size, m_seed);
-    // copy the data to the current working set.
-    revert();
+    m_original_data_matrix = new Data_Matrix<T>(different_values, max_collision_size, hash_function, number_seed);
+    m_working_set_data_matrix = m_original_data_matrix;
 
-    // print(m_all_numbers, m_bucket_count);
-    // print(m_original_numbers, m_original_bucket_count);
+    m_bucket_size = m_working_set_data_matrix->get_bucket_size();
+    m_bucket_count = m_working_set_data_matrix->get_bucket_count();
 }
 
 template<typename T>
@@ -100,7 +86,6 @@ size_t Datagenerator<T>::get_data_strided(
     bool non_collision_first,
     bool evenly_distributed
 ){
-    
     std::vector<T> normal_values;
     std::vector<T> collision_values;
     Datagenerator<T>::get_values_strided(
@@ -111,9 +96,6 @@ size_t Datagenerator<T>::get_data_strided(
         layout_seed
     );
 
-    // std::cout << "raw generated data" << std::endl;
-    // vector_print<T>(normal_values);
-    // vector_print<T>(collision_values);
     Datagenerator<T>::distribute(
         result,
         normal_values,
@@ -124,40 +106,12 @@ size_t Datagenerator<T>::get_data_strided(
         non_collision_first,
         evenly_distributed
     );
-
-    // std::cout << "data:\t"; 
-    // array_print(result, data_size);
-    // std::cout << "data end" << std::endl;
     return data_size;
-}
-
-template<typename T>
-bool Datagenerator<T>::transform_finalise(){
-    free_all_numbers(m_all_numbers, m_bucket_count);
-    malloc_all_numbers(m_all_numbers, m_bucket_count, m_bucket_size);
-    for(size_t i = 0; i < m_original_bucket_count; i++){
-        for(size_t e = 1; e <= m_original_numbers[i][0]; e++){
-            T value = m_original_numbers[i][e];
-            size_t bucket = m_hash_function(value, m_bucket_count);
-            add_number(m_all_numbers, m_bucket_count, m_bucket_size, bucket, value, true);
-        }
-    }
-    bool okay = true;
-    for(size_t i = 0; i < m_bucket_count && okay; i++){
-        okay = m_all_numbers[i][0] >= m_bucket_size;
-        okay &= m_all_numbers[i][0] > 1;
-    }
-    if(!okay){
-        revert();
-    }
-    return okay;
 }
 
 ///****************************************/
 //* implementations of private functions *//
 /****************************************///
-
-
 template<typename T>
 void Datagenerator<T>::get_collision_bit_map(
     std::vector<bool> &collide,
@@ -264,7 +218,6 @@ void Datagenerator<T>::get_values_strided(
     collision_data.clear();
     non_collision_data.clear();
 
-
     size_t neighboring_collisions = (collision_count + m_bucket_size - 1) / m_bucket_size;
     if(neighboring_collisions == 0){
         neighboring_collisions = 1;
@@ -273,23 +226,18 @@ void Datagenerator<T>::get_values_strided(
     std::vector<bool> collision_bit_map;
     get_collision_bit_map(collision_bit_map, distinct_values, collision_count, seed, neighboring_collisions);
 
-    // std::cout << "collision bit map\n";
-    // vector_print(collision_bit_map);
     //generate all ids
     size_t * ids = (size_t*)malloc(distinct_values * sizeof(size_t));
     size_t min_collision_pos;
     size_t max_collision_pos;
 
     get_ids_strided(collision_bit_map, ids, distinct_values, min_collision_pos, max_collision_pos, seed);
-    // array_print(ids, distinct_values);
-    // std::cout << min_collision_pos << ", " << max_collision_pos << std::endl;
+    
+
     get_values(collision_data, non_collision_data, collision_bit_map, ids, distinct_values, min_collision_pos);
-    // vector_print<T>(non_collision_data);
-    // vector_print<T>(collision_data);
+
     free(ids);
 }
-
-
 
 // todo
 template<typename T>
@@ -328,25 +276,12 @@ void Datagenerator<T>::get_values(
     std::vector<T> &collision_data, std::vector<T> &non_collision_data, std::vector<bool> collision_bit_map, 
     size_t * ids, size_t distinct_values, size_t min_collision_pos
 ){
-    size_t current_collision_pos = min_collision_pos;
-
-    T* cur_arr = &m_all_numbers[current_collision_pos][1];
-    T* end_arr = &m_all_numbers[current_collision_pos][m_all_numbers[current_collision_pos][0]]+1;
-
     for(size_t i = 0; i < distinct_values; i++){
         size_t pos = ids[i];
         if(collision_bit_map[i]){
-            collision_data.push_back(*cur_arr);
-            cur_arr++;
-            //if not enough values are in the buckets we can take values of the next bucket.
-            // std::cout << cur_arr << " == " << static_cast<void*>(end_arr) << "\t" << (cur_arr == end_arr )<< std::endl;
-            if(cur_arr == end_arr){
-                current_collision_pos = (current_collision_pos + 1) % m_bucket_count;  
-                cur_arr = &m_all_numbers[current_collision_pos][1];
-                end_arr = &m_all_numbers[current_collision_pos][m_all_numbers[current_collision_pos][0]] + 1;
-            }
+            collision_data.push_back(m_working_set_data_matrix->get_next_value(min_collision_pos));
         }else{
-            non_collision_data.push_back(m_all_numbers[pos][1]);
+            non_collision_data.push_back(m_working_set_data_matrix->get_next_value(pos));
         }
     }
 }
@@ -362,8 +297,6 @@ void Datagenerator<T>::distribute(
     bool non_collisions_first,
     bool evenly_distributed
 ){
-
-    
     std::vector<size_t> val_counts;
     std::vector<T> val_values;
     
@@ -373,21 +306,17 @@ void Datagenerator<T>::distribute(
     }
     size_t pos = 0;
     size_t write_pos = 0;
+
     //add non collision values
-    // std::cout << "sf1" << std::endl;
-    // std::cout << "sf2" << std::endl;    
-    // std::cout << "sf3" << std::endl;
     for(size_t i = 0; i < raw_non_collision.size(); i++){
         if(non_collisions_first){
-            // std::cout << write_pos << " " << std::flush;
             result[write_pos++] = raw_non_collision[i];
         }
         val_values.push_back(raw_non_collision[i]);
         val_counts.push_back(dist - non_collisions_first);
         pos++;
     }
-    // std::cout << "sf4" << std::endl;
-
+    
     //add collision values
     for(size_t i = 0; i < raw_collision.size(); i++){
         val_values.push_back(raw_collision[i]);
@@ -476,7 +405,6 @@ void Datagenerator<T>::get_ids_packed(
     }
 }
 
-
 ///*********************************************/
 //* template definitions of the Datagenerator *//
 /*********************************************///
@@ -489,8 +417,6 @@ template class Datagenerator<uint16_t>;
 template class Datagenerator<int16_t>;
 template class Datagenerator<uint8_t>;
 template class Datagenerator<int8_t>;
-
-
 
 ///***************************************/
 //* implementations of helper functions *//
@@ -532,15 +458,12 @@ void vector_print(std::vector<bool> x){
 }
 
 template<typename T>
-size_t total_distinct_values(){
-    return (std::numeric_limits<T>::max() - 1) - std::numeric_limits<T>::min(); //only reason to use #include <limits>
-}
-
-
-template<typename T>
 void array_print(T* x, size_t len){
     for(size_t i = 0; i < len; i++){
-        std::cout << "\t" << x[i];
+        if((i)%20 == 0){
+            std::cout << std::endl;
+        }
+        std::cout << x[i] << "\t";
     }
     std::cout << std::endl;
 }

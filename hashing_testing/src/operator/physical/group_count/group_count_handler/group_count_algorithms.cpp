@@ -67,10 +67,9 @@ void getGroupCount(Group_count<T> *& run, Group_Count_Algorithm test, size_t HSI
             break;
 #endif
         default:
-            throw std::runtime_error("The Algorithms isn't supported!");
+            throw std::runtime_error("The Algorithm isn't supported!");
     }
 }
-
 
 // template void getGroupCount<>(Group_count<uint64_t> *& , Group_Count_Algorithm , size_t , size_t (*)(uint64_t, size_t));
 template void getGroupCount<>(Group_count<uint32_t> *& , Group_Count_Algorithm , size_t , size_t (*)(uint32_t, size_t));
@@ -80,3 +79,48 @@ template void getGroupCount<>(Group_count<uint32_t> *& , Group_Count_Algorithm ,
 // template void getGroupCount<>(Group_count<int32_t> *& , Group_Count_Algorithm , size_t , size_t (*)(int32_t, size_t));
 // template void getGroupCount<>(Group_count<int16_t> *& , Group_Count_Algorithm , size_t , size_t (*)(int16_t, size_t));
 // template void getGroupCount<>(Group_count<int8_t> *& , Group_Count_Algorithm , size_t , size_t (*)(int8_t, size_t));
+
+
+
+template<class SimdT, typename T>
+void getTSLGroupCount(Group_Count_TSL_SOA<T> *& run, Group_Count_Algorithm_TSL test, size_t HSIZE, size_t (*function)(T, size_t), size_t numa_node){
+    if(run != nullptr){
+        delete run;
+        run = nullptr;
+    }
+
+    switch(test){
+        // case Group_Count_Algorithm_TSL::LP_H_SOA:
+        //     run = new TSL_gc_LP_H_SoA<SimdT, T>(HSIZE, function, numa_node);
+        //     break;
+        // case Group_Count_Algorithm_TSL::LP_V_SOA:
+        //     run = new TSL_gc_LP_V_SoA<SimdT, T>(HSIZE, function, numa_node);
+        //     break;
+        case Group_Count_Algorithm_TSL::LCP_SOA:
+            run = new TSL_gc_LCP_SoA<SimdT, T>(HSIZE, function, numa_node);
+            break;
+        default:
+            throw std::runtime_error("The Algorithm isn't supported!");
+    }
+}
+
+template void getTSLGroupCount<tsl::avx512, uint64_t>(Group_Count_TSL_SOA<uint64_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint64_t, size_t), size_t);
+template void getTSLGroupCount<tsl::avx2, uint64_t>(Group_Count_TSL_SOA<uint64_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint64_t, size_t), size_t);
+template void getTSLGroupCount<tsl::sse, uint64_t>(Group_Count_TSL_SOA<uint64_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint64_t, size_t), size_t);
+template void getTSLGroupCount<tsl::scalar, uint64_t>(Group_Count_TSL_SOA<uint64_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint64_t, size_t), size_t);
+
+template void getTSLGroupCount<tsl::avx512, uint32_t>(Group_Count_TSL_SOA<uint32_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint32_t, size_t), size_t);
+template void getTSLGroupCount<tsl::avx2, uint32_t>(Group_Count_TSL_SOA<uint32_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint32_t, size_t), size_t);
+template void getTSLGroupCount<tsl::sse, uint32_t>(Group_Count_TSL_SOA<uint32_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint32_t, size_t), size_t);
+template void getTSLGroupCount<tsl::scalar, uint32_t>(Group_Count_TSL_SOA<uint32_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint32_t, size_t), size_t);
+
+template void getTSLGroupCount<tsl::avx512, uint16_t>(Group_Count_TSL_SOA<uint16_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint16_t, size_t), size_t);
+template void getTSLGroupCount<tsl::avx2, uint16_t>(Group_Count_TSL_SOA<uint16_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint16_t, size_t), size_t);
+template void getTSLGroupCount<tsl::sse, uint16_t>(Group_Count_TSL_SOA<uint16_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint16_t, size_t), size_t);
+template void getTSLGroupCount<tsl::scalar, uint16_t>(Group_Count_TSL_SOA<uint16_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint16_t, size_t), size_t);
+
+template void getTSLGroupCount<tsl::avx512, uint8_t>(Group_Count_TSL_SOA<uint8_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint8_t, size_t), size_t);
+template void getTSLGroupCount<tsl::avx2, uint8_t>(Group_Count_TSL_SOA<uint8_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint8_t, size_t), size_t);
+template void getTSLGroupCount<tsl::sse, uint8_t>(Group_Count_TSL_SOA<uint8_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint8_t, size_t), size_t);
+template void getTSLGroupCount<tsl::scalar, uint8_t>(Group_Count_TSL_SOA<uint8_t> *&, Group_Count_Algorithm_TSL, size_t, size_t(*)(uint8_t, size_t), size_t);
+

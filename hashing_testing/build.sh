@@ -12,9 +12,11 @@ clean(){
     printf "Deletion done\n"
 }
 
+# for now we pull the v_flag out to make sure we compile the project correctly
+v_flag="USE_AVX512=ON"
 while getopts 'vch' flag; do
     case "${flag}" in
-    v) v_flag="USE_AVX512=ON" 
+    v)  
         echo "${v_flag}";;
     c) clean
         exit 1 ;;

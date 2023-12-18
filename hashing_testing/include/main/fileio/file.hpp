@@ -63,4 +63,10 @@ void write_to_strided_benchmark_file(
     size_t run_id,
     size_t collision_count
 );
+
+void write_to_file(
+    std::string filename,
+    std::string content,
+    bool override = false
+);
 #endif //TUD_HASHING_TESTING_FILE_IO

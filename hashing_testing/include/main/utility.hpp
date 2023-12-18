@@ -105,4 +105,52 @@ void status_output(size_t runs_done, const size_t total_runs, const double perce
 }
 
 
+// Different Vector Extention. SSE(128 Bit Vector), AVX2(256 Bit Vector), AVX512(512 Bit Vector)
+enum Vector_Extention{
+    SCALAR,
+    SSE,
+    AVX2,
+    AVX512
+};
+
+// we don't need not unsigned integers, because the implementation are the same.
+enum Base_Datatype{
+    UI8,
+    UI16,
+    UI32,
+    UI64
+};
+
+std::string vector_extention_to_string(Vector_Extention x){
+    switch(x){
+        case Vector_Extention::SCALAR:
+            return "scalar";
+        case Vector_Extention::SSE:
+            return "sse";
+        case Vector_Extention::AVX2:
+            return "avx2";
+        case Vector_Extention::AVX512:
+            return "avx512";
+    }
+    std::stringstream error_stream;
+    error_stream << "Unknown Vector_Extention Enum option. Please add it to vector_extention_to_string(...)\n";
+    throw std::runtime_error(error_stream.str());
+}
+
+std::string base_datatype_to_string(Base_Datatype x){
+    switch(x){
+        case Base_Datatype::UI8:
+            return "uint8";
+        case Base_Datatype::UI16:
+            return "uint16";
+        case Base_Datatype::UI32:
+            return "uint32";
+        case Base_Datatype::UI64:
+            return "uint64";
+    }
+    std::stringstream error_stream;
+    error_stream << "Unknown Base_Datatype Enum option. Please add it to base_datatype_to_string(...)\n";
+    throw std::runtime_error(error_stream.str());
+}
+
 #endif //TUD_HASHING_TESTING_AVX512_MAIN_UTILITY

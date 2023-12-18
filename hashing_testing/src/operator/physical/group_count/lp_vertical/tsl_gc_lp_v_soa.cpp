@@ -12,15 +12,24 @@
 
 
 template <class SimdT, typename T>
-TSL_gc_LP_V_SoA<SimdT, T>::TSL_gc_LP_V_SoA(size_t HSIZE, size_t (*hash_function)(T, size_t))
-    : Scalar_gc_SoA<T>(HSIZE, hash_function)
-{}
+TSL_gc_LP_V_SoA<SimdT, T>::TSL_gc_LP_V_SoA(size_t HSIZE, size_t (*hash_function)(T, size_t), size_t numa_node)
+    : Group_Count_TSL_SOA<T>(HSIZE, hash_function, numa_node)
+{
+        this->m_hash_vec = (T*) numa_alloc_onnode(this->m_HSIZE * sizeof(T), numa_node);
+    this->m_hash_vec = (T*) numa_alloc_onnode(this->m_HSIZE * sizeof(T), numa_node);
+    
+    for(size_t i = 0; i < this->m_HSIZE; i++){
+        m_hash_vec[i] = EMPTY_SPOT;
+        m_count_vec[i] = 0;
+    }
+
+}
 
 
 template <class SimdT, typename T>
 TSL_gc_LP_V_SoA<SimdT, T>::~TSL_gc_LP_V_SoA(){
-    // free(this->m_hash_vec);
-    // free(this->m_count_vec);
+    free(this->m_hash_vec);
+    free(this->m_count_vec);
 }
 
 // todo find annother way to remove limitation of gather, since current implementation limits to type size. 
@@ -163,5 +172,56 @@ void TSL_gc_LP_V_SoA<SimdT, T>::create_hash_table(T* input, size_t data_size){
     free(buffer);
 }
 
+
+template <class SimdT, typename T>
+void TSL_gc_LP_V_SoA<SimdT, T>::clear(){
+    for(size_t i = 0; i < this->m_HSIZE; i++){
+        this->m_hash_vec[i] = EMPTY_SPOT;
+        this->m_count_vec[i] = 0;
+    }
+}
+
+// todo better implementations
+template <class SimdT, typename T>
+T TSL_gc_LP_V_SoA<SimdT, T>::get(T input){
+    size_t rounds = 0;
+    size_t HSIZE = this->m_HSIZE;
+    T hash_key = this->m_hash_function(input, HSIZE);
+
+    while(rounds <= 1){
+        T value = this->m_hash_vec[hash_key];
+        if(value == input){
+            return this->m_count_vec[hash_key];
+        }else if(value == EMPTY_SPOT){
+            return 0;
+        }else{
+            hash_key = (hash_key + 1);
+            hash_key = hash_key * (hash_key < HSIZE);
+            rounds += (hash_key == 0);
+        }
+    }
+    return 0;
+}
+
 // template class TSL_gc_LP_V_SoA<uint32_t>;
 // template class TSL_gc_LP_V_SoA<uint64_t>;
+
+extern template class TSL_gc_LP_V_SoA<tsl::avx512, uint64_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::avx512, uint32_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::avx512, uint16_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::avx512, uint8_t>;
+
+extern template class TSL_gc_LP_V_SoA<tsl::avx2, uint64_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::avx2, uint32_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::avx2, uint16_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::avx2, uint8_t>;
+
+extern template class TSL_gc_LP_V_SoA<tsl::sse, uint64_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::sse, uint32_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::sse, uint16_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::sse, uint8_t>;
+
+extern template class TSL_gc_LP_V_SoA<tsl::scalar, uint64_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::scalar, uint32_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::scalar, uint16_t>;
+extern template class TSL_gc_LP_V_SoA<tsl::scalar, uint8_t>;

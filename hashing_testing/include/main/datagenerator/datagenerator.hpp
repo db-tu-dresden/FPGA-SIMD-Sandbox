@@ -1,8 +1,12 @@
 #ifndef TUD_HASHING_TESTING_DATAGENERATOR
 #define TUD_HASHING_TESTING_DATAGENERATOR
 
-#include "main/datagenerator/datagen_help.hpp"
+
+#include <stdlib.h>
+#include <vector>
+
 #include "main/hash_function.hpp"
+#include "data_matrix.hpp"
 
 template<typename T>
 class Datagenerator{
@@ -12,8 +16,13 @@ class Datagenerator{
 
         size_t m_bucket_count, m_original_bucket_count;
         size_t m_bucket_size, m_original_bucket_size;
-        T** m_all_numbers = nullptr;
-        T** m_original_numbers = nullptr;
+
+        Data_Matrix<T> *m_original_data_matrix = nullptr;
+        Data_Matrix<T> *m_data_matrix = nullptr;
+        Data_Matrix<T> *m_working_set_data_matrix = nullptr;
+
+        // T** m_all_numbers = nullptr;
+        // T** m_original_numbers = nullptr;
 
         void get_collision_bit_map(std::vector<bool> &collide, size_t space, size_t wanted, size_t &seed, size_t set_collisions = 1);
 
@@ -56,8 +65,10 @@ class Datagenerator{
         );
         
         ~Datagenerator(){
-            free_all_numbers(m_all_numbers, m_bucket_count);
-            free_all_numbers(m_original_numbers, m_original_bucket_count);
+            if(m_data_matrix != nullptr){
+                delete m_data_matrix;
+            }
+            delete m_original_data_matrix;
         }
 
         size_t get_data_bad(
@@ -80,42 +91,28 @@ class Datagenerator{
             bool evenly_distributed = true
         );
 
-        bool transform_finalise();
-
         bool transform_hsize(size_t n_hsize, bool set_collisions = true){
-            free_all_numbers(m_all_numbers, m_bucket_count);
-            if((m_original_bucket_count * m_original_bucket_size / m_bucket_size) > n_hsize){
-                m_bucket_count = n_hsize;
-
-                if(set_collisions){
-                    size_t n_collision = (m_original_bucket_count * m_original_bucket_size / m_bucket_count) - 1;
-                    return transform_collision(n_collision);
-                }
-                return true;
+            // m_original_data_matrix->print();
+            if(m_data_matrix != nullptr){
+                delete m_data_matrix;
             }
-            return false;
+            m_data_matrix = m_original_data_matrix->transform(n_hsize);
+            
+            m_working_set_data_matrix = m_data_matrix;
+            
+            m_bucket_count = m_working_set_data_matrix->get_bucket_count();
+            // m_working_set_data_matrix->print();
+            return true;           
         }
 
-        bool transform_collision(size_t n_collision){
-            free_all_numbers(m_all_numbers, m_bucket_count);
-            if((m_original_bucket_count * m_original_bucket_size / m_bucket_count) > n_collision){
-                m_bucket_size = n_collision;
-                return true;
+        void revert_hsize(){
+            if(m_data_matrix != nullptr){
+                delete m_data_matrix;
             }
-            return false;
-        }
-        
-        void revert(){
-            free_all_numbers(m_all_numbers, m_bucket_count);
-            malloc_all_numbers(m_all_numbers, m_original_bucket_count, m_original_bucket_size);
-            for(size_t i = 0; i < m_original_bucket_count; i++){
-                for(size_t e = 0; e < m_original_bucket_size + 1; e++){
-                    m_all_numbers[i][e] = m_original_numbers[i][e];
-                }
-            }
-
-            m_bucket_count = m_original_bucket_count;
-            m_bucket_size = m_original_bucket_size;
+            m_working_set_data_matrix = m_original_data_matrix;
+            
+            m_bucket_size = m_working_set_data_matrix->get_bucket_size();
+            m_bucket_count = m_working_set_data_matrix->get_bucket_count();
         }
 
         size_t get_bucket_count(){return m_bucket_count;}
@@ -125,30 +122,6 @@ class Datagenerator{
 
 };
 
-
-// template<typename T>
-// size_t generate_strided_data(
-//     T*& result, 
-//     size_t data_size,
-//     size_t distinct_values,
-//     size_t hsize,
-//     hash_fptr<T> hash_function,
-//     size_t collision_size,
-//     size_t seed,
-//     bool non_collisions_first = true,
-//     bool evenly_distributed = true
-// );
-
-// template<typename T>
-// void generate_strided_data_raw(
-//     std::vector<T> &collision_data,
-//     std::vector<T> &non_collision_data,
-//     size_t distinct_values,
-//     size_t hsize,
-//     hash_fptr<T> hash_function,
-//     size_t collision_size,
-//     size_t &seed
-// );
 
 
 #endif
