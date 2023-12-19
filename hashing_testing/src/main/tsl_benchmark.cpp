@@ -74,20 +74,20 @@ size_t seq(size_t*&result, size_t min, size_t max, size_t step){
 
 std::chrono::high_resolution_clock::time_point time_begin;
 const size_t exec_node = 0;
-const size_t max_planed_collisions = 128;
+const size_t max_planed_collisions = 256;
 
 int main(int argc, char** argv){
     fill_tab_table();
 
 
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 16 * 1024;
-    size_t build_data_amount = 4 * 1024 * 1024;
+    size_t distinct_value_count = 512 * 1024;
+    size_t build_data_amount = 16 * 1024 * 1024;
     size_t probe_data_amount = 4 * 1024 * 1024;
 
     size_t repeats_same_data = 2;
     size_t repeats_different_data = 1;
-    size_t repeats_different_layout = 1;
+    size_t repeats_different_layout = 2;
 
     Group_Count_Algorithm_TSL algorithms_undertest[] = {
         Group_Count_Algorithm_TSL::LCP_SOA
@@ -119,8 +119,8 @@ int main(int argc, char** argv){
     double scale_factors[] = {1., 2., 4., 8., 16.};
     size_t num_scale_factors = sizeof(scale_factors)/sizeof(scale_factors[0]);
 
-    size_t max_collision = distinct_value_count / 8;
-    size_t num_collision_tests = 1;
+    size_t max_collision = distinct_value_count / 2;
+    size_t num_collision_tests = 3;
     size_t collision_diminish = max_collision + 1;
     
     if(num_collision_tests > 1){
