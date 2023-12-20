@@ -1,0 +1,5 @@
+[submodule "hashing_testing/tools/tsl"]
+	path = hashing_testing/tools/tsl
+	url = git@github.com:db-tu-dresden/TSL.git
+[submodule "hashing_testing/tools/tsl/"]
+	branch = hashing_primitives
