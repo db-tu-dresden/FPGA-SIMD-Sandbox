@@ -81,30 +81,31 @@ int main(int argc, char** argv){
 
 
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 512 * 1024;
-    size_t build_data_amount = 16 * 1024 * 1024;
-    size_t probe_data_amount = 4 * 1024 * 1024;
+    size_t distinct_value_count = 1 * 1024;
+    size_t build_data_amount = 2 * 1024 * 1024;
+    size_t probe_data_amount = 2 * 1024 * 1024;
 
-    size_t repeats_same_data = 2;
+    size_t repeats_same_data = 1;
     size_t repeats_different_data = 1;
-    size_t repeats_different_layout = 2;
+    size_t repeats_different_layout = 1;
 
     Group_Count_Algorithm_TSL algorithms_undertest[] = {
-        Group_Count_Algorithm_TSL::LCP_SOA
+        Group_Count_Algorithm_TSL::LCP_SOA,
+        Group_Count_Algorithm_TSL::LP_H_SOA
     };
     size_t num_alg_undertest = sizeof(algorithms_undertest) / sizeof(algorithms_undertest[0]);
 
 
     Base_Datatype datatypes_undertest[] = {
         // Base_Datatype::UI8,
-        // Base_Datatype::UI16,
+        Base_Datatype::UI16,
         Base_Datatype::UI32,
         Base_Datatype::UI64
     };
     size_t num_datatypes_undertest = sizeof(datatypes_undertest)/ sizeof(datatypes_undertest[0]);
 
     Vector_Extention extentions_undertest[] = {
-        // Vector_Extention::SCALAR,
+        Vector_Extention::SCALAR,
         Vector_Extention::SSE,
         Vector_Extention::AVX2,
         Vector_Extention::AVX512
@@ -270,7 +271,8 @@ void build_benchmark_final(
                 write_to_file(result_file_name, config_ss.str(), true);
             }
             write_to_file(result_file_name, result_ss.str());
-            status_output(++run_count, max_run_count, 1, time_begin);
+            bool force = run_count == 0;
+            status_output(++run_count, max_run_count, 1, time_begin, force);
         }
     }
 

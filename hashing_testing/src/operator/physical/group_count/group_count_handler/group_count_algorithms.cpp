@@ -90,9 +90,9 @@ void getTSLGroupCount(Group_Count_TSL_SOA<T> *& run, Group_Count_Algorithm_TSL t
     }
 
     switch(test){
-        // case Group_Count_Algorithm_TSL::LP_H_SOA:
-        //     run = new TSL_gc_LP_H_SoA<SimdT, T>(HSIZE, function, numa_node);
-        //     break;
+        case Group_Count_Algorithm_TSL::LP_H_SOA:
+            run = new TSL_gc_LP_H_SoA<SimdT, T>(HSIZE, function, numa_node);
+            break;
         // case Group_Count_Algorithm_TSL::LP_V_SOA:
         //     run = new TSL_gc_LP_V_SoA<SimdT, T>(HSIZE, function, numa_node);
         //     break;

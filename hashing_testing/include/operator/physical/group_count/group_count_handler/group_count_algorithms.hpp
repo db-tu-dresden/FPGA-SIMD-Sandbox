@@ -10,7 +10,7 @@
 
 
 #include "operator/physical/group_count/lcp/tsl_gc_lcp_soa.hpp"
-// #include "operator/physical/group_count/lp_horizontal/tsl_gc_lp_h_soa.hpp"
+#include "operator/physical/group_count/lp_horizontal/tsl_gc_lp_h_soa.hpp"
 // #include "operator/physical/group_count/lp_vertical/tsl_gc_lp_v_soa.hpp"
 
 //chained is somehow broken rn.
