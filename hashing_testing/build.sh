@@ -26,8 +26,8 @@ while getopts 'vch' flag; do
 done
 
 
-mkdir -p build
-cd build
+mkdir -p bin
+cd bin
 
 if test -z "$v_flag"
 then
