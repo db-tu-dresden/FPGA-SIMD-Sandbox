@@ -21,6 +21,7 @@ class TSL_gc_LP_H_SoA : public Group_Count_TSL_SOA<T>{
         void clear();
 
         T get(T value);
+        void probe(T*& result, T* input, size_t size);
 
         std::string identify(){
             return "TSL LP horizontal SoA";

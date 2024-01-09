@@ -50,6 +50,9 @@ class TSL_gc_LCP_SoA : public Group_Count_TSL_SOA<T>{
         }
 
         T get(T value);
+
+        void probe(T*& result, T* input, size_t size);
+
 };
 
 

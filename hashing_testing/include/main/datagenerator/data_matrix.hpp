@@ -18,6 +18,7 @@ class Data_Matrix{
         T* m_all_numbers;
         bool * m_used;
         size_t * m_values_per_bucket;
+        size_t * m_used_cursor;
 
         void generate_numbers();
         bool insert_number(T number, bool force = false);
@@ -27,13 +28,14 @@ class Data_Matrix{
         Data_Matrix(T* all_numbers, size_t* sizes, size_t old_bucket_count, size_t old_bucket_size, size_t bucket_count, size_t bucket_size, hash_fptr<T> function, size_t seed);
 
         ~Data_Matrix(){
-            delete[] m_all_numbers;
+            free(m_all_numbers);
             delete[] m_used;
             delete[] m_values_per_bucket;
+            delete[] m_used_cursor;
         }
 
         T get_value(size_t bucket, size_t value);
-        T get_next_value(size_t bucket, bool probing = false); // next free of this bucket.
+        T get_next_value(size_t bucket, bool & next_bucket, bool probing = false); // next free of this bucket.
 
         T* get_start(size_t bucket);
         T* get_end(size_t bucket);

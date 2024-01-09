@@ -1,9 +1,6 @@
 #include "operator/physical/group_count/lcp/tsl_gc_lcp_soa.hpp"
 
-#include <numa.h>
-
 #define EMPTY_SPOT 0
-
 
 //todo
 // elements per vector
@@ -44,7 +41,7 @@ void TSL_gc_LCP_SoA<SimdT, T>::create_hash_table(T* input, size_t data_size){
 
     for(size_t p = 0; p < data_size; p++){
 
-        uint32_t value = input[p];
+        T value = input[p];
         size_t hash_key = this->m_hash_function(value, this->m_HSIZE_v);
 
         vec_t value_vector = tsl::set1<ps>(value);
@@ -66,12 +63,10 @@ void TSL_gc_LCP_SoA<SimdT, T>::create_hash_table(T* input, size_t data_size){
                 break;
             }
 
-            //branch prediction should be faster than modulo.
             ++hash_key;
             if(hash_key >= this->m_HSIZE_v){
                 hash_key = 0;
             }
-            // hash_key = (hash_key + 1) % this->m_HSIZE_v;
         }
     }
 
@@ -150,6 +145,45 @@ void TSL_gc_LCP_SoA<SimdT, T>::clear(){
     for(size_t i = 0; i < this->m_HSIZE_v; i ++){
         m_hash_map_v[i] = tsl::set1<ps>(EMPTY_SPOT);
         m_count_map_v[i] = tsl::set1<ps>(0);
+    }
+}
+
+
+template <class SimdT, typename T>
+void TSL_gc_LCP_SoA<SimdT, T>::probe(T*&result, T* input, size_t size){
+    std::cout << "TODO: extract for LCP\n";
+    return;
+    vec_t one_vec = tsl::set1<ps>(1);    
+    vec_t empty_value_vec = tsl::set1<ps>(EMPTY_SPOT);
+
+#pragma omp parallel for num_threads(this->m_thread_count) proc_bind(close)
+    for(size_t i = 0; i < size; i++){
+        T value = input[i];
+        size_t hash_key = this->m_hash_function(value, this->m_HSIZE_v);
+
+        vec_t value_vector = tsl::set1<ps>(value);
+
+        while(1) {
+            
+            mask_t check_for_match = tsl::equal<ps>(value_vector, m_hash_map_v[hash_key]);
+            imask_t check_for_match_i = tsl::to_integral<ps>(check_for_match);
+            
+            mask_t check_for_empty_space = tsl::equal<ps>(empty_value_vec, m_hash_map_v[hash_key]);
+            imask_t check_for_empty_space_i = tsl::to_integral<ps>(check_for_empty_space);
+            
+            imask_t result_mask_i = check_for_empty_space_i | check_for_match_i;
+
+            if (result_mask_i > 0) {
+                size_t pos = tsl::tzc<ps>(result_mask_i);
+                
+                // result[i] = tsl::extract_value<ps, pos>(m_count_map_v[hash_key]);
+                break;
+            } 
+            ++hash_key;
+            if(hash_key >= this->m_HSIZE_v){
+                hash_key = 0;
+            }
+        }
     }
 }
 

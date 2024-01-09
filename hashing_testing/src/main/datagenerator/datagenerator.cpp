@@ -14,6 +14,36 @@ void vector_print(std::vector<T> x);
 template<typename T>
 void array_print(T* x, size_t len);
 
+#include <chrono>
+void p_time(size_t time_sec, bool new_line = true){
+    size_t time_min = time_sec/60;
+    time_sec -= time_min * 60;
+    size_t time_hour = time_min/60;
+    time_min -= time_hour * 60;
+    if(time_hour < 10){
+        std::cout << 0;
+    }
+    std::cout << time_hour << ":";
+    if(time_min < 10){
+        std::cout << 0;
+    }
+    std::cout << time_min << ":";
+    if(time_sec < 10){
+        std::cout << 0;
+    }
+    std::cout << time_sec;
+    if(new_line){
+        std::cout << std::endl;
+    }
+}
+uint64_t dt_seconds (std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end){
+    return std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();
+}
+void p_time(std::chrono::high_resolution_clock::time_point begin, std::chrono::high_resolution_clock::time_point end, bool new_line = true){
+    uint64_t duration = dt_seconds(begin, end);
+    p_time(duration, new_line);
+}
+
 
 ///***************************************/
 //* implementations of public functions *//
@@ -25,6 +55,7 @@ Datagenerator<T>::Datagenerator(
     size_t max_collision_size, 
     size_t number_seed
 ):m_bucket_count{different_values},m_hash_function{hash_function},m_seed{number_seed}{
+
     m_original_bucket_count = different_values;
     if(m_original_bucket_count < 1){
         m_original_bucket_count = 1;
@@ -35,6 +66,7 @@ Datagenerator<T>::Datagenerator(
     }
     
     m_original_data_matrix = new Data_Matrix<T>(different_values, max_collision_size, hash_function, number_seed);
+
     m_working_set_data_matrix = m_original_data_matrix;
 
     m_bucket_size = m_working_set_data_matrix->get_bucket_size();
@@ -88,6 +120,7 @@ size_t Datagenerator<T>::get_data_strided(
 ){
     std::vector<T> normal_values;
     std::vector<T> collision_values;
+    
     Datagenerator<T>::get_values_strided(
         normal_values, 
         collision_values, 
@@ -95,7 +128,7 @@ size_t Datagenerator<T>::get_data_strided(
         collision_count,
         layout_seed
     );
-
+    
     Datagenerator<T>::distribute(
         result,
         normal_values,
@@ -106,6 +139,33 @@ size_t Datagenerator<T>::get_data_strided(
         non_collision_first,
         evenly_distributed
     );
+
+    T * values = new T[distinct_values];
+    for(size_t i = 0; i < distinct_values; i++){
+        values[i] = 0;
+    }
+    for(size_t i = 0; i < data_size; i++){
+        bool x = false;
+        for(size_t e = 0; e < distinct_values; e++){
+            if(values[e] == 0){
+                values[e] = result[i];
+                x = true;
+                break;
+            }else if(values[e] == result[i]){
+                x = true;
+                break;
+            }
+        }   
+        if(!x){
+            std::cout << "TO MANY VALUES!\t" << result[i] << std::endl;
+        }
+    }
+    // for(size_t i = 0; i < distinct_values; i++){
+    //     std::cout << values[i] << "\t";
+    // }
+    // std::cout << std::endl;
+    delete[] values;
+
     return data_size;
 }
 
@@ -227,16 +287,22 @@ void Datagenerator<T>::get_values_strided(
     get_collision_bit_map(collision_bit_map, distinct_values, collision_count, seed, neighboring_collisions);
 
     //generate all ids
-    size_t * ids = (size_t*)malloc(distinct_values * sizeof(size_t));
+    size_t * ids = new size_t[distinct_values];
     size_t min_collision_pos;
     size_t max_collision_pos;
+    // std::chrono::high_resolution_clock::time_point tb = std::chrono::high_resolution_clock::now();
 
     get_ids_strided(collision_bit_map, ids, distinct_values, min_collision_pos, max_collision_pos, seed);
     
+    // std::chrono::high_resolution_clock::time_point tm = std::chrono::high_resolution_clock::now();
 
     get_values(collision_data, non_collision_data, collision_bit_map, ids, distinct_values, min_collision_pos);
 
-    free(ids);
+    // std::chrono::high_resolution_clock::time_point te = std::chrono::high_resolution_clock::now();
+    // std::cout << "\n\ta: \t"; p_time(tb, tm, true);
+    // std::cout << "\tb:\t"; p_time(tm, te, true);
+
+    delete[]ids;
 }
 
 // todo
@@ -261,14 +327,14 @@ void Datagenerator<T>::get_values_bad(
     get_collision_bit_map_bad(collision_bit_map, distinct_values, collision_count, seed, neighboring_collisions);
 
     //generate all ids
-    size_t * ids = (size_t*)malloc(distinct_values * sizeof(size_t));
+    size_t * ids = new size_t[distinct_values];
     size_t min_collision_pos;
     size_t max_collision_pos;
     get_ids_packed(collision_bit_map, ids, distinct_values, min_collision_pos, max_collision_pos, seed);
     
     get_values(collision_data, non_collision_data, collision_bit_map, ids,  distinct_values, min_collision_pos);
 
-    free(ids);
+    delete[]ids;
 }
 
 template<typename T>
@@ -278,12 +344,18 @@ void Datagenerator<T>::get_values(
 ){
     for(size_t i = 0; i < distinct_values; i++){
         size_t pos = ids[i];
+        bool next_bucket = false;
         if(collision_bit_map[i]){
-            collision_data.push_back(m_working_set_data_matrix->get_next_value(min_collision_pos));
+            collision_data.push_back(m_working_set_data_matrix->get_next_value(min_collision_pos, next_bucket));
+            min_collision_pos += next_bucket;
+            if(min_collision_pos >= m_working_set_data_matrix->get_bucket_count()){
+                min_collision_pos = 0;
+            }
         }else{
-            non_collision_data.push_back(m_working_set_data_matrix->get_next_value(pos));
+            non_collision_data.push_back(m_working_set_data_matrix->get_next_value(pos, next_bucket));
         }
     }
+
 }
 
 template<typename T>
@@ -299,7 +371,6 @@ void Datagenerator<T>::distribute(
 ){
     std::vector<size_t> val_counts;
     std::vector<T> val_values;
-    
     size_t dist = data_size + distinct_values - 1;
     if(evenly_distributed){
         dist = dist / distinct_values;
@@ -324,19 +395,19 @@ void Datagenerator<T>::distribute(
         pos++; 
     }
 
-    while(write_pos < data_size){
+    for(;write_pos < data_size; write_pos++){
         size_t id = noise(write_pos, seed) % val_counts.size();
         size_t oid;
-        size_t count = val_counts[id];
+        
         T val = val_values[id];
-        result[write_pos++] = val;
+        result[write_pos] = val;
         val_counts[id]--;
-        if(count <= 1){
+        
+        if(val_counts[id] == 0){
             vector_delete(val_values, id);
             vector_delete(val_counts, id);
         }
     }
-
 }
 
 // the postition ids are strided. with equal space between them.

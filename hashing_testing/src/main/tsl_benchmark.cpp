@@ -22,6 +22,10 @@
 
 #include <thread>
 
+
+
+#include <omp.h>
+
 using ps_type = uint32_t;
 
 /*
@@ -81,13 +85,13 @@ int main(int argc, char** argv){
 
 
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 1 * 1024;
-    size_t build_data_amount = 2 * 1024 * 1024;
-    size_t probe_data_amount = 2 * 1024 * 1024;
+    size_t distinct_value_count = 32 * 1024;
+    size_t build_data_amount = 0.5 * 1024 * 1024;
+    size_t probe_data_amount = 1 * 1024 * 1024;
 
     size_t repeats_same_data = 1;
     size_t repeats_different_data = 1;
-    size_t repeats_different_layout = 1;
+    size_t repeats_different_layout = 3;
 
     Group_Count_Algorithm_TSL algorithms_undertest[] = {
         Group_Count_Algorithm_TSL::LCP_SOA,
@@ -98,7 +102,7 @@ int main(int argc, char** argv){
 
     Base_Datatype datatypes_undertest[] = {
         // Base_Datatype::UI8,
-        Base_Datatype::UI16,
+        // Base_Datatype::UI16,
         Base_Datatype::UI32,
         Base_Datatype::UI64
     };
@@ -121,7 +125,7 @@ int main(int argc, char** argv){
     size_t num_scale_factors = sizeof(scale_factors)/sizeof(scale_factors[0]);
 
     size_t max_collision = distinct_value_count / 2;
-    size_t num_collision_tests = 3;
+    size_t num_collision_tests = 2;
     size_t collision_diminish = max_collision + 1;
     
     if(num_collision_tests > 1){
@@ -258,7 +262,7 @@ void build_benchmark_final(
         getTSLGroupCount<Vec, T>(alg, algorithms_undertest[algorithms_undertest_i], hsize, function, hash_table_loc);
 
         for(size_t run = 0; run < repeats_same_data; run++){
-            
+            // std::cout << "\t\t" << algorithms_undertest_i << "\t" << run << std::endl;
             alg->clear();
             size_t time = 0;
             time = run_test<T>(alg, data, data_size);
@@ -378,7 +382,7 @@ void build_benchmark_data(
         double scale = scale_factors[scale_i];
 
         size_t hsize = distinct_value_count * scale;
-        hsize += scale <= 1;
+        hsize += (scale <= 1);
         
         datagen->transform_hsize(hsize);
         for(size_t hash_location_i = 0; hash_location_i < num_hash_table_locations; hash_location_i++){
@@ -386,8 +390,14 @@ void build_benchmark_data(
             
             size_t collisions = max_collision_size;
             for(size_t i = 0; i < num_collision_test; i++){
+                std::cout << "data gen:\t" << std::flush;
+                std::chrono::high_resolution_clock::time_point tb = time_now();
                 datagen->get_data_strided(data, build_data_count, distinct_value_count, collisions, seed);
-                
+                std::chrono::high_resolution_clock::time_point te = time_now();
+                std::cout << "it took ";
+                print_time(tb, te, false);
+                std::cout << " seconds to generate the build data\n";
+
                 for(size_t ve_id = 0; ve_id < num_extentions_undertest; ve_id++){
                     Vector_Extention ve = extentions_undertest[ve_id];
 
@@ -458,7 +468,6 @@ void build_benchmark_datagen(
         if(max_collisions_to_generate > max_planed_collisions){
             max_collisions_to_generate = max_planed_collisions;
         }
-
         create_Datagenerator(
             datagen,
             distinct_value_count * max_scale_factor * 2,
@@ -467,6 +476,7 @@ void build_benchmark_datagen(
             seed
         );
         for(size_t ht_loc_i = 0; ht_loc_i < num_build_data_locations; ht_loc_i++){
+            
             size_t loc = build_data_locations[ht_loc_i];
             if(data != nullptr){
                 numa_free(data, build_data_count * sizeof(T));

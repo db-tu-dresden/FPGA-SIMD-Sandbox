@@ -4,16 +4,25 @@
 template<typename T>
 Data_Matrix<T>::Data_Matrix(size_t bucket_count, size_t bucket_size, hash_fptr<T> function, size_t seed):m_bucket_count{bucket_count}, m_function{function}, m_seed{seed}{
     m_bucket_size = bucket_size + m_reserved_bucket_size;
-    // std::cout << m_bucket_size << "\t" << bucket_size << std::endl;
-    m_all_numbers = new T[m_bucket_count * m_bucket_size];
-    m_values_per_bucket = new size_t[m_bucket_count];
-    m_used = new bool[m_bucket_count * m_bucket_size];
+
+
     m_unreserved_bucket_size = bucket_size;
 
-    for(size_t i = 0; i < m_bucket_count; i++){
+    // std::cout << "before?" << m_bucket_count << "\t" << m_bucket_size << "\t" << sizeof(T) << std::endl;
+    m_all_numbers = (T*) malloc(m_bucket_count * m_bucket_size * sizeof(T));
+    m_values_per_bucket = new size_t[m_bucket_count];
+    m_used = new bool[m_bucket_count * m_bucket_size];
+    m_used_cursor = new size_t[m_bucket_count];
+    // std::cout << "after" << std::endl;
+    for(size_t i = 0; i < m_bucket_count * m_bucket_size; i++){
         m_used[i] = false;
-        m_values_per_bucket[i] = 0;
     }
+    // std::cout << "after" << std::endl;
+    for(size_t i = 0; i < m_bucket_count; i++){
+        m_values_per_bucket[i] = 0;
+        m_used_cursor[i] = 0;
+    }
+    // std::cout << "after" << std::endl;
     generate_numbers();
 }
 
@@ -22,13 +31,17 @@ Data_Matrix<T>::Data_Matrix(T* all_numbers, size_t *sizes, size_t old_bucket_cou
     m_bucket_size = bucket_size + m_reserved_bucket_size;
     
 
-    m_all_numbers = new T[m_bucket_count * m_bucket_size];
+    m_all_numbers = (T*) malloc(m_bucket_count * m_bucket_size * sizeof(T));
     m_values_per_bucket = new size_t[m_bucket_count];
     m_used = new bool[m_bucket_count * m_bucket_size];
-
-    for(size_t i = 0; i < m_bucket_count; i++){
+    m_used_cursor = new size_t[m_bucket_count];
+    
+    for(size_t i = 0; i < m_bucket_count * m_bucket_size; i++){
         m_used[i] = false;
+    }
+    for(size_t i = 0; i < m_bucket_count; i++){
         m_values_per_bucket[i] = 0;
+        m_used_cursor[i] = 0;
     }
     m_unreserved_bucket_size = bucket_size;
 
@@ -131,6 +144,9 @@ void Data_Matrix<T>::clear_used(){
     for(size_t i = 0; i < m_bucket_count * m_bucket_size; i++){
         m_used[i] = false;
     }
+    for(size_t i = 0; i < m_bucket_count; i++){
+        m_used_cursor[i] = 0;
+    }
 }
 
 template<typename T>
@@ -149,27 +165,32 @@ T Data_Matrix<T>::get_value(size_t bucket, size_t k){
 
 
 template<typename T>
-T Data_Matrix<T>::get_next_value(size_t bucket, bool probing){
+T Data_Matrix<T>::get_next_value(size_t bucket, bool & next_bucket, bool probing){
     size_t check_engine = 0;
-    for(size_t i = 0, b = bucket, t = 0; t < m_bucket_count * m_bucket_size; t++){
+    for(uint64_t i = -1, b = bucket, t = 0; t < m_bucket_count * m_bucket_size; t++, i++){
         if(b >= m_bucket_count){
             b = 0;
             check_engine = 1;
         }else if(check_engine == 1 && b == bucket){
             break;
         }
+        if(i == -1){
+            i = m_used_cursor[b];
+        }
 
         if(i < get_bucket_size(b) + (probing * m_reserved_bucket_size)){
             if(!m_used[b * m_bucket_size + i]){
                 m_used[b * m_bucket_size + i] = true;
+                m_used_cursor[b]++;
                 return m_all_numbers[b* m_bucket_size + i];
             }
         }else{
-            i = 0;
+            i = -1;
             t--;
             b++;
         }
     }
+    std::cout << "DATA GEN WARNING: 0 returned as value\n";
     return 0;
 }
 

@@ -16,4 +16,6 @@ int main(int argc, char** argv){
 
     std::cout << ps::vector_element_count() << std::endl;
     std::cout << ps::vector_alignment() << std::endl;
+    ps::register_type wow = tsl::set1<ps>(1);
+    tsl::to_ostream<ps>(std::cout, wow)<< "wowie";
 }

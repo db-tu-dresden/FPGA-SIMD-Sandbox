@@ -18,11 +18,11 @@ create_tsl(
 option(USE_AVX512 "use horizontal printing provided by terminal.cpp" OFF)
 
 if(USE_AVX512)
-add_definitions(-DUSE_AVX512)
-add_compile_options(-mavx512cd)
 endif()
 
-add_compile_options(-O3 -fno-tree-vectorize)
+add_compile_options(-mavx512cd)
+add_definitions(-DUSE_AVX512)
+add_compile_options(-O3 -fno-tree-vectorize -fopenmp)
 
 
 include_directories(hashing_tsl PUBLIC 
@@ -39,8 +39,10 @@ add_executable(hashing_tsl src/main/tsl_benchmark.cpp)
 add_executable(datagen src/main/datagen_test.cpp)
 add_executable(tsl_testing src/main/main_tsl_test.cpp)
 
+find_package(OpenMP REQUIRED)
+target_link_libraries(hashing_tsl PRIVATE OpenMP::OpenMP_CXX)
 # add_executable(datagen_test src/main/main_datagen_test.cpp)
-target_compile_options(hashing_tsl PUBLIC -lnuma)
+target_compile_options(hashing_tsl PUBLIC -lnuma -fopenmp)
 # target_link_libraries(hashing PUBLIC TABLE FILE GCH LP HASH_FUNCTIONS DATAGEN tsl)
 target_link_libraries(hashing_tsl PUBLIC TABLE FILE GCH LP LCP LP_HORIZONTAL LP_VERTICAL HASH_FUNCTIONS DATAGEN tsl "numa")
 target_link_libraries(tsl_testing tsl)
