@@ -8,7 +8,7 @@ print_usage(){
 
 clean(){
     printf "Deleting all project files\n"
-    rm -r build/
+    rm -r bin/
     printf "Deletion done\n"
 }
 
