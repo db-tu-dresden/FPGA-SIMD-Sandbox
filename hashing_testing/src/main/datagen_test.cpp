@@ -29,50 +29,56 @@ int main(int argc, char** argv){
     using ps_type = uint16_t;
 
     size_t seed = 11;
-    size_t distinct = 1 * 128;
-    size_t data_size = distinct * 10;
+    size_t distinct = 1 * 50;
+    size_t data_size = distinct * 3;
     size_t max_scale = 8;
     size_t hsize = distinct * 2;
     size_t max_test = 5;
 
-    size_t distinct_max = distinct;
-    size_t collision_max = 10;
+    size_t distinct_max = hsize * 1;
+    size_t collision_max = 8;
 
     auto hfunction = get_hash_function<ps_type>(HashFunction::MODULO);
-    ps_type* data = (ps_type*) aligned_alloc(64, (data_size+24) * sizeof(ps_type));
+    ps_type* data = (ps_type*) aligned_alloc(64, (data_size+2) * sizeof(ps_type));
     Datagenerator<ps_type> *datagen = nullptr;
     
-    std::chrono::high_resolution_clock::time_point time;
 
-    std::cout << "get-data-testing" << std::endl;
-    time = time_now();
-    
-    std::cout << "\tDatageneration\t" << std::flush;
+
     create_Datagenerator<ps_type>(datagen, distinct_max, hfunction, collision_max, seed);
-    std::cout << "\n\t    it took: "; print_time(time); time = time_now(); 
-    
-    datagen->transform_hsize(hsize+1);
-    std::cout << "\n\t    it took: "; print_time(time); time = time_now(); 
+
+    datagen->transform_hsize(hsize);
+
     
 
-    size_t collisions = 0;
-    for(size_t collisions = 0; collisions <= distinct; collisions += distinct/4){
-        std::cout << "\tCollisions = " << collisions << std::flush;
+
+    for(size_t collisions = 0; collisions <= distinct; collisions += distinct/5){
         datagen->get_data_strided(data, data_size, distinct, collisions, seed);
-        std::cout << "\n\t    it took: "; print_time(time); time = time_now();     
+        std::cout << "Col: " << collisions << std::endl << "\t";
+        for(size_t i = 0; i < distinct; i++){
+            if(i % (distinct / 5) == 0){
+                std::cout << std::endl << "\t";
+            }
+            std::cout << data[i] % (hsize*1000) << "\t" << std::flush;
+        }
+        std::cout << std::endl << std::endl;
+
+        for(float sel = 1; sel >= 0; sel -= 1./3){
+            sel *= 100.;
+            sel = (size_t) sel;
+            sel /= 100.;
+            std::cout << "\n\n\tsel: " << sel;
+            size_t da = datagen->get_probe_strided(data, data_size,sel, seed, true);
+            
+            for(size_t i = 0; i < da; i++){
+                if(i % (da / 5) == 0){
+                    std::cout << std::endl << "\t\t";
+                }
+                std::cout << data[i] % (hsize*1000) << "\t" << std::flush;
+            }
+        }
+        
+
+        std::cout << std::endl << std::endl;
     }
 
-    std::cout << "gen-time-testing" << std::endl;
-    for(size_t i = 0; i < 8; i++){
-        std::cout << "\td: "<< distinct_max << "\tc: "<< collision_max << "\t"<< std::flush;
-        create_Datagenerator<ps_type>(datagen, distinct_max, hfunction, collision_max, seed);
-        std::cout << "\n\t    it took: "; print_time(time); time = time_now();    
-        distinct_max /= 2;
-        collision_max *= 2;
-    }
-
-
-    std::cout << "DATATESTING: " << distinct << std::endl;
-    std::cout << "settings test" << std::endl;
-    
 }

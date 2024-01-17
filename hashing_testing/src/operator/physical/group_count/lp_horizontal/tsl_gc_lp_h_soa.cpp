@@ -33,6 +33,24 @@ TSL_gc_LP_H_SoA<SimdT, T>::~TSL_gc_LP_H_SoA(){
     numa_free(this->m_count_vec, this->m_HSIZE * sizeof(T));
 }
 
+template <class SimdT, typename T>
+void TSL_gc_LP_H_SoA<SimdT, T>::move_numa(size_t mem_numa_node){
+    if(mem_numa_node != this->m_mem_numa_node){
+        T* new_hash_vec = (T*) numa_alloc_onnode(this->m_HSIZE * sizeof(T), mem_numa_node);
+        T* new_count_vec = (T*) numa_alloc_onnode(this->m_HSIZE * sizeof(T), mem_numa_node);
+
+        std::memcpy(new_hash_vec, this->m_hash_vec, this->m_HSIZE * sizeof(T));
+        std::memcpy(new_count_vec, this->m_count_vec, this->m_HSIZE * sizeof(T));
+
+        numa_free(this->m_hash_vec, this->m_HSIZE * sizeof(T));
+        numa_free(this->m_count_vec, this->m_HSIZE * sizeof(T));
+
+        this->m_mem_numa_node = mem_numa_node;
+        this->m_hash_vec = new_hash_vec;
+        this->m_count_vec = new_count_vec;
+    }
+}
+
 // todo:
 //  test
 // implement masked load
@@ -190,7 +208,8 @@ void TSL_gc_LP_H_SoA<SimdT, T>::probe(T*&result, T* input, size_t size){
     mask_t oneMask = tsl::equal<ps>(zero_vec, zero_vec);
 
     #pragma omp parallel for num_threads(this->m_thread_count) proc_bind(close)
-    for(size_t i = 0; i < size; i++){
+    for(size_t k = 0; k < size * 4; k++){
+        size_t i = k%size;
         bool stop = false;
 
         T inputValue = input[i];

@@ -1,18 +1,19 @@
 #include "main/datagenerator/datagenerator.hpp"
 #include <iostream>
 #include <limits>
+#include <omp.h>
 
 template<typename T>
 bool vector_contains(std::vector<T> vec, T value);
-
 template<typename T>
 bool vector_delete(std::vector<T>& x, size_t id);
-
 template<typename T>
 void vector_print(std::vector<T> x);
-
 template<typename T>
 void array_print(T* x, size_t len);
+
+#define THREAD_COUNT 16
+
 
 #include <chrono>
 void p_time(size_t time_sec, bool new_line = true){
@@ -69,7 +70,7 @@ Datagenerator<T>::Datagenerator(
 
     m_working_set_data_matrix = m_original_data_matrix;
 
-    m_bucket_size = m_working_set_data_matrix->get_bucket_size();
+    m_bucket_size = m_working_set_data_matrix->get_max_bucket_size();
     m_bucket_count = m_working_set_data_matrix->get_bucket_count();
 }
 
@@ -105,6 +106,12 @@ size_t Datagenerator<T>::get_data_bad(
         evenly_distributed
     );
     
+    Datagenerator<T>::safe_values(
+        normal_values,
+        collision_values,
+        distinct_values
+    );
+
     return data_size;
 }
 
@@ -118,8 +125,12 @@ size_t Datagenerator<T>::get_data_strided(
     bool non_collision_first,
     bool evenly_distributed
 ){
+    
+    m_working_set_data_matrix->clear_used();
     std::vector<T> normal_values;
     std::vector<T> collision_values;
+
+    std::cout << " s1 " << std::flush;
     
     Datagenerator<T>::get_values_strided(
         normal_values, 
@@ -128,6 +139,8 @@ size_t Datagenerator<T>::get_data_strided(
         collision_count,
         layout_seed
     );
+
+    std::cout << " s2 " << std::flush;
     
     Datagenerator<T>::distribute(
         result,
@@ -139,90 +152,171 @@ size_t Datagenerator<T>::get_data_strided(
         non_collision_first,
         evenly_distributed
     );
+    
+    std::cout << " s3 " << std::flush;
 
-    T * values = new T[distinct_values];
-    for(size_t i = 0; i < distinct_values; i++){
-        values[i] = 0;
-    }
-    for(size_t i = 0; i < data_size; i++){
-        bool x = false;
-        for(size_t e = 0; e < distinct_values; e++){
-            if(values[e] == 0){
-                values[e] = result[i];
-                x = true;
-                break;
-            }else if(values[e] == result[i]){
-                x = true;
-                break;
-            }
-        }   
-        if(!x){
-            std::cout << "TO MANY VALUES!\t" << result[i] << std::endl;
-        }
-    }
-    // for(size_t i = 0; i < distinct_values; i++){
-    //     std::cout << values[i] << "\t";
-    // }
-    // std::cout << std::endl;
-    delete[] values;
+    Datagenerator<T>::safe_values(
+        normal_values,
+        collision_values,
+        distinct_values
+    );
+
+    std::cout << " s4 " << std::flush;
 
     return data_size;
+}
+
+template<typename T>
+void Datagenerator<T>::get_probe_values_random(std::vector<T> &values, size_t number, size_t seed){
+    size_t id = noise(0, seed) % m_bucket_count;
+    size_t space = m_bucket_count - number;
+    if(space < 1){
+        space = 1;
+    }
+
+    for(size_t i = 0; i < number; i++){
+        size_t skip = noise(i, seed) % space;
+        
+        size_t soft_skip = 0;
+        size_t help = 0;
+        T n_val = m_working_set_data_matrix->get_unused_value(id, soft_skip, true, false);
+        while(vector_contains(values, n_val)){
+            help ++;
+            n_val = m_working_set_data_matrix->get_unused_value(id, soft_skip, true, false, help);
+        }
+        values.push_back(n_val);
+        
+        if(soft_skip > skip && soft_skip < space){
+           skip = soft_skip;
+        }
+        space -= skip;
+        id += skip + 1;
+        while(id > m_bucket_count){
+            id -= m_bucket_count;
+        }
+    }
+}
+
+template<typename T>
+void Datagenerator<T>::get_probe_values_strided(std::vector<T> &values, size_t number, size_t seed){
+    if(number == 0){
+        return;
+    }
+    float step_size = m_bucket_count / number;
+    size_t base_id = noise(0, seed) % m_bucket_count;
+    for(size_t i = 0; i < number; i++){
+        size_t id = (size_t)(step_size * i + base_id) % m_bucket_count;   
+
+        size_t soft_skip = 0;
+        size_t help = 0;
+        T n_val = m_working_set_data_matrix->get_unused_value(id, soft_skip, true, false);
+        while(vector_contains(values, n_val)){
+            help ++;
+            n_val = m_working_set_data_matrix->get_unused_value(id, soft_skip, true, false, help);
+        }
+        values.push_back(n_val);
+    }
+}
+
+template<typename T>
+size_t Datagenerator<T>::get_probe_strided(
+    T*& result,
+    size_t data_size,
+    float selectivity,
+    size_t layout_seed,
+    bool evenly_distributed 
+){
+    std::vector<T> hit_vals;
+    std::vector<T> mis_vals;
+ 
+    size_t hit = this->m_values_count * selectivity;
+    size_t mis = this->m_values_count * (1-selectivity);
+    std::vector<bool> select;
+    
+    std::cout << " s1 " << std::flush;
+
+    get_collision_bit_map_random(select, this->m_values_count + 1, hit + (hit > 0), layout_seed++);
+    
+    std::cout << " s2 " << std::flush;
+        
+    for(size_t i = 1; i < select.size(); i++){
+        if(select[i]){
+            hit_vals.push_back(this->m_values[i-1]);
+        }
+    }
+
+    std::cout << " s3 " << std::flush;
+    get_probe_values_strided(mis_vals, mis, layout_seed++);
+
+    std::cout << " s4 " << std::flush;
+    Datagenerator<T>::distribute(
+        result,
+        hit_vals,
+        mis_vals,
+        data_size,
+        hit + mis,
+        layout_seed,
+        false, 
+        evenly_distributed
+    );
+    
+    std::cout << " s5 " << std::flush;
+    return hit_vals.size() + mis_vals.size();
 }
 
 ///****************************************/
 //* implementations of private functions *//
 /****************************************///
+
+
+/*
+    the first entry is always a collision. the rest is random.
+    this makes it perfect for strided. if no collision is wanted this still would be okay
+*/
 template<typename T>
-void Datagenerator<T>::get_collision_bit_map(
+void Datagenerator<T>::get_collision_bit_map_random(
     std::vector<bool> &collide,
     size_t distinct_values,
     size_t collision_count,
-    size_t &seed,
-    size_t set_collisions // means that the first x elements should generate collisions, such that the collisions are of known lenght if necessary
+    size_t seed
 ){
     collide.clear();
+    collide.resize(distinct_values, false);
 
-    if(collision_count > distinct_values){
-        collision_count = distinct_values;
-    }
     if(collision_count < 1){
         collision_count = 1;
     }
-    if(set_collisions > collision_count){
-        set_collisions = collision_count;
-    }
-    if(set_collisions < 1){
-        set_collisions = 1;
-    }
+    collision_count --; //collision count tracks how many values collide
 
-    size_t to_generate = collision_count - set_collisions;
-    size_t space = distinct_values - set_collisions;
+    size_t to_generate = collision_count;
+    size_t space = (distinct_values - 1) - to_generate;
 
-    bool inverse = to_generate > space - to_generate;
+    // if inverse than is the inclusion in the vector ids no collision otherwise it is a collision id
+    bool inverse = to_generate > space;
     if(inverse){
-        to_generate = space - to_generate;
+        to_generate = space;
     }
 
-    std::vector<size_t> ids;
+    std::vector<size_t> ids;    // save ids that are collisions (!inversed) or are non collisions (inversed)
     size_t help = 0;
+
+    //we generate random values for ids 
     for(size_t c = 0; c < to_generate; c++){
-        size_t nid = (noise(c + help++, seed) % (space)) + set_collisions;
-        bool contains = !vector_contains<size_t>(ids, nid);
-        if(contains){
-            ids.push_back(nid);
-        }else{
-            c--;
-        }
+        size_t nid;
+        do{
+            nid = (noise(c + help++, seed) % (distinct_values - 1)) + 1;
+            bool contains = !vector_contains<size_t>(ids, nid);
+        }while(vector_contains<size_t>(ids, nid));
+        ids.push_back(nid);
     }
 
-    for(size_t i = 0; i < set_collisions; i++){
-        collide.push_back(true);
-    }
+    collide[0] = true; // the first element is always a collision
 
-    for(size_t i = set_collisions; i < distinct_values; i++){
+    #pragma omp parallel for num_threads(THREAD_COUNT)
+    for(size_t i = 1; i < distinct_values; i++){
         bool is_in = vector_contains<size_t>(ids, i);
         bool insert = is_in != inverse;
-        collide.push_back(insert);
+        collide[i] = insert;
     }
 }
 
@@ -231,7 +325,7 @@ void Datagenerator<T>::get_collision_bit_map_bad(
     std::vector<bool> &collide,
     size_t distinct_values,
     size_t collision_count,
-    size_t &seed,
+    size_t seed,
     size_t set_collisions // means that the first x elements should generate collisions, such that the collisions are of known lenght if necessary
 ){
     collide.clear();
@@ -275,28 +369,30 @@ void Datagenerator<T>::get_values_strided(
     size_t collision_count,
     size_t seed
 ){
+    size_t * ids = new size_t[distinct_values];
+    m_working_set_data_matrix->clear_used();
     collision_data.clear();
     non_collision_data.clear();
 
-    size_t neighboring_collisions = (collision_count + m_bucket_size - 1) / m_bucket_size;
-    if(neighboring_collisions == 0){
-        neighboring_collisions = 1;
-    }
-
+    std::cout << " a " << std::flush;
     std::vector<bool> collision_bit_map;
-    get_collision_bit_map(collision_bit_map, distinct_values, collision_count, seed, neighboring_collisions);
+    get_collision_bit_map_random(collision_bit_map, distinct_values, collision_count, seed);
+    
+    std::cout << " b " << std::flush;
 
     //generate all ids
-    size_t * ids = new size_t[distinct_values];
     size_t min_collision_pos;
     size_t max_collision_pos;
     // std::chrono::high_resolution_clock::time_point tb = std::chrono::high_resolution_clock::now();
 
-    get_ids_strided(collision_bit_map, ids, distinct_values, min_collision_pos, max_collision_pos, seed);
+    std::cout << " c " << std::flush;
+    get_ids_strided(collision_bit_map, ids, distinct_values, min_collision_pos, seed);
     
     // std::chrono::high_resolution_clock::time_point tm = std::chrono::high_resolution_clock::now();
 
+    std::cout << " d " << std::flush;
     get_values(collision_data, non_collision_data, collision_bit_map, ids, distinct_values, min_collision_pos);
+    std::cout << " e " << std::flush;
 
     // std::chrono::high_resolution_clock::time_point te = std::chrono::high_resolution_clock::now();
     // std::cout << "\n\ta: \t"; p_time(tb, tm, true);
@@ -342,20 +438,45 @@ void Datagenerator<T>::get_values(
     std::vector<T> &collision_data, std::vector<T> &non_collision_data, std::vector<bool> collision_bit_map, 
     size_t * ids, size_t distinct_values, size_t min_collision_pos
 ){
+    bool okay = true;
+    bool first = true;
+restart:
+    collision_data.clear();
+    non_collision_data.clear();
+    m_working_set_data_matrix->clear_used();
+
     for(size_t i = 0; i < distinct_values; i++){
         size_t pos = ids[i];
-        bool next_bucket = false;
+        size_t next_bucket = 0;
         if(collision_bit_map[i]){
-            collision_data.push_back(m_working_set_data_matrix->get_next_value(min_collision_pos, next_bucket));
+            collision_data.push_back(m_working_set_data_matrix->get_unused_value(min_collision_pos, next_bucket));
             min_collision_pos += next_bucket;
             if(min_collision_pos >= m_working_set_data_matrix->get_bucket_count()){
                 min_collision_pos = 0;
             }
         }else{
-            non_collision_data.push_back(m_working_set_data_matrix->get_next_value(pos, next_bucket));
+            non_collision_data.push_back(m_working_set_data_matrix->get_unused_value(pos, next_bucket));
         }
     }
 
+    for(size_t i = 0; i < collision_data.size(); i++){
+        okay = okay && collision_data[i] != 0;
+    }
+
+    for(size_t i = 0; i < non_collision_data.size(); i++){
+        okay = okay && non_collision_data[i] != 0;
+    }
+
+    if(!first && !okay){
+        std::cout << "bad data generation\n";
+        exit(-1);
+    }
+    if(!okay){
+        std::cout << "first bad generation attempt" << std::endl;
+        first = false;
+        goto restart;
+    }
+    
 }
 
 template<typename T>
@@ -369,45 +490,75 @@ void Datagenerator<T>::distribute(
     bool non_collisions_first,
     bool evenly_distributed
 ){
-    std::vector<size_t> val_counts;
-    std::vector<T> val_values;
     size_t dist = data_size + distinct_values - 1;
     if(evenly_distributed){
-        dist = dist / distinct_values;
+        dist = (dist / distinct_values) + 1;
     }
+    dist -= non_collisions_first;
+    size_t help = 1;
+    while(help < distinct_values){
+        help *= 2;
+    }
+    help --;
     size_t pos = 0;
-    size_t write_pos = 0;
 
+    std::vector<T> val_values;
+    std::vector<int64_t> val_counts;
+    val_values.resize(distinct_values, 0);
+    val_counts.resize(distinct_values, dist);
     //add non collision values
+    std::cout << "a" << std::flush;
+    #pragma omp parallel for num_threads(THREAD_COUNT)
     for(size_t i = 0; i < raw_non_collision.size(); i++){
         if(non_collisions_first){
-            result[write_pos++] = raw_non_collision[i];
+            result[i + pos] = raw_non_collision[i];
         }
-        val_values.push_back(raw_non_collision[i]);
-        val_counts.push_back(dist - non_collisions_first);
-        pos++;
+        val_values[i + pos] = raw_non_collision[i];
     }
+    pos += raw_non_collision.size();
+    std::cout << "b" << std::flush;
     
     //add collision values
+    #pragma omp parallel for num_threads(THREAD_COUNT)
     for(size_t i = 0; i < raw_collision.size(); i++){
-        val_values.push_back(raw_collision[i]);
-        val_counts.push_back(dist);
-        pos++; 
+        if(non_collisions_first){
+            result[i + pos] = raw_collision[i];
+        }
+        val_values[i + pos] = raw_collision[i];
     }
+    pos += raw_collision.size();
+    std::cout << "c" << std::flush;
 
-    for(;write_pos < data_size; write_pos++){
-        size_t id = noise(write_pos, seed) % val_counts.size();
-        size_t oid;
-        
-        T val = val_values[id];
-        result[write_pos] = val;
-        val_counts[id]--;
-        
-        if(val_counts[id] == 0){
-            vector_delete(val_values, id);
-            vector_delete(val_counts, id);
+    for(size_t i = 0; i < val_counts.size(); i++){
+        if(val_values[i] == 0){
+            std::cout << i << ": is zero\n";
+            exit(1);
+        }
+        if(val_counts[i] == 0){
+            vector_delete(val_counts, i);
+            vector_delete(val_values, i);
         }
     }
+
+    const size_t vc_size = val_counts.size();
+    
+    for(size_t c_write_pos = pos; c_write_pos < data_size; c_write_pos++){        
+        size_t id = ((c_write_pos ^ seed) ^ (val_counts.size() >> 1 )) % val_counts.size(); 
+
+        T val = val_values[id];
+        val_counts[id]--;
+        result[c_write_pos] = val;
+        if(val_counts[id] <= 0){
+            vector_delete(val_counts, id);
+            vector_delete(val_values, id);
+            if(val_counts.size() == 0){
+                std::cout << "WE GOT A PROBLEM!" << std::endl;
+                return;
+            }
+        }
+    }
+    std::cout << "d" << std::flush;
+
 }
 
 // the postition ids are strided. with equal space between them.
@@ -417,33 +568,28 @@ void Datagenerator<T>::get_ids_strided(
     size_t *& ids, 
     size_t distinct_values, 
     size_t & min_collision_pos,
-    size_t & max_collision_pos,
     size_t seed
 ){
     size_t start_pos = noise(0, seed) % m_bucket_count;
     double current_pos = start_pos;
     double step_size = (m_bucket_count * 1.0) / distinct_values;
 
-    bool started = false;
-    bool ended = false;
-    for(size_t i = 0; i < distinct_values; i++){
-        ids[i] = (size_t)(current_pos) % m_bucket_count;
-        current_pos += step_size;
+    bool first_collision = false;
 
-        if(collision_bit_map[i] && !started){
-            started = true;
+    for(size_t i = 0; i < collision_bit_map.size(); i++){
+        if(collision_bit_map[i]){
             min_collision_pos = ids[i];
-        }else if(!collision_bit_map[i] && !ended){
-            ended = true;
-            max_collision_pos = ids[i];
+            break;
         }
     }
-    if(!ended){
-        max_collision_pos = ids[distinct_values - 1];
+
+    #pragma omp parallel for num_threads(THREAD_COUNT)
+    for(size_t i = 0; i < collision_bit_map.size(); i++){
+        ids[i] = (size_t)(i * step_size) % m_bucket_count;
     }
 }
 
-// the postition ids are directly next to each other.
+// the postition ids are directly next to each other. TODO
 template<typename T>
 void Datagenerator<T>::get_ids_packed(
     std::vector<bool> collision_bit_map, 
@@ -459,6 +605,7 @@ void Datagenerator<T>::get_ids_packed(
 
     bool started = false;
     bool ended = false;
+    
     for(size_t i = 0; i < distinct_values; i++){
         ids[i] = (size_t)(current_pos) % m_bucket_count;
         current_pos += step_size;
@@ -473,6 +620,31 @@ void Datagenerator<T>::get_ids_packed(
     }
     if(!ended){
         max_collision_pos = ids[distinct_values - 1];
+    }
+}
+
+template<typename T>
+void Datagenerator<T>::safe_values(
+    std::vector<T> normal_values,
+    std::vector<T> collision_values,
+    size_t distinct_values
+){
+    if(this->m_values != nullptr){
+        delete[] this->m_values;
+        this->m_values = nullptr;
+    }
+    this->m_values = new T[distinct_values];
+    this->m_values_count = distinct_values;
+    size_t id = 0;
+    #pragma omp parallel for num_threads(THREAD_COUNT)
+    for(size_t i = 0; i < normal_values.size(); i++){
+        m_values[id + i] = normal_values[i];
+    }
+    id = normal_values.size();
+
+    #pragma omp parallel for num_threads(THREAD_COUNT)
+    for(size_t i = 0; i < collision_values.size(); i++){
+        m_values[id + i] = collision_values[i];
     }
 }
 

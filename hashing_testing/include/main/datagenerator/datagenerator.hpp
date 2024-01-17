@@ -20,13 +20,17 @@ class Datagenerator{
         Data_Matrix<T> *m_original_data_matrix = nullptr;
         Data_Matrix<T> *m_data_matrix = nullptr;
         Data_Matrix<T> *m_working_set_data_matrix = nullptr;
+        
+        //saved for probeing
+        T * m_values = nullptr;
+        size_t m_values_count = 0;
 
         // T** m_all_numbers = nullptr;
         // T** m_original_numbers = nullptr;
 
-        void get_collision_bit_map(std::vector<bool> &collide, size_t space, size_t wanted, size_t &seed, size_t set_collisions = 1);
+        void get_collision_bit_map_random(std::vector<bool> &collide, size_t space, size_t wanted, size_t seed);
 
-        void get_collision_bit_map_bad(std::vector<bool> &collide, size_t space, size_t wanted, size_t &seed, size_t set_collisions = 1);
+        void get_collision_bit_map_bad(std::vector<bool> &collide, size_t space, size_t wanted, size_t seed, size_t set_collisions = 1);
 
         void get_values_strided(
             std::vector<T> &collision_data, std::vector<T> &non_collision_data, 
@@ -55,8 +59,17 @@ class Datagenerator{
         
         void get_ids_strided(
             std::vector<bool> collision_bit_map, size_t *& ids, size_t distinct_values, 
-            size_t & min_collision_pos, size_t & max_collision_pos, size_t seed
+            size_t & min_collision_pos, size_t seed
         );
+
+        void safe_values(
+            std::vector<T> normal_values,
+            std::vector<T> collision_values,
+            size_t distinct_values
+        );
+
+        void get_probe_values_random(std::vector<T> &values, size_t number, size_t seed);
+        void get_probe_values_strided(std::vector<T> &values, size_t number, size_t seed);
 
     public:
         Datagenerator(
@@ -67,6 +80,9 @@ class Datagenerator{
         ~Datagenerator(){
             if(m_data_matrix != nullptr){
                 delete m_data_matrix;
+            }
+            if(m_values != nullptr){
+                delete[] m_values;
             }
             delete m_original_data_matrix;
         }
@@ -91,6 +107,14 @@ class Datagenerator{
             bool evenly_distributed = true
         );
 
+        size_t get_probe_strided(
+            T*& result,
+            size_t data_size,
+            float selectivity,
+            size_t layout_seed,
+            bool evenly_distributed = true
+        );
+
         bool transform_hsize(size_t n_hsize, bool set_collisions = true){
             // m_original_data_matrix->print();
             if(m_data_matrix != nullptr){
@@ -101,7 +125,6 @@ class Datagenerator{
             m_working_set_data_matrix = m_data_matrix;
             
             m_bucket_count = m_working_set_data_matrix->get_bucket_count();
-            // m_working_set_data_matrix->print();
             return true;           
         }
 
@@ -111,7 +134,7 @@ class Datagenerator{
             }
             m_working_set_data_matrix = m_original_data_matrix;
             
-            m_bucket_size = m_working_set_data_matrix->get_bucket_size();
+            m_bucket_size = m_working_set_data_matrix->get_max_bucket_size();
             m_bucket_count = m_working_set_data_matrix->get_bucket_count();
         }
 

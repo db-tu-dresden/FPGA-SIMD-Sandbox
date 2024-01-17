@@ -19,9 +19,12 @@ class TSL_gc_LP_H_SoA : public Group_Count_TSL_SOA<T>{
         void create_hash_table(T* input, size_t data_size);
         
         void clear();
+        void move_numa(size_t mem_numa_node); 
 
         T get(T value);
         void probe(T*& result, T* input, size_t size);
+
+        
 
         std::string identify(){
             return "TSL LP horizontal SoA";

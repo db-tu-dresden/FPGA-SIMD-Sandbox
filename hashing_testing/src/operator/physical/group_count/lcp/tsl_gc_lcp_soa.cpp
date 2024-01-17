@@ -34,6 +34,26 @@ TSL_gc_LCP_SoA<SimdT, T>::~TSL_gc_LCP_SoA(){
 }
 
 template <class SimdT, typename T>
+void TSL_gc_LCP_SoA<SimdT, T>::move_numa(size_t mem_numa_node){
+    if(mem_numa_node != this->m_mem_numa_node){
+        T* new_hash_vec = (T*) numa_alloc_onnode(this->m_HSIZE_v * sizeof(vec_t), mem_numa_node);
+        T* new_count_vec = (T*) numa_alloc_onnode(this->m_HSIZE_v * sizeof(vec_t), mem_numa_node);
+
+        std::memcpy(new_hash_vec, this->m_hash_vec, this->m_HSIZE_v * sizeof(vec_t));
+        std::memcpy(new_count_vec, this->m_count_vec, this->m_HSIZE_v * sizeof(vec_t));
+
+        numa_free(this->m_hash_vec, this->m_HSIZE * sizeof(vec_t));
+        numa_free(this->m_count_vec, this->m_HSIZE * sizeof(vec_t));
+
+        this->m_mem_numa_node = mem_numa_node;
+        this->m_hash_vec = new_hash_vec;
+        this->m_count_vec = new_count_vec;
+    }
+}
+
+
+
+template <class SimdT, typename T>
 void TSL_gc_LCP_SoA<SimdT, T>::create_hash_table(T* input, size_t data_size){
     
     vec_t one_vec = tsl::set1<ps>(1);    

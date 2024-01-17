@@ -12,13 +12,11 @@ class Data_Matrix{
         hash_fptr<T> m_function;
         size_t m_bucket_count;
         size_t m_bucket_size;
-        size_t m_reserved_bucket_size = 1; // only for probing data. 
-        size_t m_unreserved_bucket_size; //over all data.
+        size_t m_reserved_bucket_size = 1; // only for probing data.
         
         T* m_all_numbers;
-        bool * m_used;
-        size_t * m_values_per_bucket;
-        size_t * m_used_cursor;
+        size_t * m_values_per_bucket; //count of values in a bucket
+        size_t * m_used_cursor; //skip list for used values
 
         void generate_numbers();
         bool insert_number(T number, bool force = false);
@@ -29,14 +27,13 @@ class Data_Matrix{
 
         ~Data_Matrix(){
             free(m_all_numbers);
-            delete[] m_used;
             delete[] m_values_per_bucket;
             delete[] m_used_cursor;
         }
 
         T get_value(size_t bucket, size_t value);
-        T get_next_value(size_t bucket, bool & next_bucket, bool probing = false); // next free of this bucket.
-
+        T get_unused_value(size_t bucket, size_t &next_bucket, bool probing = false, bool mark_used = true, size_t skip_x = 0); // next free of this bucket.
+        
         T* get_start(size_t bucket);
         T* get_end(size_t bucket);
 
@@ -48,13 +45,13 @@ class Data_Matrix{
             return m_bucket_count;
         }
         
-        size_t get_bucket_size(){
-            return m_unreserved_bucket_size;
+        size_t get_max_bucket_size(){
+            return m_bucket_size - m_reserved_bucket_size;
         }
 
-        size_t get_bucket_size(size_t bucket){
+        size_t get_bucket_size(size_t bucket, bool probing = false){
             if(bucket < m_bucket_count){
-                return m_values_per_bucket[bucket] - m_reserved_bucket_size;
+                return m_values_per_bucket[bucket] - (!probing) * m_reserved_bucket_size;
             }
             return 0;
         }

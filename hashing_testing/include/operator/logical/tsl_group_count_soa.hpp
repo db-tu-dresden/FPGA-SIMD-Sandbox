@@ -7,9 +7,6 @@
 #include <numa.h>
 #include <omp.h>
 
-// #include <tslintrin.hpp>
-
-
 template<typename T>
 class Group_Count_TSL_SOA{
     private:
@@ -31,8 +28,10 @@ class Group_Count_TSL_SOA{
         virtual void create_hash_table(T* input, size_t data_size) = 0;
         virtual T get(T input) = 0;
 
-        virtual void probe(T*& result, T* input, size_t size);
+        virtual void probe(T*& result, T* input, size_t size) = 0;
         virtual void clear() = 0;
+
+        virtual void move_numa(size_t mem_numa_node) = 0; 
 
         virtual std::string identify() = 0;
 
@@ -40,11 +39,11 @@ class Group_Count_TSL_SOA{
             return m_HSIZE;
         }
 
-        // void set_thread_count(size_t thread_count){
-        //     if(thread_count > 0){
-        //         this->m_thread_count = thread_count;
-        //     }
-        // }
+        void set_thread_count(size_t thread_count){
+            if(thread_count > 0){
+                this->m_thread_count = thread_count;
+            }
+        }
 };
 
 template class Group_Count_TSL_SOA<uint64_t>;

@@ -5,46 +5,25 @@ template<typename T>
 Data_Matrix<T>::Data_Matrix(size_t bucket_count, size_t bucket_size, hash_fptr<T> function, size_t seed):m_bucket_count{bucket_count}, m_function{function}, m_seed{seed}{
     m_bucket_size = bucket_size + m_reserved_bucket_size;
 
-
-    m_unreserved_bucket_size = bucket_size;
-
-    // std::cout << "before?" << m_bucket_count << "\t" << m_bucket_size << "\t" << sizeof(T) << std::endl;
     m_all_numbers = (T*) malloc(m_bucket_count * m_bucket_size * sizeof(T));
     m_values_per_bucket = new size_t[m_bucket_count];
-    m_used = new bool[m_bucket_count * m_bucket_size];
     m_used_cursor = new size_t[m_bucket_count];
-    // std::cout << "after" << std::endl;
-    for(size_t i = 0; i < m_bucket_count * m_bucket_size; i++){
-        m_used[i] = false;
-    }
-    // std::cout << "after" << std::endl;
-    for(size_t i = 0; i < m_bucket_count; i++){
-        m_values_per_bucket[i] = 0;
-        m_used_cursor[i] = 0;
-    }
-    // std::cout << "after" << std::endl;
+
     generate_numbers();
 }
 
 template<typename T>
-Data_Matrix<T>::Data_Matrix(T* all_numbers, size_t *sizes, size_t old_bucket_count, size_t old_bucket_size, size_t bucket_count, size_t bucket_size, hash_fptr<T> function, size_t seed):m_bucket_count{bucket_count}, m_function{function}, m_seed{seed}{
+Data_Matrix<T>::Data_Matrix(T* all_numbers, size_t *sizes, size_t old_bucket_count, size_t old_bucket_size, size_t bucket_count, size_t bucket_size, hash_fptr<T> function, size_t seed)
+    :m_bucket_count{bucket_count}, m_function{function}, m_seed{seed}{
+
     m_bucket_size = bucket_size + m_reserved_bucket_size;
     
-
+    
     m_all_numbers = (T*) malloc(m_bucket_count * m_bucket_size * sizeof(T));
     m_values_per_bucket = new size_t[m_bucket_count];
-    m_used = new bool[m_bucket_count * m_bucket_size];
+    
     m_used_cursor = new size_t[m_bucket_count];
     
-    for(size_t i = 0; i < m_bucket_count * m_bucket_size; i++){
-        m_used[i] = false;
-    }
-    for(size_t i = 0; i < m_bucket_count; i++){
-        m_values_per_bucket[i] = 0;
-        m_used_cursor[i] = 0;
-    }
-    m_unreserved_bucket_size = bucket_size;
-
     for(size_t b = 0; b < old_bucket_count; b++){
         for(size_t i = 0; i < sizes[b]; i++){
             insert_number(all_numbers[b * old_bucket_size + i], true);
@@ -72,8 +51,8 @@ void Data_Matrix<T>::generate_numbers(){
     size_t non_values = max_different_values - wanted_different_values;
     non_values *= 0.7;
     
-    size_t chunk_count = 10;
-    size_t chunk_size = (wanted_different_values / (chunk_count-1)) + 1;
+    size_t chunk_count = 12;
+    size_t chunk_size = (wanted_different_values / (chunk_count-2)) + 1;
     if(chunk_size < 2 * m_bucket_count){
         chunk_size = 2 * m_bucket_count;
         chunk_count = wanted_different_values/ chunk_size;
@@ -113,13 +92,12 @@ void Data_Matrix<T>::generate_numbers(){
             unsucessful_numbers += !successful_insert;
         }
     }
-    std::cout << "generation done\n";
+    std::cout << "\tgeneration done\n";
 }
 
 template<typename T>
 bool Data_Matrix<T>::insert_number(T number, bool force){
     size_t bucket = m_function(number, this->m_bucket_count);
-    size_t &bucket_fill = m_values_per_bucket[bucket];
     size_t base = bucket * m_bucket_size;
 
     if(m_values_per_bucket[bucket] < m_bucket_size){
@@ -141,9 +119,6 @@ bool Data_Matrix<T>::insert_number(T number, bool force){
 
 template<typename T>
 void Data_Matrix<T>::clear_used(){
-    for(size_t i = 0; i < m_bucket_count * m_bucket_size; i++){
-        m_used[i] = false;
-    }
     for(size_t i = 0; i < m_bucket_count; i++){
         m_used_cursor[i] = 0;
     }
@@ -165,29 +140,29 @@ T Data_Matrix<T>::get_value(size_t bucket, size_t k){
 
 
 template<typename T>
-T Data_Matrix<T>::get_next_value(size_t bucket, bool & next_bucket, bool probing){
+T Data_Matrix<T>::get_unused_value(size_t bucket, size_t &next_bucket, bool probing, bool mark_used, size_t skip_x){
     size_t check_engine = 0;
-    for(uint64_t i = -1, b = bucket, t = 0; t < m_bucket_count * m_bucket_size; t++, i++){
+    skip_x = (!mark_used) * skip_x;
+
+    for(uint64_t b = bucket, t = 0; t < m_bucket_count * m_bucket_size; t++){
         if(b >= m_bucket_count){
             b = 0;
             check_engine = 1;
         }else if(check_engine == 1 && b == bucket){
             break;
         }
-        if(i == -1){
-            i = m_used_cursor[b];
-        }
-
-        if(i < get_bucket_size(b) + (probing * m_reserved_bucket_size)){
-            if(!m_used[b * m_bucket_size + i]){
-                m_used[b * m_bucket_size + i] = true;
-                m_used_cursor[b]++;
-                return m_all_numbers[b* m_bucket_size + i];
-            }
+        size_t offset_i = m_used_cursor[b];
+        size_t bucket_size = get_bucket_size(b, probing);
+        if(offset_i + skip_x < bucket_size){
+            m_used_cursor[b] += mark_used;
+            return m_all_numbers[b* m_bucket_size + offset_i];
         }else{
-            i = -1;
+            if(offset_i < bucket_size){
+                skip_x -= (bucket_size - offset_i);
+            }
             t--;
             b++;
+            next_bucket++;
         }
     }
     std::cout << "DATA GEN WARNING: 0 returned as value\n";
@@ -203,14 +178,13 @@ Data_Matrix<T>* Data_Matrix<T>::transform(size_t bucket_count){
         }
     }
     size_t n_bucket_size = m_bucket_count * m_bucket_size / bucket_count;
-    n_bucket_size *= 1.1;
     if(n_bucket_size < max_fill){
         n_bucket_size *= 1.5;
         if(n_bucket_size > max_fill){
             n_bucket_size = max_fill;
         }
     }
-
+    n_bucket_size -= m_reserved_bucket_size;
     Data_Matrix<T>* res = new Data_Matrix(m_all_numbers, m_values_per_bucket, m_bucket_count, m_bucket_size, bucket_count, n_bucket_size, m_function, m_seed);
     return res;
 }
@@ -218,9 +192,7 @@ Data_Matrix<T>* Data_Matrix<T>::transform(size_t bucket_count){
 template<typename T>
 void Data_Matrix<T>::print(){
     for(size_t b = 0; b < m_bucket_count; b++){
-        std::cout << b ;//<< ":" << m_values_per_bucket[b];
-        // std::cout << b << ":" << m_values_per_bucket[b];
-
+        std::cout << b << ":" << m_values_per_bucket[b];
         for(size_t i = 0; i < m_values_per_bucket[b]; i++){
             std::cout << "\t" << m_all_numbers[b * m_bucket_size + i]; 
         }

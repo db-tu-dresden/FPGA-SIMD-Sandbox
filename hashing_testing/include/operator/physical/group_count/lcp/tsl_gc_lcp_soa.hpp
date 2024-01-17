@@ -18,7 +18,7 @@ class TSL_gc_LCP_SoA : public Group_Count_TSL_SOA<T>{
     using vec_t = typename ps::register_type;
     using mask_t = typename ps::mask_type;
     using imask_t = typename ps::imask_type;
-    const size_t m_elements_per_vector = ps::vector_element_count(); // todo!
+    const size_t m_elements_per_vector = ps::vector_element_count(); 
 
     protected:
         size_t m_HSIZE_v;
@@ -44,6 +44,7 @@ class TSL_gc_LCP_SoA : public Group_Count_TSL_SOA<T>{
         }
 
         void clear();
+        void move_numa(size_t mem_numa_node);
 
         size_t get_HSIZE(){
             return m_HSIZE_v * m_elements_per_vector;
