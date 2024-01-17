@@ -2,6 +2,7 @@
 #define TUD_HASHING_TESTING_DATA_MATRIX
 
 #include <stdlib.h>
+#include <cstdint>
 #include "main/hash_function.hpp"
 
 //todo integration

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h> 
 #include <string>
+#include <cstdint>
 
 template <typename T>
 class Group_count{

@@ -6,6 +6,7 @@
 #include <string>
 #include <numa.h>
 #include <omp.h>
+#include <cstdint>
 
 template<typename T>
 class Group_Count_TSL_SOA{

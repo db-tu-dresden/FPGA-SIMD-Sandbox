@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <stdlib.h> 
+#include <cstdint>
 
 #include <immintrin.h>
 

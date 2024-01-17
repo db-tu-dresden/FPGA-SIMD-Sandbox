@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string>
+#include <cstdint>
 // #include "main/datagenerator/datagen_help.hpp"
 
 enum HashFunction{

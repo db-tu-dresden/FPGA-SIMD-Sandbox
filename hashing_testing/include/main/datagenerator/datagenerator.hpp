@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <vector>
+#include <cstdint>
 
 #include "main/hash_function.hpp"
 #include "data_matrix.hpp"

@@ -3,6 +3,7 @@
 #define TUD_HASHING_TESTING_AVX512_MAIN_TSL_BENCHMARK
 
 #include <stdlib.h>
+#include <cstdint>
 #include "main/utility.hpp"
 #include "main/hash_function.hpp"
 #include "operator/physical/group_count/group_count_handler/group_count_algorithms.hpp"
