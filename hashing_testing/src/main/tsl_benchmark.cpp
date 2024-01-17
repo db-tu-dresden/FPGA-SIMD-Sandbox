@@ -115,7 +115,7 @@ int main(int argc, char** argv){
 
 
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 1 * 1024 * 1024;
+    size_t distinct_value_count = 30 * 1024 * 1024;
     size_t build_data_amount = distinct_value_count * 2;
     size_t probe_data_amount = distinct_value_count * 16;
 
