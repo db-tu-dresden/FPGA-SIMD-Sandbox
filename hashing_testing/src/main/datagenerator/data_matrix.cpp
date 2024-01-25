@@ -18,7 +18,6 @@ Data_Matrix<T>::Data_Matrix(T* all_numbers, size_t *sizes, size_t old_bucket_cou
 
     m_bucket_size = bucket_size + m_reserved_bucket_size;
     
-    
     m_all_numbers = (T*) malloc(m_bucket_count * m_bucket_size * sizeof(T));
     m_values_per_bucket = new size_t[m_bucket_count];
     
@@ -165,7 +164,7 @@ T Data_Matrix<T>::get_unused_value(size_t bucket, size_t &next_bucket, bool prob
             next_bucket++;
         }
     }
-    std::cout << "DATA GEN WARNING: 0 returned as value\n";
+    // std::cout << "DATA GEN WARNING: 0 returned as value\n";
     return 0;
 }
 
@@ -192,12 +191,14 @@ Data_Matrix<T>* Data_Matrix<T>::transform(size_t bucket_count){
 template<typename T>
 void Data_Matrix<T>::print(){
     for(size_t b = 0; b < m_bucket_count; b++){
-        std::cout << b << ":" << m_values_per_bucket[b];
-        for(size_t i = 0; i < m_values_per_bucket[b]; i++){
-            std::cout << "\t" << m_all_numbers[b * m_bucket_size + i]; 
-        }
-        std::cout << std::endl;
+        std::cout << " " << m_values_per_bucket[b];
+        // std::cout << b << ":" << m_values_per_bucket[b];
+        // for(size_t i = 0; i < m_values_per_bucket[b]; i++){
+        //     std::cout << "\t" << m_all_numbers[b * m_bucket_size + i]; 
+        // }
+        // std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
 
 template class Data_Matrix<uint64_t>;

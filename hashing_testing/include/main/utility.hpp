@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstdint>
 
-
+using time_stamp = std::chrono::high_resolution_clock::time_point;
 std::chrono::high_resolution_clock::time_point time_now(){
     return std::chrono::high_resolution_clock::now();
 }

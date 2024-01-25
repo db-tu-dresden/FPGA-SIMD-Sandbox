@@ -2,6 +2,8 @@
 #include <iostream>
 #include <limits>
 #include <omp.h>
+#include <utility>
+#include <map>
 
 template<typename T>
 bool vector_contains(std::vector<T> vec, T value);
@@ -210,9 +212,8 @@ void Datagenerator<T>::get_probe_values_strided(std::vector<T> &values, size_t n
         size_t soft_skip = 0;
         size_t help = 0;
         T n_val = m_working_set_data_matrix->get_unused_value(id, soft_skip, true, false);
-        while(vector_contains(values, n_val)){
-            help ++;
-            n_val = m_working_set_data_matrix->get_unused_value(id, soft_skip, true, false, help);
+        if(soft_skip != 0){
+            std::cout << "something is weird\n";
         }
         values.push_back(n_val);
     }
@@ -273,6 +274,57 @@ size_t Datagenerator<T>::get_probe_strided(
     the first entry is always a collision. the rest is random.
     this makes it perfect for strided. if no collision is wanted this still would be okay
 */
+
+// // //TODO: takes to much time!
+// template<typename T>
+// void Datagenerator<T>::get_collision_bit_map_random(
+//     std::vector<bool> &collide,
+//     size_t distinct_values,
+//     size_t collision_count,
+//     size_t seed
+// ){
+//     collide.clear();
+//     collide.resize(distinct_values, false);
+
+//     if(collision_count < 1){
+//         collision_count = 1;
+//     }
+//     collision_count --; //collision count tracks how many values collide
+
+//     size_t to_generate = collision_count;
+//     size_t space = (distinct_values - 1) - to_generate;
+
+//     // if inverse than is the inclusion in the vector ids no collision otherwise it is a collision id
+//     bool inverse = to_generate > space;
+//     if(inverse){
+//         to_generate = space;
+//     }
+// std::cout << "slow" << std::flush;
+//     std::vector<size_t> ids;    // save ids that are collisions (!inversed) or are non collisions (inversed)
+//     size_t help = 0;
+//     ids.resize(to_generate, 0);
+//     //we generate random values for ids 
+//     for(size_t c = 0; c < to_generate; c++){
+//         size_t nid;
+//         do{
+//             nid = (noise(c + help++, seed) % (distinct_values - 1)) + 1;
+//             bool contains = !vector_contains<size_t>(ids, nid);
+//         }while(vector_contains<size_t>(ids, nid));
+//         ids.push_back(nid);
+//     }
+
+//     collide[0] = true; // the first element is always a collision
+
+//     #pragma omp parallel for num_threads(THREAD_COUNT)
+//     for(size_t i = 1; i < distinct_values; i++){
+//         bool is_in = vector_contains<size_t>(ids, i);
+//         bool insert = is_in != inverse;
+//         collide[i] = insert;
+//     }
+// }
+
+
+//hopefully faster
 template<typename T>
 void Datagenerator<T>::get_collision_bit_map_random(
     std::vector<bool> &collide,
@@ -297,28 +349,112 @@ void Datagenerator<T>::get_collision_bit_map_random(
         to_generate = space;
     }
 
-    std::vector<size_t> ids;    // save ids that are collisions (!inversed) or are non collisions (inversed)
     size_t help = 0;
-
     //we generate random values for ids 
     for(size_t c = 0; c < to_generate; c++){
-        size_t nid;
-        do{
-            nid = (noise(c + help++, seed) % (distinct_values - 1)) + 1;
-            bool contains = !vector_contains<size_t>(ids, nid);
-        }while(vector_contains<size_t>(ids, nid));
-        ids.push_back(nid);
+        size_t nid = (noise(c + help++, seed) % (distinct_values - 1)) + 1;
+        if(c < to_generate * 0.9){
+            while(collide[nid]){
+                nid = (noise(c + help++, seed) % (distinct_values - 1)) + 1;
+            }
+        }else{
+            while(collide[nid]){
+                nid += 1;
+                if(nid > distinct_values){
+                    nid = 1;
+                }
+            }
+        }
+        collide[nid] = true;
     }
 
     collide[0] = true; // the first element is always a collision
-
     #pragma omp parallel for num_threads(THREAD_COUNT)
     for(size_t i = 1; i < distinct_values; i++){
-        bool is_in = vector_contains<size_t>(ids, i);
-        bool insert = is_in != inverse;
+        bool insert = collide[i] != inverse;
         collide[i] = insert;
     }
 }
+
+// //TODO: takes to much time!
+// template<typename T>
+// void Datagenerator<T>::get_collision_bit_map_random(
+//     std::vector<bool> &collide,
+//     size_t distinct_values,
+//     size_t collision_count,
+//     size_t seed
+// ){
+//     std::vector<size_t> ids;    // save ids that are collisions (!inversed) or are non collisions (inversed)
+//     collide.clear();
+//     collide.resize(distinct_values, false);
+    
+//     ids.resize(distinct_values, 0);
+
+//     if(collision_count < 1){
+//         collision_count = 1;
+//     }
+//     collision_count --; //collision count tracks how many values collide
+
+//     size_t to_generate = collision_count;
+//     size_t space = (distinct_values - 1) - to_generate;
+
+//     // if inverse than is the inclusion in the vector ids no collision otherwise it is a collision id
+//     bool inverse = to_generate > space;
+//     if(inverse){
+//         to_generate = space;
+//     }
+
+//     size_t resolution = 16;
+//     auto data_helper = new size_t[(THREAD_COUNT + 1)][(resolution + 1)];
+//     size_t help = 0;
+    
+//     #pragma omp parallel for num_threads(THREAD_COUNT)
+//     for(size_t c = 0; c < distinct_values; c++){
+//         int t_id = omp_get_thread_num();
+//         size_t n = f_noise(c, seed) & ((resolution) - 1);
+
+//         data_helper[t_id + 1][n + 1] ++;
+//         ids[c] = n;
+//     }
+
+//     for(size_t i = 1; i < THREAD_COUNT; i++){
+//         for(size_t e = 0; e < resolution + 1; e++){
+//             data_helper[1][e] += data_helper[i + 1][e];
+//         }
+//     }
+
+//     int64_t current_collision_delta = - collision_count;
+//     std::map<std::pair<size_t, size_t>, int64_t> best_fit;
+//     size_t a = 0; 
+//     size_t b = 0;
+//     while(true){
+//         bool error = false;
+//         if(current_collision_delta < 0 && b < resolution){
+//             b++;
+//             current_collision_delta += data_helper[1][b];
+//         }else if(current_collision_delta > 0 && a < resolution){
+//             current_collision_delta -= data_helper[1][a];
+//             a++;
+//         }else{
+//             error = true;
+//         }
+//         if(!error){
+//             //todo enter data
+//         }
+//     }
+//     //todo find best
+//     //todo get ids
+//     //todo get bits
+
+//     collide[0] = true; // the first element is always a collision
+
+//     #pragma omp parallel for num_threads(THREAD_COUNT)
+//     for(size_t i = 1; i < distinct_values; i++){
+//         bool is_in = vector_contains<size_t>(ids, i);
+//         bool insert = is_in != inverse;
+//         collide[i] = insert;
+//     }
+// }
 
 template<typename T>
 void Datagenerator<T>::get_collision_bit_map_bad(
@@ -495,6 +631,8 @@ void Datagenerator<T>::distribute(
         dist = (dist / distinct_values) + 1;
     }
     dist -= non_collisions_first;
+    dist += 1;
+    
     size_t help = 1;
     while(help < distinct_values){
         help *= 2;
@@ -506,6 +644,7 @@ void Datagenerator<T>::distribute(
     std::vector<int64_t> val_counts;
     val_values.resize(distinct_values, 0);
     val_counts.resize(distinct_values, dist);
+
     //add non collision values
     std::cout << "a" << std::flush;
     #pragma omp parallel for num_threads(THREAD_COUNT)
@@ -542,6 +681,7 @@ void Datagenerator<T>::distribute(
 
     const size_t vc_size = val_counts.size();
     
+    std::cout << "d" << std::flush;
     for(size_t c_write_pos = pos; c_write_pos < data_size; c_write_pos++){        
         size_t id = ((c_write_pos ^ seed) ^ (val_counts.size() >> 1 )) % val_counts.size(); 
 
@@ -557,8 +697,7 @@ void Datagenerator<T>::distribute(
             }
         }
     }
-    std::cout << "d" << std::flush;
-
+    std::cout << "e" << std::flush;
 }
 
 // the postition ids are strided. with equal space between them.

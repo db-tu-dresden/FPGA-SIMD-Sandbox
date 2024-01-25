@@ -6,6 +6,8 @@
 #include <vector>
 #include <cstdint>
 
+#include <iostream>
+
 #include "main/hash_function.hpp"
 #include "data_matrix.hpp"
 
@@ -22,12 +24,10 @@ class Datagenerator{
         Data_Matrix<T> *m_data_matrix = nullptr;
         Data_Matrix<T> *m_working_set_data_matrix = nullptr;
         
-        //saved for probeing
+        //saved for probeing data gen
         T * m_values = nullptr;
         size_t m_values_count = 0;
 
-        // T** m_all_numbers = nullptr;
-        // T** m_original_numbers = nullptr;
 
         void get_collision_bit_map_random(std::vector<bool> &collide, size_t space, size_t wanted, size_t seed);
 
@@ -116,10 +116,10 @@ class Datagenerator{
             bool evenly_distributed = true
         );
 
-        bool transform_hsize(size_t n_hsize, bool set_collisions = true){
-            // m_original_data_matrix->print();
+        bool transform_hsize(size_t n_hsize, bool set_collisions = true){   
             if(m_data_matrix != nullptr){
                 delete m_data_matrix;
+                m_data_matrix = nullptr;
             }
             m_data_matrix = m_original_data_matrix->transform(n_hsize);
             
@@ -132,6 +132,7 @@ class Datagenerator{
         void revert_hsize(){
             if(m_data_matrix != nullptr){
                 delete m_data_matrix;
+                m_data_matrix = nullptr;
             }
             m_working_set_data_matrix = m_original_data_matrix;
             
@@ -144,6 +145,9 @@ class Datagenerator{
         size_t get_bucket_size(){return m_bucket_size;}
         size_t get_original_bucket_size(){return m_original_bucket_size;}
 
+        void print_data(){
+            m_original_data_matrix->print();
+        }
 };
 
 

@@ -17,7 +17,7 @@ class Group_Count_TSL_SOA{
         size_t m_HSIZE;
         size_t m_mem_numa_node;
 
-        size_t m_thread_count = 1;
+        size_t m_thread_count = 16;
 
         T* m_hash_vec;
         T* m_count_vec;

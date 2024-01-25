@@ -7,6 +7,13 @@ size_t table[8][256];
 size_t _k_update_rounds = 2;
 size_t _k_finalize_rounds = 2;
 
+size_t xor_shift(size_t val){
+    size_t x64 = val ^ (val << 13); 
+    x64 ^= x64 >> 7;
+    x64 ^= x64 << 17;
+    return x64;
+}
+
 size_t noise(size_t position, size_t seed){
     size_t BIT_NOISE1 = 0x68E31DA4;
     size_t BIT_NOISE2 = 0xB5297A4D;
@@ -20,6 +27,12 @@ size_t noise(size_t position, size_t seed){
     mangled ^= (mangled >> 7);
     mangled *= BIT_NOISE3;
     mangled ^= (mangled << 17);
+    return mangled;
+}
+
+size_t f_noise(size_t position, size_t seed){
+    size_t mangled = xor_shift(position);
+    mangled ^= xor_shift(seed);
     return mangled;
 }
 

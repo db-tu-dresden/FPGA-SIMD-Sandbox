@@ -40,7 +40,7 @@ void compress(size_t& v0, size_t& v1, size_t& v2, size_t& v3, const size_t round
 // /// @param seed 
 // /// @return a number that depends on both the position and the seed
 size_t noise(size_t postion, size_t seed);
-
+size_t f_noise(size_t position, size_t seed);
 //---------------------------------------
 // hash function
 //---------------------------------------
