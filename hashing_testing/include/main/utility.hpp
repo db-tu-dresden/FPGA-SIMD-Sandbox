@@ -88,7 +88,8 @@ void status_output(size_t runs_done, const size_t total_runs, const double perce
     size_t runs_alt = runs_done -1;
     double p = (total_runs / 100.) * percentage_print;
     size_t val_c = runs_done / p;
-    size_t val_a = runs_alt /p;
+    size_t val_a = runs_alt / p;
+
     if(val_c != val_a || force){
         double percent_done = runs_done * 1.0 / total_runs;
         time_end = time_now();

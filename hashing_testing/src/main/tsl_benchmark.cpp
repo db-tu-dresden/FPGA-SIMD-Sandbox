@@ -35,7 +35,7 @@ using ps_type = uint32_t;
 */
 const uint8_t MAX_GENERATION_TYPES = 2;
 
-double percentage_print = 0.5;
+double percentage_print = 0.25;
 
 template<typename T>
 void safe_numa_free(T*& data, size_t count){
@@ -113,18 +113,17 @@ const size_t max_planed_collisions = 256;
 int main(int argc, char** argv){
     fill_tab_table();
 
-
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 30 * 1024 * 1024;
-    size_t build_data_amount = distinct_value_count * 1;
+    size_t distinct_value_count = 8 * 1024 * 1024;
+    size_t build_data_amount = distinct_value_count * 16;
     size_t probe_data_amount = distinct_value_count * 16;
 
-    size_t repeats_same_data = 1;
+    size_t repeats_same_data = 3;
     size_t repeats_different_data = 1;
     size_t repeats_different_layout = 1;
 
     Group_Count_Algorithm_TSL algorithms_undertest[] = {
-        // Group_Count_Algorithm_TSL::LCP_SOA,
+        Group_Count_Algorithm_TSL::LCP_SOA,
         Group_Count_Algorithm_TSL::LP_H_SOA
     };
     size_t num_alg_undertest = sizeof(algorithms_undertest) / sizeof(algorithms_undertest[0]);
@@ -133,15 +132,15 @@ int main(int argc, char** argv){
     Base_Datatype datatypes_undertest[] = {
         // Base_Datatype::UI8,
         // Base_Datatype::UI16,
-        // Base_Datatype::UI32
+        // Base_Datatype::UI32,
         Base_Datatype::UI64
     };
     size_t num_datatypes_undertest = sizeof(datatypes_undertest)/ sizeof(datatypes_undertest[0]);
 
     Vector_Extention extentions_undertest[] = {
         // Vector_Extention::SCALAR,
-        // Vector_Extention::SSE,
-        // Vector_Extention::AVX2,
+        Vector_Extention::SSE,
+        Vector_Extention::AVX2,
         Vector_Extention::AVX512
     };
     size_t num_extentions_undertest = sizeof(extentions_undertest)/ sizeof(extentions_undertest[0]);
@@ -152,13 +151,13 @@ int main(int argc, char** argv){
     size_t num_hashfunc_undertest = sizeof(hashfunctions_undertest) / sizeof(hashfunctions_undertest[0]);
 
     // double scale_factors[] = {1., 2., 4., 8., 16.};
-    double scale_factors[] = {8.};
+    double scale_factors[] = {2., 4., 8., 16.};
     // double scale_factors[] = {8., 16.};
     size_t num_scale_factors = sizeof(scale_factors)/sizeof(scale_factors[0]);
 
 
-    size_t max_collision = 1;
-    size_t num_collision_tests = 1;
+    size_t max_collision = distinct_value_count / 64;
+    size_t num_collision_tests = 3;
     size_t collision_diminish = max_collision + 1;
     
     if(num_collision_tests > 1){
@@ -177,9 +176,11 @@ int main(int argc, char** argv){
     }
 //TODO: 
 // Nice to have for easier switching of data generation types: Functionptr for memberfunction for different layout generation methods.
+    float selectivities[] = {1, 0.75};
+    size_t num_select = sizeof(selectivities) / sizeof(selectivities[0]);
 
     size_t min_mem_numa = 0;
-    size_t max_mem_numa = 4;
+    size_t max_mem_numa = 1;
     size_t step_size_numa = 1;
 
     size_t *hash_table_locations;
@@ -191,142 +192,70 @@ int main(int argc, char** argv){
 
 
     const size_t num_concurrent_build_tests = 1;
+    // if(false){
+    if(true){
+        build_benchmark(
+            distinct_value_count,
+            build_data_amount,
+            hash_table_locations,
+            num_hash_table_locations,
+            build_data_locations,
+            num_build_data_locations, 
+            repeats_different_data,
+            repeats_same_data,
+            repeats_different_layout,
 
-    // std::thread thread;
-    
-    // thread = std::thread([
-    //             distinct_value_count,
-    //             build_data_amount,
-    //             hash_table_locations,
-    //             num_hash_table_locations,
-    //             build_data_locations,
-    //             num_build_data_locations, 
-    //             repeats_different_data,
-    //             repeats_same_data,
-    //             repeats_different_layout,
-    //             &algorithms_undertest, 
-    //             num_alg_undertest,
-    //             &datatypes_undertest,
-    //             num_datatypes_undertest,
-    //             &extentions_undertest,
-    //             num_extentions_undertest,
-    //             &hashfunctions_undertest,
-    //             num_hashfunc_undertest,
-    //             &scale_factors,
-    //             num_scale_factors,
-    //             max_collision,
-    //             num_collision_tests,
-    //             collision_diminish
-    //         ]
-    //     {
-    //         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //         build_benchmark(
-    //             distinct_value_count,
-    //             build_data_amount,
-    //             hash_table_locations,
-    //             num_hash_table_locations,
-    //             build_data_locations,
-    //             num_build_data_locations, 
-    //             repeats_different_data,
-    //             repeats_same_data,
-    //             repeats_different_layout,
+            algorithms_undertest, 
+            num_alg_undertest,
+            datatypes_undertest,
+            num_datatypes_undertest,
 
-    //             algorithms_undertest, 
-    //             num_alg_undertest,
-    //             datatypes_undertest,
-    //             num_datatypes_undertest,
+            extentions_undertest,
+            num_extentions_undertest,
+            hashfunctions_undertest,
+            num_hashfunc_undertest,
 
-    //             extentions_undertest,
-    //             num_extentions_undertest,
-    //             hashfunctions_undertest,
-    //             num_hashfunc_undertest,
+            scale_factors,
+            num_scale_factors,
 
-    //             scale_factors,
-    //             num_scale_factors,
+            max_collision,
+            num_collision_tests,
+            collision_diminish
+        );
+    }else{
+        probe_benchmark(
+            distinct_value_count,
+            build_data_amount,
+            probe_data_amount,
+            hash_table_locations,
+            num_hash_table_locations,
+            probe_data_locations,
+            num_probe_data_locations, 
+            repeats_different_data,
+            repeats_same_data,
+            repeats_different_layout,
 
-    //             max_collision,
-    //             num_collision_tests,
-    //             collision_diminish
-    //         );
-    //     }
-    // );
+            algorithms_undertest, 
+            num_alg_undertest,
+            datatypes_undertest,
+            num_datatypes_undertest,
 
-        std::thread thread;
-    
-    thread = std::thread([
-                distinct_value_count,
-                build_data_amount,
-                probe_data_amount,
-                hash_table_locations,
-                num_hash_table_locations,
-                probe_data_locations,
-                num_probe_data_locations, 
-                repeats_different_data,
-                repeats_same_data,
-                repeats_different_layout,
-                &algorithms_undertest, 
-                num_alg_undertest,
-                &datatypes_undertest,
-                num_datatypes_undertest,
-                &extentions_undertest,
-                num_extentions_undertest,
-                &hashfunctions_undertest,
-                num_hashfunc_undertest,
-                &scale_factors,
-                num_scale_factors,
-                max_collision,
-                num_collision_tests,
-                collision_diminish
-            ]
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            
-            float selectivities[] = {0.95};
-            size_t num_select = sizeof(selectivities) / sizeof(selectivities[0]);
-            probe_benchmark(
-                distinct_value_count,
-                build_data_amount,
-                probe_data_amount,
-                hash_table_locations,
-                num_hash_table_locations,
-                probe_data_locations,
-                num_probe_data_locations, 
-                repeats_different_data,
-                repeats_same_data,
-                repeats_different_layout,
+            extentions_undertest,
+            num_extentions_undertest,
+            hashfunctions_undertest,
+            num_hashfunc_undertest,
 
-                algorithms_undertest, 
-                num_alg_undertest,
-                datatypes_undertest,
-                num_datatypes_undertest,
+            scale_factors,
+            num_scale_factors,
 
-                extentions_undertest,
-                num_extentions_undertest,
-                hashfunctions_undertest,
-                num_hashfunc_undertest,
-
-                scale_factors,
-                num_scale_factors,
-
-                max_collision,
-                num_collision_tests,
-                collision_diminish,
-                selectivities,
-                num_select
-            );
-        }
-    );
-
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
-    for(size_t i = 0; i < 16; i++){
-        CPU_SET(i, &cpuset);
-        // CPU_SET(i + 64, &cpuset);
-        
+            max_collision,
+            num_collision_tests,
+            collision_diminish,
+            selectivities,
+            num_select
+        );
     }
-    int rc = pthread_setaffinity_np(thread.native_handle(), sizeof(cpu_set_t), &cpuset);
-    thread.join();
-    return 0;
+
 }
 
 
@@ -381,7 +310,7 @@ void build_benchmark_final(
             }
             write_to_file(result_file_name, result_ss.str());
             bool force = run_count == 0;
-            status_output(++run_count, max_run_count, 1, time_begin, force);
+            status_output(++run_count, max_run_count, percentage_print, time_begin, force);
         }
     }
 
@@ -897,7 +826,7 @@ void build_benchmark(
         }
     }
 
-    status_output(run_count, total_tests, 1, time_begin, true);
+    status_output(run_count, total_tests, percentage_print, time_begin, true);
 }
 
 // runs the given algorithm with the given data. Afterwards it might clear the hash_table (reset = true) and or deletes the operator (clean up)
@@ -1027,7 +956,7 @@ void probe_benchmark(
             );
         }
     }
-    status_output(run_count, total_tests, 1, time_begin, true);
+    status_output(run_count, total_tests, percentage_print, time_begin, true);
 }
 
 void probe_benchmark_template_helper_base(
