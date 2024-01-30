@@ -1,1 +1,1 @@
-numactl --physcpubind=0-15,64-79 -- ./bin/hashing_tsl
+numactl --cpunodebind=0 -- ./bin/hashing_tsl
