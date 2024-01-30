@@ -58,12 +58,14 @@ void move_data(T*& data, size_t count, size_t numa_node){
     std::cout << "moveing data" << std::flush;
     T* data_new = nullptr;
     safe_numa_alloc<T>(data_new, count, numa_node);
-    
+    if(data_new == nullptr){
+        std::cout << "BIG PROBLEM WHILE ALLOCATION\n";
+    }
     if(data != nullptr){    //just copy data if data not nullptr
         std::memcpy(data_new, data, count * sizeof(T));
+        safe_numa_free(data, count);
     }
     
-    safe_numa_free(data, count);
     data = data_new;
     std::cout << " - done\n";
 }
@@ -114,7 +116,7 @@ int main(int argc, char** argv){
     fill_tab_table();
 
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 8 * 1024 * 1024;
+    size_t distinct_value_count = 11 * 1024 * 1024;
     size_t build_data_amount = distinct_value_count * 16;
     size_t probe_data_amount = distinct_value_count * 16;
 
@@ -139,8 +141,8 @@ int main(int argc, char** argv){
 
     Vector_Extention extentions_undertest[] = {
         // Vector_Extention::SCALAR,
-        Vector_Extention::SSE,
-        Vector_Extention::AVX2,
+        // Vector_Extention::SSE,
+        // Vector_Extention::AVX2,
         Vector_Extention::AVX512
     };
     size_t num_extentions_undertest = sizeof(extentions_undertest)/ sizeof(extentions_undertest[0]);
@@ -157,7 +159,7 @@ int main(int argc, char** argv){
 
 
     size_t max_collision = distinct_value_count / 64;
-    size_t num_collision_tests = 3;
+    size_t num_collision_tests = 1;
     size_t collision_diminish = max_collision + 1;
     
     if(num_collision_tests > 1){
@@ -180,7 +182,7 @@ int main(int argc, char** argv){
     size_t num_select = sizeof(selectivities) / sizeof(selectivities[0]);
 
     size_t min_mem_numa = 0;
-    size_t max_mem_numa = 1;
+    size_t max_mem_numa = 4;
     size_t step_size_numa = 1;
 
     size_t *hash_table_locations;
@@ -192,8 +194,8 @@ int main(int argc, char** argv){
 
 
     const size_t num_concurrent_build_tests = 1;
-    // if(false){
-    if(true){
+    if(false){
+    // if(true){
         build_benchmark(
             distinct_value_count,
             build_data_amount,
@@ -286,20 +288,11 @@ void build_benchmark_final(
         getTSLGroupCount<Vec, T>(alg, algorithms_undertest[algorithms_undertest_i], hsize, function, hash_table_loc);
 
         for(size_t run = 0; run < repeats_same_data; run++){
-            // std::cout << "\t\t" << algorithms_undertest_i << "\t" << run << std::endl;
             alg->clear();
             size_t time = 0;
 
-            // std::thread thread([alg, data, data_size, &time](){
             time += run_test_build<T>(alg, data, data_size);
-            time += run_test_build<T>(alg, data, data_size);
-            // });
-            // cpu_set_t cpuset;
-            // CPU_ZERO(&cpuset);
-            // CPU_SET(0, &cpuset);
-            // int rc = pthread_setaffinity_np(thread.native_handle(), sizeof(cpu_set_t), &cpuset);
-            // thread.join();
-            
+            // time += run_test_build<T>(alg, data, data_size);
 
             std::stringstream config_ss;
             config_ss << config_string << ",algorithm,reported_hsize,run,time";
@@ -1280,11 +1273,7 @@ void probe_benchmark_data(
     size_t& run_count,
     const size_t max_run_count
 ){
-    size_t original_numa_node = 0;
-    T* probe_data = nullptr;
-    T* result_data = nullptr;
-    safe_numa_alloc(probe_data, probe_data_count, original_numa_node);
-    safe_numa_alloc(result_data, probe_data_count, original_numa_node);
+    
     for(size_t scale_i = 0; scale_i < num_scale_factors; scale_i++){
         double scale = scale_factors[scale_i];
 
@@ -1303,39 +1292,25 @@ void probe_benchmark_data(
             print_time(tb, te, false);
             std::cout << " seconds to generate the build data\n";
 
-            
-            for(size_t sel_i = 0; sel_i < num_selectivities; sel_i++){
-                float selectivity = selectivities[sel_i];
+            for(size_t ve_id = 0; ve_id < num_extentions_undertest; ve_id++){
+                Vector_Extention ve = extentions_undertest[ve_id];
 
-                std::cout << "data gen:\t" << std::flush;
-                std::chrono::high_resolution_clock::time_point tb2 = time_now();
-                datagen->get_probe_strided(probe_data, probe_data_count, selectivity, seed);
-                std::chrono::high_resolution_clock::time_point te2 = time_now();
-                std::cout << "it took ";
-                print_time(tb2, te2, false);
-                std::cout << " seconds to generate probe data\n";
-                for(size_t ve_id = 0; ve_id < num_extentions_undertest; ve_id++){
-                    Vector_Extention ve = extentions_undertest[ve_id];
-
-                    std::stringstream config_ss;
-                    config_ss <<"vector_extention,"<< config_string << ",scale,hsize,collision_count,selectivity";
-                    std::stringstream result_ss;
-                    result_ss << vector_extention_to_string(ve) << "," << result_string << "," << scale << "," << hsize << "," << collisions << "," << selectivity;
-                    probe_benchmark_vector_extention<T>(
-                        result_file_name, config_ss.str(), result_ss.str(), 
-                        build_data_count, probe_data_count, datagen, 
-                        data, probe_data, result_data, hsize, function, 
-                        ve, algorithms_undertest, num_algorithms_undertest, 
-                        hash_table_locations, num_hash_table_locations, 
-                        probe_locations, num_probe_locations,
-                        repeats_same_data, seed, run_count, max_run_count);
-                }
-                collisions /= collision_diminish;
+                std::stringstream config_ss;
+                config_ss <<"vector_extention,"<< config_string << ",scale,hsize,collision_count";
+                std::stringstream result_ss;
+                result_ss << vector_extention_to_string(ve) << "," << result_string << "," << scale << "," << hsize << "," << collisions;
+                probe_benchmark_vector_extention<T>(
+                    result_file_name, config_ss.str(), result_ss.str(), 
+                    build_data_count, probe_data_count, datagen, 
+                    data, selectivities, num_selectivities, hsize, function, 
+                    ve, algorithms_undertest, num_algorithms_undertest, 
+                    hash_table_locations, num_hash_table_locations, 
+                    probe_locations, num_probe_locations,
+                    repeats_same_data, seed, run_count, max_run_count);
             }
+            collisions /= collision_diminish;
         }
     }
-    safe_numa_free(probe_data, probe_data_count);
-    safe_numa_free(result_data, probe_data_count);
 }
 
 template<typename T>
@@ -1347,8 +1322,8 @@ void probe_benchmark_vector_extention(
     const size_t probe_data_count,
     Datagenerator<T> *datagen,
     T* data,
-    T* probe_data,
-    T* result_data,
+    float* selectivities,
+    size_t num_selectivities,
     size_t hsize,
     hash_fptr<T> function,
     Vector_Extention ve,
@@ -1369,7 +1344,7 @@ void probe_benchmark_vector_extention(
         probe_benchmark_hash_table<T, tsl::scalar>(
             result_file_name, config_string, result_string, 
             build_data_count, probe_data_count, datagen, 
-            data, probe_data, result_data, hsize, function, 
+            data, selectivities, num_selectivities, hsize, function, 
             algorithms_undertest, num_algorithms_undertest, 
             hash_table_locations, num_hash_table_locations,
             probe_locations, num_probe_locations,
@@ -1380,7 +1355,7 @@ void probe_benchmark_vector_extention(
         probe_benchmark_hash_table<T, tsl::sse>(
             result_file_name, config_string, result_string, 
             build_data_count, probe_data_count, datagen, 
-            data, probe_data, result_data, hsize, function, 
+            data, selectivities, num_selectivities, hsize, function, 
             algorithms_undertest, num_algorithms_undertest, 
             hash_table_locations, num_hash_table_locations,
             probe_locations, num_probe_locations,
@@ -1391,7 +1366,7 @@ void probe_benchmark_vector_extention(
         probe_benchmark_hash_table<T, tsl::avx2>(
             result_file_name, config_string, result_string, 
             build_data_count, probe_data_count, datagen, 
-            data, probe_data, result_data, hsize, function, 
+            data, selectivities, num_selectivities, hsize, function, 
             algorithms_undertest, num_algorithms_undertest, 
             hash_table_locations, num_hash_table_locations,
             probe_locations, num_probe_locations,
@@ -1402,7 +1377,7 @@ void probe_benchmark_vector_extention(
         probe_benchmark_hash_table<T, tsl::avx512>(
             result_file_name, config_string, result_string, 
             build_data_count, probe_data_count, datagen, 
-            data, probe_data, result_data, hsize, function, 
+            data, selectivities, num_selectivities, hsize, function, 
             algorithms_undertest, num_algorithms_undertest, 
             hash_table_locations, num_hash_table_locations,
             probe_locations, num_probe_locations,
@@ -1424,8 +1399,8 @@ void probe_benchmark_hash_table(
     const size_t probe_data_count,
     Datagenerator<T> *datagen,
     T* data,
-    T* probe_data,
-    T* result_data,
+    float* selectivities,
+    size_t num_selectivities,
     size_t hsize,
     hash_fptr<T> function,
     Group_Count_Algorithm_TSL* algorithms_undertest, // which algorithms to test
@@ -1450,7 +1425,7 @@ void probe_benchmark_hash_table(
         std::cout << "it took ";
         print_time(tb, te, false);
         std::cout << " seconds to build the hash_table\n";
-
+        
         for(size_t ht_loc_i = 0; ht_loc_i < num_hash_table_locations; ht_loc_i++){
             size_t ht_loc = hash_table_locations[ht_loc_i];
             alg->move_numa(ht_loc);
@@ -1463,7 +1438,7 @@ void probe_benchmark_hash_table(
             probe_benchmark_final<T, Vec>(
                 result_file_name, config_ss.str(), result_ss.str(), 
                 probe_data_count, datagen, alg,
-                probe_data, result_data,
+                selectivities, num_selectivities,
                 probe_locations, num_probe_locations,
                 repeats_same_data, seed, run_count, max_run_count
             );
@@ -1482,8 +1457,8 @@ void probe_benchmark_final(
     const size_t probe_data_count,
     Datagenerator<T> *datagen,
     Group_Count_TSL_SOA<T> *alg,
-    T* probe_data,
-    T* result_data,
+    float* selectivities,
+    size_t num_selectivities,
     size_t* probe_locations,
     size_t num_probe_locations,
     size_t repeats_same_data,           
@@ -1491,30 +1466,51 @@ void probe_benchmark_final(
     size_t& run_count,
     const size_t max_run_count
 ){
-  
-    for(size_t numa_node_i = 0; numa_node_i < num_probe_locations; numa_node_i++){
-        size_t probe_loc = probe_locations[numa_node_i];
+    size_t current_numa_node = 0;
+    T* probe_data = nullptr;
+    T* result_data = nullptr;
+    safe_numa_alloc(probe_data, probe_data_count, current_numa_node);
+    safe_numa_alloc(result_data, probe_data_count, current_numa_node);
+    for(size_t sel_i = 0; sel_i < num_selectivities; sel_i++){
+        float selectivity = selectivities[sel_i];
+
+        std::cout << "data gen:\t" << std::flush;
+        std::chrono::high_resolution_clock::time_point tb2 = time_now();
+        datagen->get_probe_strided(probe_data, probe_data_count, selectivity, seed);
+        std::chrono::high_resolution_clock::time_point te2 = time_now();
+        std::cout << "it took ";
+        print_time(tb2, te2, false);
+        std::cout << " seconds to generate probe data\n";
         
-        move_data(probe_data, probe_data_count, probe_loc);
-        move_data(result_data, probe_data_count, probe_loc);
-        
-        for(size_t run = 0; run < repeats_same_data; run++){
+        for(size_t numa_node_i = 0; numa_node_i < num_probe_locations; numa_node_i++){
+            size_t probe_loc = probe_locations[numa_node_i];
             
-            size_t time = 0;
-            time += run_test_probe<T>(alg, probe_data, result_data, probe_data_count); 
-            
-            std::stringstream config_ss;
-            config_ss << config_string << ",probe_location,run,time";
-            std::stringstream result_ss;
-            result_ss << result_string << "," << probe_loc << "," << run << "," << time;
-            if(run_count == 0){
-                write_to_file(result_file_name, config_ss.str(), true);
+            if(current_numa_node != probe_loc){
+                move_data(probe_data, probe_data_count, probe_loc);
+                move_data(result_data, probe_data_count, probe_loc);
+                current_numa_node = probe_loc;
             }
-            write_to_file(result_file_name, result_ss.str());
-            bool force = run_count == 0;
-            status_output(++run_count, max_run_count, 1, time_begin, force);
+            
+            for(size_t run = 0; run < repeats_same_data; run++){
+                
+                size_t time = 0;
+                time += run_test_probe<T>(alg, probe_data, result_data, probe_data_count); 
+                
+                std::stringstream config_ss;
+                config_ss << config_string << ",selectivity,probe_location,run,time";
+                std::stringstream result_ss;
+                result_ss << result_string << "," << selectivity << "," << probe_loc << "," << run << "," << time;
+                if(run_count == 0){
+                    write_to_file(result_file_name, config_ss.str(), true);
+                }
+                write_to_file(result_file_name, result_ss.str());
+                bool force = run_count == 0;
+                status_output(++run_count, max_run_count, percentage_print, time_begin, force);
+            }
         }
-    }
+        }
+    safe_numa_free(probe_data, probe_data_count);
+    safe_numa_free(result_data, probe_data_count);
 }
 
 // runs the given algorithm with the given data. Afterwards it might clear the hash_table (reset = true) and or deletes the operator (clean up)
