@@ -111,6 +111,7 @@ size_t seq(size_t*&result, size_t min, size_t max, size_t step){
 std::chrono::high_resolution_clock::time_point time_begin;
 const size_t exec_node = 0;
 const size_t max_planed_collisions = 256;
+const size_t number_threads = 24;
 
 int main(int argc, char** argv){
     fill_tab_table();
@@ -911,9 +912,9 @@ void probe_benchmark(
             Base_Datatype bt = datatypes_undertest[bt_id];
             
             std::stringstream config_ss;
-            config_ss << "datatype";
+            config_ss << "datatype,thread_count";
             std::stringstream result_ss;
-            result_ss << base_datatype_to_string(bt);
+            result_ss << base_datatype_to_string(bt) << "," << number_threads;
 
             probe_benchmark_template_helper_base(
                 file_name,
@@ -1519,7 +1520,7 @@ void probe_benchmark_final(
 template <typename T>
 size_t run_test_probe(Group_Count_TSL_SOA<T>*& group_count, T* data, T * result, size_t data_size){
     std::chrono::high_resolution_clock::time_point time_begin, time_end;
-    
+    group_count->set_thread_count(number_threads);
     time_begin = time_now();
     group_count->probe(result, data, data_size);;
     time_end = time_now();
