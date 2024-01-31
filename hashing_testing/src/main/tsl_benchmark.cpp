@@ -35,7 +35,7 @@ using ps_type = uint32_t;
 */
 const uint8_t MAX_GENERATION_TYPES = 2;
 
-double percentage_print = 0.25;
+double percentage_print = 0.5;
 
 template<typename T>
 void safe_numa_free(T*& data, size_t count){
@@ -55,7 +55,7 @@ void safe_numa_alloc(T*& data, size_t count, size_t numa_node){
 
 template<typename T>
 void move_data(T*& data, size_t count, size_t numa_node){    
-    std::cout << "moveing data" << std::flush;
+    std::cout << "moveing data to " << numa_node << std::flush;
     T* data_new = nullptr;
     safe_numa_alloc<T>(data_new, count, numa_node);
     if(data_new == nullptr){
@@ -116,16 +116,16 @@ int main(int argc, char** argv){
     fill_tab_table();
 
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 11 * 1024 * 1024;
-    size_t build_data_amount = distinct_value_count * 16;
-    size_t probe_data_amount = distinct_value_count * 16;
+    size_t distinct_value_count = 64 * 1024 * 1024;
+    size_t build_data_amount = distinct_value_count * 1;
+    size_t probe_data_amount = distinct_value_count * 8;
 
-    size_t repeats_same_data = 3;
+    size_t repeats_same_data = 1;
     size_t repeats_different_data = 1;
     size_t repeats_different_layout = 1;
 
     Group_Count_Algorithm_TSL algorithms_undertest[] = {
-        Group_Count_Algorithm_TSL::LCP_SOA,
+        // Group_Count_Algorithm_TSL::LCP_SOA,
         Group_Count_Algorithm_TSL::LP_H_SOA
     };
     size_t num_alg_undertest = sizeof(algorithms_undertest) / sizeof(algorithms_undertest[0]);
@@ -142,8 +142,8 @@ int main(int argc, char** argv){
     Vector_Extention extentions_undertest[] = {
         // Vector_Extention::SCALAR,
         // Vector_Extention::SSE,
-        // Vector_Extention::AVX2,
-        Vector_Extention::AVX512
+        Vector_Extention::AVX2
+        // Vector_Extention::AVX512
     };
     size_t num_extentions_undertest = sizeof(extentions_undertest)/ sizeof(extentions_undertest[0]);
 
@@ -153,12 +153,12 @@ int main(int argc, char** argv){
     size_t num_hashfunc_undertest = sizeof(hashfunctions_undertest) / sizeof(hashfunctions_undertest[0]);
 
     // double scale_factors[] = {1., 2., 4., 8., 16.};
-    double scale_factors[] = {2., 4., 8., 16.};
+    double scale_factors[] = {4.};
     // double scale_factors[] = {8., 16.};
     size_t num_scale_factors = sizeof(scale_factors)/sizeof(scale_factors[0]);
 
 
-    size_t max_collision = distinct_value_count / 64;
+    size_t max_collision = 1;
     size_t num_collision_tests = 1;
     size_t collision_diminish = max_collision + 1;
     
@@ -178,11 +178,11 @@ int main(int argc, char** argv){
     }
 //TODO: 
 // Nice to have for easier switching of data generation types: Functionptr for memberfunction for different layout generation methods.
-    float selectivities[] = {1, 0.75};
+    float selectivities[] = {1};
     size_t num_select = sizeof(selectivities) / sizeof(selectivities[0]);
 
     size_t min_mem_numa = 0;
-    size_t max_mem_numa = 4;
+    size_t max_mem_numa = 16;
     size_t step_size_numa = 1;
 
     size_t *hash_table_locations;
@@ -1171,7 +1171,7 @@ void probe_benchmark_datagen(
         HashFunction function_id = hashfunctions_undertest[hash_function_id];
         hash_fptr<T> function = get_hash_function<T>(function_id);
         size_t max_collisions_to_generate = max_collision_size;
-        size_t max_planed_collisions = (512 * 4) / (8 * sizeof(T));
+        size_t max_planed_collisions = (511) / (8 * sizeof(T));
         if(max_collisions_to_generate > max_planed_collisions){
             max_collisions_to_generate = max_planed_collisions;
         }
@@ -1466,13 +1466,14 @@ void probe_benchmark_final(
     size_t& run_count,
     const size_t max_run_count
 ){
-    size_t current_numa_node = 0;
     T* probe_data = nullptr;
     T* result_data = nullptr;
-    safe_numa_alloc(probe_data, probe_data_count, current_numa_node);
-    safe_numa_alloc(result_data, probe_data_count, current_numa_node);
     for(size_t sel_i = 0; sel_i < num_selectivities; sel_i++){
         float selectivity = selectivities[sel_i];
+
+        size_t current_numa_node = 0;
+        safe_numa_alloc(result_data, probe_data_count, current_numa_node);
+        safe_numa_alloc(probe_data, probe_data_count, current_numa_node);
 
         std::cout << "data gen:\t" << std::flush;
         std::chrono::high_resolution_clock::time_point tb2 = time_now();
@@ -1508,9 +1509,10 @@ void probe_benchmark_final(
                 status_output(++run_count, max_run_count, percentage_print, time_begin, force);
             }
         }
-        }
-    safe_numa_free(probe_data, probe_data_count);
-    safe_numa_free(result_data, probe_data_count);
+    
+        safe_numa_free(probe_data, probe_data_count);
+        safe_numa_free(result_data, probe_data_count);
+    }
 }
 
 // runs the given algorithm with the given data. Afterwards it might clear the hash_table (reset = true) and or deletes the operator (clean up)
