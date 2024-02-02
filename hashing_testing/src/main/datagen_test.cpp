@@ -22,6 +22,24 @@ void create_Datagenerator(
     datagen = new Datagenerator<T>(hsize, hash_function, max_collision_size, number_seed);
 }
 
+template<typename T>
+void print_data(T* data, size_t data_size, size_t mod = 0){
+    size_t breaks  = 10;
+    bool small = mod != 0;
+    
+    for(size_t i = 0, r = 0; i < data_size; i++, r++){        
+        if(r >= breaks){
+            r = 0;
+            std::cout << "\n";
+        }
+        if(small){
+            std::cout << data[i] % mod << "\t";
+        }else{
+            std::cout << data[i] << "\t";
+        }
+    }
+    std::cout << "\n";
+}
 
 int main(int argc, char** argv){
     fill_tab_table();
@@ -29,18 +47,19 @@ int main(int argc, char** argv){
     using ps_type = uint64_t;
 
     size_t seed = 11;
-    size_t distinct =  1024 * 1024 * 64;
-    size_t data_size = distinct * 24;
+    size_t distinct =  100;
+    size_t data_size = distinct * 5;
     size_t max_scale = 8;
-    size_t hsize = distinct;
+    size_t test_scale = 2;
+    size_t hsize = distinct * test_scale;
     size_t max_test = 5;
 
     size_t distinct_max = hsize * max_scale;
-    size_t collision_max_gen = 16;
-    size_t collision_max_dat = distinct / 2;
+    size_t collision_max_gen = distinct / 2;
+    size_t collision_max_dat = 11;// distinct / 10;
 
     auto hfunction = get_hash_function<ps_type>(HashFunction::MODULO);
-    ps_type* data = (ps_type*) aligned_alloc(64, (data_size+2) * sizeof(ps_type));
+    ps_type* data = (ps_type*) aligned_alloc(64, data_size * sizeof(ps_type));
     Datagenerator<ps_type> *datagen = nullptr;
     
 
@@ -54,11 +73,13 @@ int main(int argc, char** argv){
     std::cout << "\nhsize change:\t";print_time(b, true);
 
     time_stamp c = time_now();
-    datagen->get_data_strided(data, data_size, distinct, collision_max_dat, seed + 1);
+    datagen->get_data_blocked(data, data_size, distinct, collision_max_dat, seed + 1);
     std::cout << "\nbuilt data gen:\t";print_time(c, true);
+    print_data(data, data_size);
+    print_data(data, data_size, hsize);
 
     time_stamp d = time_now();
-    datagen->get_probe_strided(data, data_size, 1 - (1. * collision_max_dat) / distinct, seed + 2);
+    datagen->get_probe_blocked(data, data_size, 1, seed + 2);
     std::cout << "\nprobe data gen:\t";print_time(d, true);
-    
+    print_data(data, data_size);
 }

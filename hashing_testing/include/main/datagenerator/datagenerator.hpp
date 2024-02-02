@@ -28,10 +28,21 @@ class Datagenerator{
         T * m_values = nullptr;
         size_t m_values_count = 0;
 
+        std::vector<std::vector<T>> m_blocks;
 
         void get_collision_bit_map_random(std::vector<bool> &collide, size_t space, size_t wanted, size_t seed);
 
         void get_collision_bit_map_bad(std::vector<bool> &collide, size_t space, size_t wanted, size_t seed, size_t set_collisions = 1);
+
+        void get_values_blocked(
+            std::vector<std::vector<T>> & blocks,
+            size_t number_of_blocks,
+            size_t distinct_values,
+            size_t hsize,
+            size_t collision_size,
+            size_t layout_seed,
+            bool probeing = false
+        );
 
         void get_values_strided(
             std::vector<T> &collision_data, std::vector<T> &non_collision_data, 
@@ -51,6 +62,11 @@ class Datagenerator{
         void distribute(
             T*& result, std::vector<T> raw_collision, std::vector<T> raw_non_collision, size_t data_size,
             size_t distinct_values, size_t seed, bool non_collisions_first, bool evenly_distributed
+        );
+
+        void distribute(
+            T*& result, std::vector<std::vector<T>> blocks, size_t data_size, 
+            size_t number_of_blocks, size_t seed, bool non_collisions_first, bool evenly_distributed
         );
 
         void get_ids_packed(
@@ -109,6 +125,23 @@ class Datagenerator{
         );
 
         size_t get_probe_strided(
+            T*& result,
+            size_t data_size,
+            float selectivity,
+            size_t layout_seed,
+            bool evenly_distributed = true
+        );
+
+        size_t get_data_blocked(    
+            T*& result,
+            size_t data_size,
+            size_t distinct_values,
+            size_t collision_count,
+            size_t layout_seed,
+            bool evenly_distributed = true
+        );
+
+        size_t get_probe_blocked(
             T*& result,
             size_t data_size,
             float selectivity,

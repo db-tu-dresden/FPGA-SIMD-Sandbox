@@ -169,6 +169,199 @@ size_t Datagenerator<T>::get_data_strided(
 }
 
 template<typename T>
+size_t Datagenerator<T>::get_data_blocked(    
+    T*& result,
+    size_t data_size,
+    size_t distinct_values,
+    size_t collision_size,
+    size_t layout_seed,
+    bool evenly_distributed
+){
+    collision_size += collision_size == 0;
+    size_t number_of_blocks = (distinct_values + collision_size -1) / collision_size;
+    m_blocks.clear();
+    m_blocks.resize(number_of_blocks); 
+    // std::cout << collision_size << "\t" << number_of_blocks << std::endl;
+    Datagenerator<T>::get_values_blocked(
+        m_blocks, 
+        number_of_blocks,
+        distinct_values,
+        m_bucket_count,
+        collision_size, 
+        layout_seed
+    );
+
+    // for(std::vector<T> b : m_blocks){
+    //     for(T x: b){
+    //         std::cout << x << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    Datagenerator<T>::distribute(
+        result,
+        m_blocks,
+        data_size,
+        number_of_blocks,
+        layout_seed,
+        true,
+        evenly_distributed
+    );
+    return 0;
+}
+
+template<typename T>
+size_t Datagenerator<T>::get_probe_blocked(
+    T*& result,
+    size_t data_size,
+    float selectivity,
+    size_t layout_seed,
+    bool evenly_distributed 
+){
+    // size_t collision_size = 1;
+    // if(m_blocks.size() != 0 && m_blocks[0].size() != 0){
+    //     collision_size = m_blocks[0].size();
+    // }else{
+    //     return 0;
+    // }
+    
+    if(selectivity != 1){
+        selectivity = 1;
+        std::cout << "get_probe_blocked() can't generate selectivity values other than one right now" ;
+    }
+
+    //TODO add functionality for 
+    distribute(result, m_blocks, data_size, m_blocks.size(), layout_seed, false, evenly_distributed);
+
+    return 0;
+}
+
+template<typename T>
+void Datagenerator<T>::get_values_blocked(
+    std::vector<std::vector<T>> & blocks,
+    size_t number_of_blocks,
+    size_t distinct_values,
+    size_t hsize,
+    size_t collision_size,
+    size_t layout_seed,
+    bool probeing
+){ 
+    size_t count = 0;
+    float skip = (hsize + number_of_blocks - 1) / number_of_blocks;
+    for(size_t i = 0; i < number_of_blocks; i++){
+        size_t id = skip * i;
+        size_t help = 0;
+        for(size_t e = 0; e < collision_size; e++){
+            if(!probeing){  //default non probing
+                blocks[i].push_back(m_working_set_data_matrix->get_unused_value(id, help));
+                // std::cout << "n" <<blocks[i].size() << std::endl;
+            }else{  //during probing we need to give e with otherwise we get the same value x times;
+                blocks[i].push_back(m_working_set_data_matrix->get_unused_value(id, help, true, false, e));
+                // std::cout << "p" << blocks[i].size() << std::endl;
+            }
+            count ++;
+            if(count >= distinct_values){
+                return;
+            }
+        }
+    }
+}
+
+
+//TODO:
+template<typename T>
+void Datagenerator<T>::distribute(
+    T*& result, 
+    std::vector<std::vector<T>> blocks, 
+    size_t data_size,
+    size_t number_of_blocks, 
+    size_t seed, 
+    bool non_collisions_first,
+    bool evenly_distributed
+){
+    std::vector<int64_t> val_counts;
+    std::vector<std::vector<T>> values;
+
+    size_t total_values = 0;
+    for(std::vector<T> b: blocks){
+        values.push_back(b);
+        total_values += b.size();
+    }
+
+    size_t dist = data_size + total_values - 1;
+    // std::cout << "evenly_distributed: " << evenly_distributed << std::endl;
+    // std::cout << "dist:\t" << dist << std::endl;
+    if(evenly_distributed){
+        dist = dist / total_values +1;
+    }
+    dist -= non_collisions_first;
+    // std::cout << "dist:\t" << dist << std::endl;
+
+    val_counts.resize(values.size(), dist);
+    
+
+    // for(std::vector<T> b: blocks){
+    //     for(T x : b){
+    //         std::cout << x << "\t" << std::flush;
+    //     }
+    //     std::cout << std::endl;
+    // }
+    
+    //distribute
+    size_t write_pos = 0;
+
+    for(std::vector<T> b : values){
+        for(T x: b){
+            result[write_pos] = x;
+            write_pos++;
+            if(write_pos >= data_size){
+                return;
+            }
+        }
+    }
+
+    while(write_pos < data_size && val_counts.size() > 0){
+        // std::cout << "size:\t"<<  val_counts.size() << std::endl;
+        size_t id = noise(write_pos, seed) % val_counts.size();
+        std::vector<T> block = values[id];
+        // std::cout << "\t" << id << "\t" << block.size() << "\t" << val_counts[id]<<  std::endl;
+        
+        for(T x : block){
+            result[write_pos] = x;
+            write_pos++;
+            if(write_pos >= data_size){
+                break;
+            }
+        }
+
+        // size_t start = noise(write_pos + id, seed) % block.size(); // a bit of randomness in order of elements
+        // size_t i = start;
+        // do{
+        //     result[write_pos] = block[i];
+        //     write_pos++;
+        //     if(write_pos >= data_size){
+        //         break;
+        //     }
+        //     i ++;
+        //     if(i > block.size()){
+        //         i = 0;
+        //     }
+        // }while(i != start);
+
+        val_counts[id]--;
+        if(val_counts[id] == 0){
+            vector_delete(val_counts,id);
+            vector_delete(values, id);
+        }
+    }
+
+
+    if(write_pos < data_size){
+        std::cout << "To few data points got generated" << std::endl;
+    }
+}
+
+template<typename T>
 void Datagenerator<T>::get_probe_values_random(std::vector<T> &values, size_t number, size_t seed){
     size_t id = noise(0, seed) % m_bucket_count;
     size_t space = m_bucket_count - number;

@@ -1287,7 +1287,8 @@ void probe_benchmark_data(
         for(size_t i = 0; i < num_collision_test; i++){
             std::cout << "data gen:\t" << std::flush;
             std::chrono::high_resolution_clock::time_point tb = time_now();
-            datagen->get_data_strided(data, build_data_count, distinct_value_count, collisions, seed);
+            // datagen->get_data_strided(data, build_data_count, distinct_value_count, collisions, seed);
+            datagen->get_data_blocked(data, build_data_count, distinct_value_count, collisions, seed);
             std::chrono::high_resolution_clock::time_point te = time_now();
             std::cout << "it took ";
             print_time(tb, te, false);
@@ -1478,7 +1479,9 @@ void probe_benchmark_final(
 
         std::cout << "data gen:\t" << std::flush;
         std::chrono::high_resolution_clock::time_point tb2 = time_now();
-        datagen->get_probe_strided(probe_data, probe_data_count, selectivity, seed);
+        // datagen->get_probe_strided(probe_data, probe_data_count, selectivity, seed);
+        datagen->get_probe_blocked(probe_data, probe_data_count, selectivity, seed);
+
         std::chrono::high_resolution_clock::time_point te2 = time_now();
         std::cout << "it took ";
         print_time(tb2, te2, false);
