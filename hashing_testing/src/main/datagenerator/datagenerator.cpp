@@ -177,6 +177,8 @@ size_t Datagenerator<T>::get_data_blocked(
     size_t layout_seed,
     bool evenly_distributed
 ){
+    std::cout << " b1 " << std::flush;
+
     collision_size += collision_size == 0;
     size_t number_of_blocks = (distinct_values + collision_size -1) / collision_size;
     m_blocks.clear();
@@ -190,6 +192,7 @@ size_t Datagenerator<T>::get_data_blocked(
         collision_size, 
         layout_seed
     );
+    std::cout << " b2 " << std::flush;
 
     // for(std::vector<T> b : m_blocks){
     //     for(T x: b){
@@ -207,6 +210,8 @@ size_t Datagenerator<T>::get_data_blocked(
         true,
         evenly_distributed
     );
+    std::cout << " b3 " << std::flush;
+
     return 0;
 }
 
@@ -224,6 +229,7 @@ size_t Datagenerator<T>::get_probe_blocked(
     // }else{
     //     return 0;
     // }
+    std::cout << " b1 " << std::flush;
     
     if(selectivity != 1){
         selectivity = 1;
@@ -232,6 +238,7 @@ size_t Datagenerator<T>::get_probe_blocked(
 
     //TODO add functionality for 
     distribute(result, m_blocks, data_size, m_blocks.size(), layout_seed, false, evenly_distributed);
+    std::cout << " b2 " << std::flush;
 
     return 0;
 }
@@ -248,10 +255,12 @@ void Datagenerator<T>::get_values_blocked(
 ){ 
     size_t count = 0;
     float skip = (hsize + number_of_blocks - 1) / number_of_blocks;
+    size_t last_block_size = distinct_values - ((number_of_blocks - 1) * collision_size);
+    #pragma omp parallel for num_threads(THREAD_COUNT)
     for(size_t i = 0; i < number_of_blocks; i++){
         size_t id = skip * i;
         size_t help = 0;
-        for(size_t e = 0; e < collision_size; e++){
+        for(size_t e = 0; e < collision_size && (i+1 != number_of_blocks || e < last_block_size); e++){
             if(!probeing){  //default non probing
                 blocks[i].push_back(m_working_set_data_matrix->get_unused_value(id, help));
                 // std::cout << "n" <<blocks[i].size() << std::endl;
@@ -287,6 +296,7 @@ void Datagenerator<T>::distribute(
         values.push_back(b);
         total_values += b.size();
     }
+    std::cout << "d1 " << std::flush;
 
     size_t dist = data_size + total_values - 1;
     // std::cout << "evenly_distributed: " << evenly_distributed << std::endl;
@@ -319,6 +329,7 @@ void Datagenerator<T>::distribute(
             }
         }
     }
+    std::cout << "d2 " << std::flush;
 
     while(write_pos < data_size && val_counts.size() > 0){
         // std::cout << "size:\t"<<  val_counts.size() << std::endl;
@@ -354,10 +365,10 @@ void Datagenerator<T>::distribute(
             vector_delete(values, id);
         }
     }
-
+    std::cout << "d3 " << std::flush;
 
     if(write_pos < data_size){
-        std::cout << "To few data points got generated" << std::endl;
+        std::cout << "\tWARNING: To few data points got generated\t" << std::flush;
     }
 }
 
