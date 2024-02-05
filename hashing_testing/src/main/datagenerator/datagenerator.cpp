@@ -268,10 +268,10 @@ void Datagenerator<T>::get_values_blocked(
                 blocks[i].push_back(m_working_set_data_matrix->get_unused_value(id, help, true, false, e));
                 // std::cout << "p" << blocks[i].size() << std::endl;
             }
-            count ++;
-            if(count >= distinct_values){
-                return;
-            }
+            // count ++;
+            // if(count >= distinct_values){
+            //     // return;
+            // }
         }
     }
 }
@@ -330,7 +330,7 @@ void Datagenerator<T>::distribute(
         }
     }
     std::cout << "d2 " << std::flush;
-
+    
     while(write_pos < data_size && val_counts.size() > 0){
         // std::cout << "size:\t"<<  val_counts.size() << std::endl;
         size_t id = noise(write_pos, seed) % val_counts.size();

@@ -111,15 +111,16 @@ size_t seq(size_t*&result, size_t min, size_t max, size_t step){
 std::chrono::high_resolution_clock::time_point time_begin;
 const size_t exec_node = 0;
 const size_t max_planed_collisions = 256;
-const size_t number_threads = 24;
+const size_t number_threads = 1;
+const bool blocked_data_gen = true;
 
 int main(int argc, char** argv){
     fill_tab_table();
 
     //TODO user input so we don't need to recompile all the time!
-    size_t distinct_value_count = 64 * 1024 * 1024;
+    size_t distinct_value_count = 32 * 1024 * 1024;
     size_t build_data_amount = distinct_value_count * 1;
-    size_t probe_data_amount = distinct_value_count * 8;
+    size_t probe_data_amount = distinct_value_count * 12;
 
     size_t repeats_same_data = 1;
     size_t repeats_different_data = 1;
@@ -143,8 +144,8 @@ int main(int argc, char** argv){
     Vector_Extention extentions_undertest[] = {
         // Vector_Extention::SCALAR,
         // Vector_Extention::SSE,
-        Vector_Extention::AVX2
-        // Vector_Extention::AVX512
+        // Vector_Extention::AVX2
+        Vector_Extention::AVX512
     };
     size_t num_extentions_undertest = sizeof(extentions_undertest)/ sizeof(extentions_undertest[0]);
 
@@ -154,12 +155,12 @@ int main(int argc, char** argv){
     size_t num_hashfunc_undertest = sizeof(hashfunctions_undertest) / sizeof(hashfunctions_undertest[0]);
 
     // double scale_factors[] = {1., 2., 4., 8., 16.};
-    double scale_factors[] = {4.};
+    double scale_factors[] = {8.};
     // double scale_factors[] = {8., 16.};
     size_t num_scale_factors = sizeof(scale_factors)/sizeof(scale_factors[0]);
 
 
-    size_t max_collision = 1;
+    size_t max_collision = 8;
     size_t num_collision_tests = 1;
     size_t collision_diminish = max_collision + 1;
     
@@ -182,16 +183,28 @@ int main(int argc, char** argv){
     float selectivities[] = {1};
     size_t num_select = sizeof(selectivities) / sizeof(selectivities[0]);
 
+    /*
     size_t min_mem_numa = 0;
     size_t max_mem_numa = 16;
     size_t step_size_numa = 1;
-
     size_t *hash_table_locations;
     size_t num_hash_table_locations = seq(hash_table_locations, min_mem_numa, max_mem_numa, step_size_numa);
     size_t *build_data_locations;
     size_t num_build_data_locations = seq(build_data_locations, min_mem_numa, max_mem_numa, step_size_numa);
     size_t *probe_data_locations;
     size_t num_probe_data_locations = seq(probe_data_locations, min_mem_numa, max_mem_numa, step_size_numa);
+    //*/
+    //*
+    // size_t hash_table_locations[] = {0, 1, 2, 3, 8, 9, 10, 11}; //just one socket test
+    // size_t build_data_locations[] = {0, 1, 2, 3, 8, 9, 10, 11}; //just one socket test
+    // size_t probe_data_locations[] = {0, 1, 2, 3, 8, 9, 10, 11}; //just one socket test
+    size_t hash_table_locations[] = {0, 1, 2, 3}; //just one socket test
+    size_t build_data_locations[] = {0, 1, 2, 3}; //just one socket test
+    size_t probe_data_locations[] = {0, 1, 2, 3}; //just one socket test
+    size_t num_hash_table_locations = sizeof(hash_table_locations)/sizeof(hash_table_locations[0]);
+    size_t num_build_data_locations = sizeof(build_data_locations)/sizeof(build_data_locations[0]);
+    size_t num_probe_data_locations = sizeof(probe_data_locations)/sizeof(probe_data_locations[0]);
+    //*/
 
 
     const size_t num_concurrent_build_tests = 1;
@@ -1287,8 +1300,13 @@ void probe_benchmark_data(
         for(size_t i = 0; i < num_collision_test; i++){
             std::cout << "data gen:\t" << std::flush;
             std::chrono::high_resolution_clock::time_point tb = time_now();
-            // datagen->get_data_strided(data, build_data_count, distinct_value_count, collisions, seed);
-            datagen->get_data_blocked(data, build_data_count, distinct_value_count, collisions, seed);
+            
+            if(blocked_data_gen){
+                datagen->get_data_blocked(data, build_data_count, distinct_value_count, collisions, seed);
+            }else{
+                datagen->get_data_strided(data, build_data_count, distinct_value_count, collisions, seed);
+            }
+
             std::chrono::high_resolution_clock::time_point te = time_now();
             std::cout << "it took ";
             print_time(tb, te, false);
@@ -1298,9 +1316,9 @@ void probe_benchmark_data(
                 Vector_Extention ve = extentions_undertest[ve_id];
 
                 std::stringstream config_ss;
-                config_ss <<"vector_extention,"<< config_string << ",scale,hsize,collision_count";
+                config_ss <<"vector_extention,"<< config_string << ",scale,hsize,collision_count,build_data_count";
                 std::stringstream result_ss;
-                result_ss << vector_extention_to_string(ve) << "," << result_string << "," << scale << "," << hsize << "," << collisions;
+                result_ss << vector_extention_to_string(ve) << "," << result_string << "," << scale << "," << hsize << "," << collisions << "," << build_data_count;
                 probe_benchmark_vector_extention<T>(
                     result_file_name, config_ss.str(), result_ss.str(), 
                     build_data_count, probe_data_count, datagen, 
@@ -1479,8 +1497,11 @@ void probe_benchmark_final(
 
         std::cout << "data gen:\t" << std::flush;
         std::chrono::high_resolution_clock::time_point tb2 = time_now();
-        // datagen->get_probe_strided(probe_data, probe_data_count, selectivity, seed);
-        datagen->get_probe_blocked(probe_data, probe_data_count, selectivity, seed);
+        if(blocked_data_gen){
+            datagen->get_probe_blocked(probe_data, probe_data_count, selectivity, seed);
+        }else{
+            datagen->get_probe_strided(probe_data, probe_data_count, selectivity, seed);
+        }
 
         std::chrono::high_resolution_clock::time_point te2 = time_now();
         std::cout << "it took ";
@@ -1502,9 +1523,9 @@ void probe_benchmark_final(
                 time += run_test_probe<T>(alg, probe_data, result_data, probe_data_count); 
                 
                 std::stringstream config_ss;
-                config_ss << config_string << ",selectivity,probe_location,run,time";
+                config_ss << config_string << ",selectivity,probe_location,probe_data_count,blocked_data_gen,run,time";
                 std::stringstream result_ss;
-                result_ss << result_string << "," << selectivity << "," << probe_loc << "," << run << "," << time;
+                result_ss << result_string << "," << selectivity << "," << probe_loc << "," << probe_data_count << "," << blocked_data_gen << "," << run << "," << time;
                 if(run_count == 0){
                     write_to_file(result_file_name, config_ss.str(), true);
                 }

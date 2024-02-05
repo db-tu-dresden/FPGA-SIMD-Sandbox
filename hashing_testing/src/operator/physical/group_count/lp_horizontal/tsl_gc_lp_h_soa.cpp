@@ -210,45 +210,39 @@ void TSL_gc_LP_H_SoA<SimdT, T>::probe(T*&result, T* input, size_t size){
     double block_size = size * 1.0;
     block_size /=  this->m_thread_count;
 
-    #pragma omp parallel for num_threads(this->m_thread_count) proc_bind(close)
-    for(size_t block_i = 0; block_i < this->m_thread_count; block_i++){
-        size_t st = (size_t)(block_i * block_size);
-        size_t en = (size_t)((block_i + 1) * block_size);
+    #pragma omp parallel for schedule(static, 1024) num_threads(this->m_thread_count) proc_bind(close)
+    for(size_t i = 0; i < size; i++){
+        bool stop = false;
 
-        for(size_t k = st; k < en; k++){
-            size_t i = k%size;
-            bool stop = false;
+        T inputValue = input[i];
+        T hash_key = this->m_hash_function(inputValue, HSIZE);
+        vec_t value_vec = tsl::set1<ps>(inputValue);
+        
+        while(1){
+            int64_t overflow = (hash_key + vec_elements) - HSIZE;
+            overflow = overflow < 0? 0: overflow;
+            imask_t overflow_correction_imask = tsl::to_integral<ps>(oneMask) >> overflow;
+            mask_t overflow_correction_mask = tsl::to_mask<ps>(overflow_correction_imask);
 
-            T inputValue = input[i];
-            T hash_key = this->m_hash_function(inputValue, HSIZE);
-            vec_t value_vec = tsl::set1<ps>(inputValue);
+            vec_t next_elements = tsl::loadu<ps>(overflow_correction_mask, &this->m_hash_vec[hash_key]);
+            mask_t compare_res = tsl::equal<ps>(overflow_correction_mask, value_vec, next_elements);
+            mask_t check_for_free_space = tsl::equal<ps>(overflow_correction_mask, zero_vec, next_elements);
             
-            while(1){
-                int64_t overflow = (hash_key + vec_elements) - HSIZE;
-                overflow = overflow < 0? 0: overflow;
-                imask_t overflow_correction_imask = tsl::to_integral<ps>(oneMask) >> overflow;
-                mask_t overflow_correction_mask = tsl::to_mask<ps>(overflow_correction_imask);
-
-                vec_t next_elements = tsl::loadu<ps>(overflow_correction_mask, &this->m_hash_vec[hash_key]);
-                mask_t compare_res = tsl::equal<ps>(overflow_correction_mask, value_vec, next_elements);
-                mask_t check_for_free_space = tsl::equal<ps>(overflow_correction_mask, zero_vec, next_elements);
-                
-                imask_t res_found_i = tsl::to_integral<ps>(compare_res) | tsl::to_integral<ps>(check_for_free_space);
-                
-                if(res_found_i != 0){
-                    uint64_t pos = tsl::tzc<ps>(res_found_i);
-                    result[i] = this->m_count_vec[hash_key + pos];
-                    break;
-                }else{
-                    hash_key += vec_elements;
-                    if(hash_key >= HSIZE){
-                        if(stop){
-                            result[i] = 0;
-                            break;
-                        }  
-                        stop = true;                      
-                        hash_key = 0;
-                    }
+            imask_t res_found_i = tsl::to_integral<ps>(compare_res) | tsl::to_integral<ps>(check_for_free_space);
+            
+            if(res_found_i != 0){
+                uint64_t pos = tsl::tzc<ps>(res_found_i);
+                result[i] = this->m_count_vec[hash_key + pos];
+                break;
+            }else{
+                hash_key += vec_elements;
+                if(hash_key >= HSIZE){
+                    if(stop){
+                        result[i] = 0;
+                        break;
+                    }  
+                    stop = true;                      
+                    hash_key = 0;
                 }
             }
         }
